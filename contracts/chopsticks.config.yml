@@ -1,0 +1,7 @@
+relaychain:
+  endpoint: wss://westend-rpc.polkadot.io
+parachains:
+  - endpoint: wss://westend-hub-rpc.polkadot.io
+    paraId: 1000
+  - endpoint: wss://bifrost-westend-rpc.polkadot.io
+    paraId: 2001
