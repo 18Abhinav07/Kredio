@@ -1,0 +1,199 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ISystem",
+  "sourceName": "evm/interfaces/ISystem.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "callerIsOrigin",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "callerIsRoot",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint8[33]",
+          "name": "publicKey",
+          "type": "uint8[33]"
+        }
+      ],
+      "name": "ecdsaToEthAddress",
+      "outputs": [
+        {
+          "internalType": "bytes20",
+          "name": "",
+          "type": "bytes20"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "input",
+          "type": "bytes"
+        }
+      ],
+      "name": "hashBlake128",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "digest",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "input",
+          "type": "bytes"
+        }
+      ],
+      "name": "hashBlake256",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "digest",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "minimumBalance",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "ownCodeHash",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint8[64]",
+          "name": "signature",
+          "type": "uint8[64]"
+        },
+        {
+          "internalType": "bytes",
+          "name": "message",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "publicKey",
+          "type": "bytes32"
+        }
+      ],
+      "name": "sr25519Verify",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "beneficiary",
+          "type": "address"
+        }
+      ],
+      "name": "terminate",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "input",
+          "type": "address"
+        }
+      ],
+      "name": "toAccountId",
+      "outputs": [
+        {
+          "internalType": "bytes",
+          "name": "account_id",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "weightLeft",
+      "outputs": [
+        {
+          "internalType": "uint64",
+          "name": "refTime",
+          "type": "uint64"
+        },
+        {
+          "internalType": "uint64",
+          "name": "proofSize",
+          "type": "uint64"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

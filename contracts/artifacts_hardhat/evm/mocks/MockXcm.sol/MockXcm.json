@@ -1,0 +1,134 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "MockXcm",
+  "sourceName": "evm/mocks/MockXcm.sol",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "message",
+          "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint64",
+          "name": "refTime",
+          "type": "uint64"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint64",
+          "name": "proofSize",
+          "type": "uint64"
+        }
+      ],
+      "name": "Executed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "destination",
+          "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "message",
+          "type": "bytes"
+        }
+      ],
+      "name": "Sent",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "message",
+          "type": "bytes"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint64",
+              "name": "refTime",
+              "type": "uint64"
+            },
+            {
+              "internalType": "uint64",
+              "name": "proofSize",
+              "type": "uint64"
+            }
+          ],
+          "internalType": "struct IXcm.Weight",
+          "name": "weight",
+          "type": "tuple"
+        }
+      ],
+      "name": "execute",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "destination",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "message",
+          "type": "bytes"
+        }
+      ],
+      "name": "send",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        }
+      ],
+      "name": "weighMessage",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint64",
+              "name": "refTime",
+              "type": "uint64"
+            },
+            {
+              "internalType": "uint64",
+              "name": "proofSize",
+              "type": "uint64"
+            }
+          ],
+          "internalType": "struct IXcm.Weight",
+          "name": "weight",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x60808060405234610016576102b6908161001c8239f35b600080fdfe6040608081526004908136101561001557600080fd5b600091823560e01c806347400c23146101865780637f0a3bf9146100ed5763d3b7e04d1461004257600080fd5b346100e95760603660031901126100e957803567ffffffffffffffff918282116100e557610072913691016101f6565b9091836023193601126100e557602435908082168092036100e1576044359081168091036100e157846100d27f2414996516b6050535afb8c92621efdfe249453810a9d7b01a30465e2c13f1c4965195869560608752606087019161025f565b9260208501528301520390a180f35b8580fd5b8480fd5b8280fd5b5090346100e957806003193601126100e95767ffffffffffffffff9082358281116100e55761011f90369085016101f6565b92906024359182116100e15761017261015f7fd838c4b7f903146c126466bfdd6cd31be2fddc3937bdd716b37c8961ed68830396610180943691016101f6565b919092855196868897885287019161025f565b91848303602086015261025f565b0390a180f35b5082346101f35760203660031901126101f35767ffffffffffffffff9180358381116100e9576101b8913691016101f6565b505060206101c4610229565b82815201526101d1610229565b9060206402540be4009283815201620100008152835192835251166020820152f35b80fd5b9181601f840112156102245782359167ffffffffffffffff8311610224576020838186019501011161022457565b600080fd5b604051906040820182811067ffffffffffffffff82111761024957604052565b634e487b7160e01b600052604160045260246000fd5b908060209392818452848401376000828201840152601f01601f191601019056fea2646970667358221220b459ff51372513969ea93c05d9d4aeb94157b44521e2596bdb87f2a1d9eebb2664736f6c63430008180033",
+  "deployedBytecode": "0x6040608081526004908136101561001557600080fd5b600091823560e01c806347400c23146101865780637f0a3bf9146100ed5763d3b7e04d1461004257600080fd5b346100e95760603660031901126100e957803567ffffffffffffffff918282116100e557610072913691016101f6565b9091836023193601126100e557602435908082168092036100e1576044359081168091036100e157846100d27f2414996516b6050535afb8c92621efdfe249453810a9d7b01a30465e2c13f1c4965195869560608752606087019161025f565b9260208501528301520390a180f35b8580fd5b8480fd5b8280fd5b5090346100e957806003193601126100e95767ffffffffffffffff9082358281116100e55761011f90369085016101f6565b92906024359182116100e15761017261015f7fd838c4b7f903146c126466bfdd6cd31be2fddc3937bdd716b37c8961ed68830396610180943691016101f6565b919092855196868897885287019161025f565b91848303602086015261025f565b0390a180f35b5082346101f35760203660031901126101f35767ffffffffffffffff9180358381116100e9576101b8913691016101f6565b505060206101c4610229565b82815201526101d1610229565b9060206402540be4009283815201620100008152835192835251166020820152f35b80fd5b9181601f840112156102245782359167ffffffffffffffff8311610224576020838186019501011161022457565b600080fd5b604051906040820182811067ffffffffffffffff82111761024957604052565b634e487b7160e01b600052604160045260246000fd5b908060209392818452848401376000828201840152601f01601f191601019056fea2646970667358221220b459ff51372513969ea93c05d9d4aeb94157b44521e2596bdb87f2a1d9eebb2664736f6c63430008180033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

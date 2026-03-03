@@ -1,0 +1,90 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ITesseractCompute",
+  "sourceName": "evm/interfaces/ITesseractCompute.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "assetPrecompile",
+          "type": "address"
+        }
+      ],
+      "name": "getAssetBalance",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint64[]",
+          "name": "aprs",
+          "type": "uint64[]"
+        }
+      ],
+      "name": "getBestStrategy",
+      "outputs": [
+        {
+          "internalType": "uint64",
+          "name": "bestIndex",
+          "type": "uint64"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "destination",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "message",
+          "type": "bytes"
+        }
+      ],
+      "name": "routeToParachain",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "systemInfo",
+      "outputs": [
+        {
+          "internalType": "uint64",
+          "name": "refTime",
+          "type": "uint64"
+        },
+        {
+          "internalType": "uint64",
+          "name": "proofSize",
+          "type": "uint64"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "codeHash",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
