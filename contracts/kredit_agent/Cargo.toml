@@ -1,0 +1,21 @@
+[package]
+name = "kredit_agent"
+version = "0.1.0"
+authors = ["[your_name] <[your_email]>"]
+edition = "2021"
+
+[dependencies]
+ink = { version = "6.0.0-beta.1", default-features = false }
+substrate-fixed = { version = "0.5", default-features = false }
+
+[dev-dependencies]
+ink_e2e = { version = "6.0.0-beta.1" }
+
+[lib]
+path = "lib.rs"
+
+[features]
+default = ["std"]
+std = ["ink/std"]
+ink-as-dependency = []
+e2e-tests = []

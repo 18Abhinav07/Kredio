@@ -1,40 +1,40 @@
 @import "tailwindcss";
 
 :root {
-  /* Soft Pearl Grey / White */
-  --bg-primary: #f8fafc;
-  --bg-secondary: #f1f5f9;
+  /* Light Mode - Base #F9FAFB, Surface #FFFFFF */
+  --bg-primary: #f9fafb;
+  --bg-secondary: #ffffff;
   
   /* Deep Navy / Magenta accents */
-  --brand-accent: #e81cff;    /* Polkadot Pink/Magenta */
-  --brand-subtle: #0f172a;    /* Navy */
+  --brand-accent: #e81cff;    /* Magenta */
+  --brand-subtle: #0f172a;    /* Deep Navy */
   
   --text-main: #0f172a;
-  --text-secondary: #475569;
+  --text-secondary: #64748b;
   
-  --font-primary: 'Inter', sans-serif;
+  --font-primary: var(--font-jakarta), 'Inter', sans-serif;
   
-  /* Glassmorphism Light */
-  --glass-bg: rgba(255, 255, 255, 0.6);
-  --glass-border: rgba(15, 23, 42, 0.05);
+  /* Borders */
+  --glass-bg: transparent;
+  --glass-border: rgba(15, 23, 42, 0.1);
 }
 
 .dark {
-  /* Deep Charcoal */
-  --bg-primary: #020617;
-  --bg-secondary: #0f172a;
+  /* Dark Mode - Base #060708, Surface #0D0F12 */
+  --bg-primary: #060708;
+  --bg-secondary: #0d0f12;
   
   /* Neon Pink / Cyan accents */
-  --brand-accent: #e81cff;    /* Polkadot Pink */
-  --brand-subtle: #22d3ee;    /* Cyan */
+  --brand-accent: #e81cff;    /* Neon Pink */
+  --brand-subtle: #00e2ff;    /* Cyan */
   
   --text-main: #f8fafc;
-  --text-secondary: #94a3b8;
+  --text-secondary: #64748b;
   
-  --font-primary: 'Inter', sans-serif;
+  --font-primary: var(--font-jakarta), 'Inter', sans-serif;
 
-  /* Glassmorphism Dark */
-  --glass-bg: rgba(15, 23, 42, 0.4);
+  /* Borders */
+  --glass-bg: transparent;
   --glass-border: rgba(255, 255, 255, 0.05);
 }
 

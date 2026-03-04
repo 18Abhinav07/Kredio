@@ -1,82 +1,201 @@
-import { useAccount, useReadContract, useWriteContract, useSimulateContract, useWaitForTransactionReceipt } from 'wagmi'
-import { parseUnits } from 'viem'
-import { ADDRESSES, ABIS } from '../lib/constants'
+'use client';
+import { useCallback, useState } from 'react';
+import { useAccount, usePublicClient, useWalletClient } from 'wagmi';
+import { parseUnits, formatUnits } from 'viem';
+import { ABIS } from '../lib/constants';
+import config, { isDeployed } from '../lib/addresses';
 
-export function useSwapLogic(tokenIn: string, amountIn: string, isCrossChain: boolean) {
-    const { address } = useAccount();
+type SwapState = {
+    reserveA: bigint;
+    reserveB: bigint;
+    balanceA: bigint;
+    balanceB: bigint;
+    estimatedOut: bigint;
+    isLoading: boolean;
+    error: string | null;
+};
 
-    // 1. Get Token Balances
-    const { data: balance, isLoading: isBalanceLoading } = useReadContract({
-        address: tokenIn === 'PAS' ? ADDRESSES.PAS : undefined, // Replace w/ actual XC20 address map if multiple
-        abi: ABIS.ERC20,
-        functionName: 'balanceOf',
-        args: address ? [address] : undefined,
-        query: {
-            enabled: !!address && tokenIn !== 'PAS',
-        }
+export function useSwapLogic() {
+    const { address, isConnected } = useAccount();
+    const publicClient = usePublicClient();
+    const { data: walletClient } = useWalletClient();
+
+    const [state, setState] = useState<SwapState>({
+        reserveA: 0n, reserveB: 0n,
+        balanceA: 0n, balanceB: 0n,
+        estimatedOut: 0n,
+        isLoading: false, error: null,
     });
 
-    // 2. Check Allowance
-    const { data: allowance } = useReadContract({
-        address: tokenIn === 'PAS' ? ADDRESSES.PAS : undefined,
-        abi: ABIS.ERC20,
-        functionName: 'allowance',
-        args: address ? [address, ADDRESSES.SWAP] : undefined,
-        query: {
-            enabled: !!address && tokenIn !== 'PAS',
+    // Fetch reserves and balances
+    const fetchPoolData = useCallback(async (assetA: number, assetB: number) => {
+        if (!publicClient || !address || !isDeployed(config.swap)) return;
+        try {
+            const reserves = await publicClient.readContract({
+                address: config.swap, abi: ABIS.SWAP,
+                functionName: 'getReserves', args: [assetA, assetB],
+            }) as [bigint, bigint];
+
+            // Get token addresses
+            const tokenA = await publicClient.readContract({
+                address: config.swap, abi: ABIS.SWAP,
+                functionName: 'assetPrecompile', args: [assetA],
+            }) as `0x${string}`;
+            const tokenB = await publicClient.readContract({
+                address: config.swap, abi: ABIS.SWAP,
+                functionName: 'assetPrecompile', args: [assetB],
+            }) as `0x${string}`;
+
+            // Guard: skip balanceOf if the asset isn't registered on-chain yet
+            const balA = isDeployed(tokenA)
+                ? (await publicClient.readContract({
+                    address: tokenA, abi: ABIS.ERC20,
+                    functionName: 'balanceOf', args: [address],
+                }) as bigint)
+                : 0n;
+            const balB = isDeployed(tokenB)
+                ? (await publicClient.readContract({
+                    address: tokenB, abi: ABIS.ERC20,
+                    functionName: 'balanceOf', args: [address],
+                }) as bigint)
+                : 0n;
+
+            setState(s => ({
+                ...s, reserveA: reserves[0], reserveB: reserves[1],
+                balanceA: balA, balanceB: balB, error: null,
+            }));
+        } catch (e: any) {
+            setState(s => ({ ...s, error: e.message }));
         }
-    });
+    }, [publicClient, address]);
 
-    const parsedAmount = amountIn ? parseUnits(amountIn, 18) : 0n;
-    const needsApproval = tokenIn !== 'PAS' && (allowance as bigint || 0n) < parsedAmount;
-
-    // 3. Simulate Swap (Slippage Catch)
-    const deadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 20); // 20 min
-
-    const { data: simulateSwap, error: simulateError } = useSimulateContract({
-        address: ADDRESSES.SWAP,
-        abi: ABIS.SWAP,
-        functionName: isCrossChain ? 'swapAndBridgeXCM' : 'swapExactTokensForTokens',
-        args: isCrossChain
-            ? [parsedAmount, 0n, [ADDRESSES.PAS, ADDRESSES.PAS], address, deadline, 2001, 1000000000n] // Mock args
-            : [parsedAmount, 0n, [ADDRESSES.PAS, ADDRESSES.PAS], address, deadline],
-        query: {
-            enabled: !!address && parsedAmount > 0n && !needsApproval,
+    // Estimate output amount
+    const estimateOutput = useCallback((amountIn: string, reserveIn: bigint, reserveOut: bigint, decimalsIn: number) => {
+        if (!amountIn || reserveIn === 0n || reserveOut === 0n) {
+            setState(s => ({ ...s, estimatedOut: 0n }));
+            return;
         }
-    });
-
-    // 4. Execution
-    const { data: hash, writeContract: executeRaw, isPending } = useWriteContract();
-
-    const executeApproval = () => {
-        executeRaw({
-            address: ADDRESSES.PAS,
-            abi: ABIS.ERC20,
-            functionName: 'approve',
-            args: [ADDRESSES.SWAP, parsedAmount]
-        });
-    }
-
-    const executeSwap = () => {
-        if (simulateSwap?.request) {
-            executeRaw(simulateSwap.request);
+        try {
+            const parsed = parseUnits(amountIn, decimalsIn);
+            const withFee = parsed * 997n;
+            const out = (withFee * reserveOut) / (reserveIn * 1000n + withFee);
+            setState(s => ({ ...s, estimatedOut: out }));
+        } catch {
+            setState(s => ({ ...s, estimatedOut: 0n }));
         }
-    }
+    }, []);
 
-    // 5. Receipt wait
-    const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-        hash,
-    });
+    // Execute swap
+    const executeSwap = useCallback(async (
+        assetIdIn: number, assetIdOut: number,
+        amountIn: string, minAmountOut: string,
+        decimalsIn: number,
+        decimalsOut: number,
+    ) => {
+        if (!walletClient || !publicClient || !address || !isDeployed(config.swap)) return;
+        setState(s => ({ ...s, isLoading: true, error: null }));
+        try {
+            const parsed = parseUnits(amountIn, decimalsIn);
+            const minOut = parseUnits(minAmountOut || '0', decimalsOut);
+
+            // Get token address and approve
+            const tokenIn = await publicClient.readContract({
+                address: config.swap, abi: ABIS.SWAP,
+                functionName: 'assetPrecompile', args: [assetIdIn],
+            }) as `0x${string}`;
+
+            if (!isDeployed(tokenIn)) {
+                setState(s => ({ ...s, isLoading: false, error: `Asset ${assetIdIn} not registered on swap contract` }));
+                return;
+            }
+
+            const allowance = await publicClient.readContract({
+                address: tokenIn, abi: ABIS.ERC20,
+                functionName: 'allowance', args: [address, config.swap],
+            }) as bigint;
+
+            if (allowance < parsed) {
+                const approveTx = await walletClient.writeContract({
+                    address: tokenIn, abi: ABIS.ERC20,
+                    functionName: 'approve', args: [config.swap, parsed],
+                });
+                await publicClient.waitForTransactionReceipt({ hash: approveTx });
+            }
+
+            // Execute swap
+            const tx = await walletClient.writeContract({
+                address: config.swap, abi: ABIS.SWAP,
+                functionName: 'swap',
+                args: [assetIdIn, assetIdOut, parsed, minOut],
+            });
+            await publicClient.waitForTransactionReceipt({ hash: tx });
+
+            setState(s => ({ ...s, isLoading: false }));
+            return tx;
+        } catch (e: any) {
+            setState(s => ({ ...s, isLoading: false, error: e.message }));
+        }
+    }, [walletClient, publicClient, address]);
+
+    // Execute swap + XCM bridge
+    const executeSwapAndBridge = useCallback(async (
+        assetIdIn: number, assetIdOut: number,
+        amountIn: string, minAmountOut: string,
+        xcmDestination: `0x${string}`, xcmMessage: `0x${string}`,
+        decimalsIn: number,
+        decimalsOut: number,
+    ) => {
+        if (!walletClient || !publicClient || !address || !isDeployed(config.swap)) return;
+        setState(s => ({ ...s, isLoading: true, error: null }));
+        try {
+            const parsed = parseUnits(amountIn, decimalsIn);
+            const minOut = parseUnits(minAmountOut || '0', decimalsOut);
+
+            // Approve
+            const tokenIn = await publicClient.readContract({
+                address: config.swap, abi: ABIS.SWAP,
+                functionName: 'assetPrecompile', args: [assetIdIn],
+            }) as `0x${string}`;
+
+            if (!isDeployed(tokenIn)) {
+                setState(s => ({ ...s, isLoading: false, error: `Asset ${assetIdIn} not registered on swap contract` }));
+                return;
+            }
+
+            const allowance = await publicClient.readContract({
+                address: tokenIn, abi: ABIS.ERC20,
+                functionName: 'allowance', args: [address, config.swap],
+            }) as bigint;
+
+            if (allowance < parsed) {
+                const approveTx = await walletClient.writeContract({
+                    address: tokenIn, abi: ABIS.ERC20,
+                    functionName: 'approve', args: [config.swap, parsed],
+                });
+                await publicClient.waitForTransactionReceipt({ hash: approveTx });
+            }
+
+            const tx = await walletClient.writeContract({
+                address: config.swap, abi: ABIS.SWAP,
+                functionName: 'swapAndBridgeXCM',
+                args: [assetIdIn, assetIdOut, parsed, minOut, xcmDestination, xcmMessage],
+            });
+            await publicClient.waitForTransactionReceipt({ hash: tx });
+
+            setState(s => ({ ...s, isLoading: false }));
+            return tx;
+        } catch (e: any) {
+            setState(s => ({ ...s, isLoading: false, error: e.message }));
+        }
+    }, [walletClient, publicClient, address]);
 
     return {
+        ...state,
+        fetchPoolData,
+        estimateOutput,
         executeSwap,
-        executeApproval,
-        needsApproval,
-        isPending: isPending || isConfirming,
-        isSuccess,
-        balance: balance as bigint | undefined,
-        isBalanceLoading,
-        simulationError: simulateError?.message,
-        hash
-    }
+        executeSwapAndBridge,
+        isConnected,
+        formatAmount: (v: bigint, d: number) => formatUnits(v, d),
+    };
 }

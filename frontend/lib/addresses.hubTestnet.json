@@ -1,0 +1,43 @@
+{
+  "network": "hubTestnet",
+  "chainId": 420420417,
+  "rpc": "https://eth-rpc-testnet.polkadot.io/",
+  "explorer": "https://paseo.subscan.io",
+  "contracts": {
+    "swap": "0x5750782B954d36104Eb3d5e8CBd682c50998e7bA",
+    "vault": "0x0C2EF62925D376cCBa24da6633642c26Ca8bED79",
+    "compute": null
+  },
+  "tokens": {
+    "wpas": {
+      "address": "0x013F4470EE1532CF28E7df4acDb4f7B139096D3c",
+      "assetId": 9999,
+      "decimals": 18,
+      "symbol": "WPAS",
+      "isReal": false
+    },
+    "tusdc": {
+      "address": "0x083Ba083eD4e5aB44937e2Ee72c6643feaa40860",
+      "assetId": 8888,
+      "decimals": 6,
+      "symbol": "tUSDC",
+      "isReal": false
+    },
+    "usdt": {
+      "address": "0x000007C000000000000000000000000001200000",
+      "assetId": 1984,
+      "decimals": 10,
+      "symbol": "USDT",
+      "isReal": true,
+      "note": "Mainnet reference only. Confirmed live on Passet Hub."
+    }
+  },
+  "pools": {
+    "primary": {
+      "assetA": 9999,
+      "assetB": 8888,
+      "label": "WPAS / tUSDC"
+    }
+  },
+  "deployer": "0xe37a8983570B39F305fe93D565A29F89366f3fFe"
+}

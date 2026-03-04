@@ -2,24 +2,28 @@ import { defineChain } from 'viem'
 import { http, createConfig } from 'wagmi'
 import { injected } from 'wagmi/connectors'
 
-export const paseoTestnet = defineChain({
+export const passetHub = defineChain({
     id: 420420417,
-    name: 'Polkadot Hub TestNet',
+    name: 'Passet Hub TestNet',
     nativeCurrency: { name: 'PAS', symbol: 'PAS', decimals: 18 },
     rpcUrls: {
-        default: { http: ['https://eth-rpc-testnet.polkadot.io/'], webSocket: ['wss://asset-hub-paseo-rpc.n.dwellir.com'] },
+        default: { http: ['https://eth-rpc-testnet.polkadot.io/'] },
     },
     blockExplorers: {
-        default: { name: 'Blockscout', url: 'https://blockscout-testnet.polkadot.io/' },
+        default: { name: 'Subscan', url: 'https://paseo.subscan.io/' },
     },
+    testnet: true,
 });
 
 export const wagmiConfig = createConfig({
-    chains: [paseoTestnet],
+    chains: [passetHub],
     connectors: [
         injected(),
     ],
     transports: {
-        [paseoTestnet.id]: http('https://eth-rpc-testnet.polkadot.io/'),
+        [passetHub.id]: http('https://eth-rpc-testnet.polkadot.io/'),
     },
 });
+
+// Backward compat alias
+export const paseoTestnet = passetHub;

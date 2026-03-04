@@ -10,16 +10,16 @@ export const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
     ({ className, children, variant = 'default', ...props }, ref) => {
 
         const variants = {
-            default: 'bg-white/5 border-[rgba(255,255,255,0.1)] shadow-2xl backdrop-blur-xl',
-            elevated: 'bg-white/10 border-[rgba(255,255,255,0.2)] shadow-2xl shadow-primary/5 backdrop-blur-3xl ring-1 ring-white/5',
-            subtle: 'bg-surface/30 border-glass-border border-opacity-50 backdrop-blur-md'
+            default: 'bg-white/[0.02] backdrop-blur-xl border border-white/10 shadow-2xl',
+            elevated: 'bg-white/[0.04] backdrop-blur-2xl border border-white/20 shadow-2xl',
+            subtle: 'bg-transparent border border-white/5'
         }
 
         return (
             <div
                 ref={ref}
                 className={cn(
-                    "rounded-3xl border overflow-hidden transition-all duration-300",
+                    "rounded-none transition-all duration-300",
                     variants[variant],
                     className
                 )}

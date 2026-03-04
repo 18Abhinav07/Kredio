@@ -23,8 +23,10 @@ export const TokenInput = React.forwardRef<HTMLInputElement, TokenInputProps>(
         };
 
         return (
-            <div className="flex flex-col gap-2 w-full rounded-2xl bg-black/20 p-4 border border-white/5 transition-colors focus-within:border-white/20 focus-within:bg-black/30">
-                <div className="flex justify-between items-center text-sm text-muted">
+            <div className="flex flex-col gap-3 w-full p-6 border border-white/10 bg-white/[0.02] backdrop-blur-md transition-all focus-within:border-white/20 relative group">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                <div className="flex justify-between items-center text-xs uppercase tracking-widest text-slate-500">
                     <span>{label}</span>
                     {balance !== undefined && (
                         <div className="flex gap-2 items-center">
@@ -53,7 +55,7 @@ export const TokenInput = React.forwardRef<HTMLInputElement, TokenInputProps>(
                         placeholder="0.0"
                         onChange={handleInputChange}
                         className={cn(
-                            "flex w-full bg-transparent text-3xl font-medium outline-none placeholder:text-muted/50 disabled:cursor-not-allowed disabled:opacity-50",
+                            "flex w-full bg-transparent text-5xl font-extralight tracking-tighter outline-none placeholder:text-muted/30 disabled:cursor-not-allowed disabled:opacity-50",
                             className
                         )}
                         {...props}
@@ -62,9 +64,9 @@ export const TokenInput = React.forwardRef<HTMLInputElement, TokenInputProps>(
                     <button
                         type="button"
                         onClick={onTokenSelect}
-                        className="flex items-center gap-2 rounded-full bg-surface/50 hover:bg-surface border border-white/5 px-4 py-2 text-foreground font-semibold shadow-sm transition-all flex-shrink-0"
+                        className="flex items-center gap-2 rounded-none bg-transparent hover:bg-white/5 border border-white/10 px-4 py-2 text-foreground font-medium text-sm tracking-wide transition-all flex-shrink-0"
                     >
-                        {tokenIcon && <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">{tokenIcon}</div>}
+                        {tokenIcon && <div className="w-5 h-5 flex items-center justify-center overflow-hidden">{tokenIcon}</div>}
                         <span>{tokenSymbol || 'Select'}</span>
                         <svg className="w-4 h-4 text-muted mx-[-2px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

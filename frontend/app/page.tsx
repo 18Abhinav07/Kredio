@@ -2,8 +2,9 @@
 
 import { useProtocolStore } from '../lib/store'
 import { SwapWidget } from '../components/modules/SwapWidget'
-import { StakeWidget } from '../components/modules/StakeWidget'
 import { VaultDashboard } from '../components/modules/VaultDashboard'
+import { ComputeDashboard } from '../components/modules/ComputeDashboard'
+import { HomeDashboard } from '../components/modules/HomeDashboard'
 import { AnimatePresence, motion } from 'framer-motion'
 
 export default function Home() {
@@ -11,10 +12,11 @@ export default function Home() {
 
     const getPageContext = () => {
         switch (activeTab) {
+            case 'home': return <HomeDashboard key="home" />;
             case 'swap': return <SwapWidget key="swap" />;
-            case 'stake': return <StakeWidget key="stake" />;
             case 'vault': return <VaultDashboard key="vault" />;
-            default: return null;
+            case 'compute': return <ComputeDashboard key="compute" />;
+            default: return <HomeDashboard key="home" />;
         }
     }
 
@@ -27,7 +29,7 @@ export default function Home() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -15 }}
                     transition={{ duration: 0.3, ease: 'easeInOut' }}
-                    className="w-full flex justify-center h-full items-center"
+                    className="w-full flex justify-center items-start"
                 >
                     {getPageContext()}
                 </motion.div>
