@@ -8,7 +8,7 @@ import config from '../../../lib/addresses';
 import { ABIS } from '../../../lib/constants';
 import { formatTokenAmount, cn } from '../../../lib/utils';
 import { parseUsdcInput } from '../../../lib/input';
-import { MarketModeSwitch, PageShell, StateNotice } from '../../../components/modules/ProtocolUI';
+import { PageShell, StateNotice } from '../../../components/modules/ProtocolUI';
 import { bpsToPercent, fmtToken, formatHealthFactor, healthState, tierLabel, useUserPortfolio } from '../../../hooks/useProtocolData';
 import { useProtocolActions } from '../../../hooks/useProtocolActions';
 import { useAccess } from '../../../hooks/useAccess';
@@ -246,7 +246,7 @@ function BorrowStep({ collateralAtoms, maxBorrowAtoms, onSuccess }: {
                 className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-3">
                 <div className="flex items-center gap-2 text-emerald-300 font-semibold text-sm"><Check /> Borrowed {borrowDisplay} mUSDC</div>
                 <p className="text-xs text-slate-400">Your position is active. Manage repayments, view health, and withdraw collateral from your positions page.</p>
-                <Link href="/positions"
+                <Link href="/dashboard"
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-300 hover:text-indigo-200 transition-colors">
                     View your position →
                 </Link>
@@ -331,8 +331,7 @@ export default function BorrowUsdcPage() {
     }, [portfolio.loading, portfolio.lendingCollateralWallet, scoreRaw]);
 
     return (
-        <PageShell title="Borrow / USDC" subtitle="Deposit mUSDC collateral, then borrow based on your credit score.">
-            <MarketModeSwitch base="/borrow" active="usdc" />
+        <PageShell title="Borrow" subtitle="Deposit mUSDC collateral, then borrow based on your credit score.">
             <div className="max-w-lg mx-auto space-y-4">
                 {!isConnected && <StateNotice tone="info" message="Connect MetaMask via the header to borrow." />}
                 {isConnected && isWrongNetwork && <StateNotice tone="error" message="Switch to the correct network to continue." />}
@@ -340,7 +339,7 @@ export default function BorrowUsdcPage() {
                 {isConnected && !isWrongNetwork && hasActivePosition && (
                     <div className="space-y-2">
                         <StateNotice tone="warning" message="You have an active borrow position. Repay it first before opening a new one." />
-                        <Link href="/positions"
+                        <Link href="/dashboard"
                             className="inline-flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 transition-colors font-medium">
                             Manage your position →
                         </Link>

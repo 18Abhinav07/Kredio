@@ -16,7 +16,7 @@ import {
 import config from '../../../lib/addresses';
 import { ABIS } from '../../../lib/constants';
 import { formatDisplayBalance, formatTokenAmount, cn } from '../../../lib/utils';
-import { PageShell, MarketModeSwitch, StatRow, StateNotice } from '../../../components/modules/ProtocolUI';
+import { PageShell, StatRow, StateNotice } from '../../../components/modules/ProtocolUI';
 import { useUserPortfolio, useGlobalProtocolData, formatHealthFactor, healthState, fmtToken, fmtOraclePrice8 } from '../../../hooks/useProtocolData';
 import { useProtocolActions } from '../../../hooks/useProtocolActions';
 
@@ -266,7 +266,7 @@ function BorrowStep({ depositedWei, maxBorrowAtoms, onSuccess }: {
                 className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-3">
                 <div className="flex items-center gap-2 text-emerald-300 font-semibold text-sm"><Check /> Borrowed {borrowDisplay} mUSDC</div>
                 <p className="text-xs text-slate-400">Your position is active. Manage repayments, view health, and withdraw collateral from your positions page.</p>
-                <Link href="/positions"
+                <Link href="/dashboard"
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-300 hover:text-indigo-200 transition-colors">
                     View your position →
                 </Link>
@@ -404,7 +404,7 @@ function HubTab() {
             {isConnected && (portfolio.pasPosition[0] > 0n || portfolio.pasPosition[2] > 0n) && (
                 <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 px-4 py-3 flex items-center justify-between gap-3">
                     <p className="text-xs text-slate-400">You have an active PAS borrow position.</p>
-                    <Link href="/positions"
+                    <Link href="/dashboard"
                         className="text-xs font-semibold text-indigo-300 hover:text-indigo-200 transition-colors shrink-0">
                         Manage position →
                     </Link>
@@ -643,17 +643,18 @@ export default function BorrowPasPage() {
         active ? 'bg-white text-black border-white' : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
     );
     return (
-        <PageShell title="Borrow / PAS Collateral" subtitle="Deposit PAS as collateral and borrow mUSDC from KredioPASMarket.">
-            <MarketModeSwitch base="/borrow" active="pas" />
-            <div className="inline-flex gap-1 rounded-xl border border-white/10 bg-black/30 p-1 mt-2">
-                <button className={tabCls(source === 'hub')} onClick={() => setSource('hub')}>PAS on Hub</button>
-                <button className={tabCls(source === 'people')} onClick={() => setSource('people')}>PAS on People Chain</button>
+        <PageShell title="Borrow" subtitle="Deposit PAS as collateral and borrow mUSDC from KredioPASMarket.">
+            <div className="max-w-lg mx-auto space-y-4">
+                <div className="inline-flex gap-1 rounded-xl border border-white/10 bg-black/30 p-1">
+                    <button className={tabCls(source === 'hub')} onClick={() => setSource('hub')}>PAS on Hub</button>
+                    <button className={tabCls(source === 'people')} onClick={() => setSource('people')}>PAS on People Chain</button>
+                </div>
+                <AnimatePresence mode="wait">
+                    <motion.div key={source} initial={{ opacity: 0, x: source === 'hub' ? -8 : 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                        {source === 'hub' ? <HubTab /> : <PeopleTab />}
+                    </motion.div>
+                </AnimatePresence>
             </div>
-            <AnimatePresence mode="wait">
-                <motion.div key={source} initial={{ opacity: 0, x: source === 'hub' ? -8 : 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                    {source === 'hub' ? <HubTab /> : <PeopleTab />}
-                </motion.div>
-            </AnimatePresence>
         </PageShell>
     );
 }
