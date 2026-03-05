@@ -6,7 +6,7 @@ import config from '../../lib/addresses';
 import { ABIS } from '../../lib/constants';
 import { validAddress } from '../../lib/input';
 import { useProtocolActions } from '../../hooks/useProtocolActions';
-import { bpsToPercent } from '../../hooks/useProtocolData';
+import { bpsToPercent, formatHealthFactor } from '../../hooks/useProtocolData';
 import { useActionLog } from '../../components/providers/ActionLogProvider';
 import { ActionButton, ActionInput, Grid, PageShell, Panel, StatRow } from '../../components/modules/ProtocolUI';
 import { useAccess } from '../../hooks/useAccess';
@@ -86,9 +86,9 @@ export default function LiquidatePage() {
                     <ActionInput label="Borrower Address" value={borrowerInput} onChange={setBorrowerInput} placeholder="0x…" />
                     <ActionButton label="Load Health" loading={busy} disabled={busy || !borrower} onClick={inspect} />
                     <StatRow label="Lending Position Active" value={exists.lending ? 'Yes' : 'No'} />
-                    <StatRow label="Lending Health" value={bpsToPercent(lendingHealth)} tone={Number(lendingHealth) < 11000 ? 'red' : Number(lendingHealth) < 15000 ? 'yellow' : 'green'} />
+                    <StatRow label="Lending Health" value={formatHealthFactor(lendingHealth)} tone={Number(lendingHealth) < 11000 ? 'red' : Number(lendingHealth) < 15000 ? 'yellow' : 'green'} />
                     <StatRow label="PAS Position Active" value={exists.pas ? 'Yes' : 'No'} />
-                    <StatRow label="PAS Health" value={bpsToPercent(pasHealth)} tone={Number(pasHealth) < 11000 ? 'red' : Number(pasHealth) < 15000 ? 'yellow' : 'green'} />
+                    <StatRow label="PAS Health" value={formatHealthFactor(pasHealth)} tone={Number(pasHealth) < 11000 ? 'red' : Number(pasHealth) < 15000 ? 'yellow' : 'green'} />
                 </Panel>
 
                 <Panel title="Liquidator Actions" subtitle="Admin-only liquidation controls for at-risk positions.">

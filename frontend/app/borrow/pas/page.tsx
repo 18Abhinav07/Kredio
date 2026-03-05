@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useProtocolActions } from '../../../hooks/useProtocolActions';
-import { bpsToPercent, fmtToken, healthState, useGlobalProtocolData, useUserPortfolio } from '../../../hooks/useProtocolData';
+import { formatHealthFactor, bpsToPercent, fmtToken, fmtOraclePrice8, healthState, useGlobalProtocolData, useUserPortfolio } from '../../../hooks/useProtocolData';
 import { parsePasInput, parseUsdcInput } from '../../../lib/input';
 import config from '../../../lib/addresses';
 import { ActionButton, ActionInput, Grid, MarketModeSwitch, PageShell, Panel, StatRow } from '../../../components/modules/ProtocolUI';
@@ -52,8 +52,8 @@ export default function BorrowPasPage() {
                     <StatRow label="Accrued" value={`${fmtToken(portfolio.pasPosition[3], 6, 4)} mUSDC`} />
                     <StatRow label="Total Owed" value={`${fmtToken(portfolio.pasPosition[4], 6, 2)} mUSDC`} />
                     <StatRow label="Interest" value={bpsToPercent(portfolio.pasPosition[5])} />
-                    <StatRow label="Health Ratio" value={bpsToPercent(portfolio.pasHealthRatio)} tone={healthTone === 'red' ? 'red' : healthTone === 'yellow' ? 'yellow' : 'green'} />
-                    <StatRow label="Oracle Price (8d)" value={oracle.price8.toString()} />
+                    <StatRow label="Health Ratio" value={formatHealthFactor(portfolio.pasHealthRatio)} tone={healthTone === 'red' ? 'red' : healthTone === 'yellow' ? 'yellow' : 'green'} />
+                    <StatRow label="Oracle Price" value={fmtOraclePrice8(oracle.price8)} />
                     <StatRow label="Oracle Crash" value={oracle.isCrashed ? 'True' : 'False'} tone={oracle.isCrashed ? 'red' : 'green'} />
                 </Panel>
 

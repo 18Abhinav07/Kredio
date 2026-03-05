@@ -5,7 +5,7 @@ import { useAccount } from 'wagmi';
 import config from '../../../lib/addresses';
 import { parseUsdcInput } from '../../../lib/input';
 import { useProtocolActions } from '../../../hooks/useProtocolActions';
-import { bpsToPercent, fmtToken, healthState, useUserPortfolio } from '../../../hooks/useProtocolData';
+import { bpsToPercent, fmtToken, formatHealthFactor, healthState, useUserPortfolio } from '../../../hooks/useProtocolData';
 import { ActionButton, ActionInput, Grid, MarketModeSwitch, PageShell, Panel, StatRow } from '../../../components/modules/ProtocolUI';
 import { useActionLog } from '../../../components/providers/ActionLogProvider';
 import { useAccess } from '../../../hooks/useAccess';
@@ -49,7 +49,7 @@ export default function BorrowUsdcPage() {
                     <StatRow label="Accrued" value={`${fmtToken(portfolio.lendingPosition[2], 6, 4)} mUSDC`} />
                     <StatRow label="Total Owed" value={`${fmtToken(portfolio.lendingPosition[3], 6, 2)} mUSDC`} />
                     <StatRow label="Interest" value={bpsToPercent(portfolio.lendingPosition[4])} />
-                    <StatRow label="Health Ratio" value={bpsToPercent(portfolio.lendingHealthRatio)} tone={healthTone === 'red' ? 'red' : healthTone === 'yellow' ? 'yellow' : 'green'} />
+                    <StatRow label="Health Ratio" value={formatHealthFactor(portfolio.lendingHealthRatio)} tone={healthTone === 'red' ? 'red' : healthTone === 'yellow' ? 'yellow' : 'green'} />
                 </Panel>
 
                 <Panel title="Borrower Actions" subtitle="Approve mUSDC before collateral deposit.">

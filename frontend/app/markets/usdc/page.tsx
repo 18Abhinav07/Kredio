@@ -1,7 +1,7 @@
 "use client";
 
 import { Grid, PageShell, Panel, StateNotice, StatRow, StatRowSkeleton } from '../../../components/modules/ProtocolUI';
-import { bpsToPercent, fmtToken, healthState, tierLabel, useGlobalProtocolData, useUserPortfolio, useUserScore } from '../../../hooks/useProtocolData';
+import { formatHealthFactor, bpsToPercent, fmtToken, healthState, tierLabel, useGlobalProtocolData, useUserPortfolio, useUserScore } from '../../../hooks/useProtocolData';
 
 export default function MarketsUsdcPage() {
     const { lending, refresh, loading, error } = useGlobalProtocolData();
@@ -33,7 +33,7 @@ export default function MarketsUsdcPage() {
                     <StatRow label="Total Owed" value={`${fmtToken(portfolio.lendingPosition[3], 6, 2)} mUSDC`} />
                     <StatRow label="Rate" value={bpsToPercent(portfolio.lendingPosition[4])} />
                     <StatRow label="Tier" value={tierLabel(portfolio.lendingPosition[5])} />
-                    <StatRow label="Health" value={bpsToPercent(portfolio.lendingHealthRatio)} tone={healthTone === 'red' ? 'red' : healthTone === 'yellow' ? 'yellow' : 'green'} />
+                    <StatRow label="Health" value={formatHealthFactor(portfolio.lendingHealthRatio)} tone={healthTone === 'red' ? 'red' : healthTone === 'yellow' ? 'yellow' : 'green'} />
                     {portfolio.error ? <StateNotice tone="warning" message={portfolio.error} /> : null}
                 </Panel>
             </Grid>

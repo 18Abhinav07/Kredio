@@ -8,13 +8,19 @@ const { ethers } = require('ethers');
 
 // ---------- Config ----------
 const MODE = (process.env.MODE || 'DEMO').toUpperCase();
-const TICK_MS = MODE === 'REAL' ? 24 * 60 * 60 * 1000 : 60 * 1000;
+const DEFAULT_TICK_MS = MODE === 'REAL' ? 15 * 60 * 1000 : 60 * 1000;
+const TICK_MS = Number(process.env.TICK_MS || DEFAULT_TICK_MS);
 const RPC = process.env.RPC || 'https://eth-rpc-testnet.polkadot.io/';
 const ORACLE_ADDR = process.env.ORACLE;
 const MARKET_ADDR = process.env.MARKET;
 const KEY = process.env.KEY;
 const PORT = Number(process.env.PORT || 3001);
 const CRASH_PRICE = process.env.CRASH_PRICE_8DEC ? BigInt(process.env.CRASH_PRICE_8DEC) : 250000000n;
+
+if (!Number.isFinite(TICK_MS) || TICK_MS < 10_000) {
+    console.error('Invalid TICK_MS: expected a number >= 10000 (ms)');
+    process.exit(1);
+}
 
 if (!ORACLE_ADDR || !KEY) {
     console.error('Missing env: ORACLE and KEY are required');
@@ -54,6 +60,7 @@ const market = MARKET_ADDR ? new ethers.Contract(MARKET_ADDR, marketAbi, provide
 let index = 0;
 let lastTickAt = Date.now();
 let ticking = false;
+let effectiveTickMs = TICK_MS;
 
 // Cached status served by HTTP handler without RPC calls
 let cachedState = {
@@ -103,8 +110,26 @@ function logTick(info) {
 
 function nextTickInSeconds() {
     const elapsed = Date.now() - lastTickAt;
-    const remain = Math.max(0, TICK_MS - elapsed);
+    const remain = Math.max(0, effectiveTickMs - elapsed);
     return Math.floor(remain / 1000);
+}
+
+async function alignTickWithStalenessLimit() {
+    if (!market) return;
+    try {
+        const limit = Number(await withTimeout(market.stalenessLimit(), 8000, 'stalenessLimit'));
+        if (!Number.isFinite(limit) || limit <= 0) return;
+
+        const safeTickMs = Math.max(10_000, Math.floor(limit * 1000 * 0.8));
+        if (effectiveTickMs > safeTickMs) {
+            console.warn(
+                `[WARN] TICK_MS (${effectiveTickMs}ms) exceeds safe oracle cadence for stalenessLimit=${limit}s; capping to ${safeTickMs}ms`
+            );
+            effectiveTickMs = safeTickMs;
+        }
+    } catch (err) {
+        console.warn('[WARN] Could not read market stalenessLimit, using configured TICK_MS:', err.message || err);
+    }
 }
 
 // ---------- Tick loop ----------
@@ -147,7 +172,15 @@ async function tick(manual = false) {
     }
 }
 
-setInterval(() => { tick(false); }, TICK_MS);
+async function startTicker() {
+    await alignTickWithStalenessLimit();
+    setInterval(() => { tick(false); }, effectiveTickMs);
+}
+
+startTicker().catch((err) => {
+    console.error('Failed to start ticker:', err.message || err);
+    process.exit(1);
+});
 
 // ---------- HTTP server ----------
 const server = http.createServer(async (req, res) => {
@@ -216,5 +249,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`Oracle feeder running on port ${PORT} mode=${MODE} tick=${TICK_MS / 1000}s`);
+    console.log(`Oracle feeder running on port ${PORT} mode=${MODE} tick=${effectiveTickMs / 1000}s`);
 });

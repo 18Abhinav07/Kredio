@@ -5,12 +5,13 @@ import { formatUnits } from 'viem';
 import config, { isDeployed } from '../../lib/addresses';
 import { ABIS } from '../../lib/constants';
 import { ALL_TOKENS, TUSDC, type TokenDef } from '../../lib/tokens';
+import { formatTokenAmount } from '../../lib/utils';
 
 /* ── Row data ─────────────────────────────────────────────────────── */
 type Row = { token: TokenDef; balance: string; raw: bigint };
 
 /* ── Helpers ──────────────────────────────────────────────────────── */
-const fmt = (v: bigint, d: number) => parseFloat(formatUnits(v, d)).toFixed(d > 10 ? 4 : 2);
+const fmt = (v: bigint, d: number) => formatTokenAmount(v, d, d > 10 ? 4 : 2, false);
 
 const readErc20 = async (
     pc: ReturnType<typeof usePublicClient>,

@@ -1,7 +1,7 @@
 "use client";
 
 import { Grid, PageShell, Panel, StateNotice, StatRow, StatRowSkeleton } from '../../../components/modules/ProtocolUI';
-import { bpsToPercent, fmtToken, healthState, tierLabel, useGlobalProtocolData, useUserPortfolio } from '../../../hooks/useProtocolData';
+import { bpsToPercent, fmtToken, fmtOraclePrice8, fmtCount, fmtTimestamp, healthState, tierLabel, useGlobalProtocolData, useUserPortfolio, formatHealthFactor } from '../../../hooks/useProtocolData';
 
 export default function MarketsPasPage() {
     const { pasMarket, oracle, refresh, loading, error } = useGlobalProtocolData();
@@ -21,9 +21,9 @@ export default function MarketsPasPage() {
                 </Panel>
 
                 <Panel title="Oracle">
-                    <StatRow label="Price (8d)" value={oracle.price8.toString()} />
-                    <StatRow label="Round ID" value={oracle.roundId.toString()} />
-                    <StatRow label="Updated At" value={oracle.updatedAt.toString()} />
+                    <StatRow label="Price" value={fmtOraclePrice8(oracle.price8)} />
+                    <StatRow label="Round ID" value={fmtCount(oracle.roundId)} />
+                    <StatRow label="Updated" value={fmtTimestamp(oracle.updatedAt)} />
                     <StatRow label="Crash Mode" value={oracle.isCrashed ? 'True' : 'False'} tone={oracle.isCrashed ? 'red' : 'green'} />
                 </Panel>
             </Grid>
@@ -42,15 +42,15 @@ export default function MarketsPasPage() {
                     <StatRow label="Total Owed" value={`${fmtToken(portfolio.pasPosition[4], 6, 2)} mUSDC`} />
                     <StatRow label="Rate" value={bpsToPercent(portfolio.pasPosition[5])} />
                     <StatRow label="Tier" value={tierLabel(portfolio.pasPosition[6])} />
-                    <StatRow label="Health" value={bpsToPercent(portfolio.pasHealthRatio)} tone={healthTone === 'red' ? 'red' : healthTone === 'yellow' ? 'yellow' : 'green'} />
+                    <StatRow label="Health" value={formatHealthFactor(portfolio.pasHealthRatio)} tone={healthTone === 'red' ? 'red' : healthTone === 'yellow' ? 'yellow' : 'green'} />
                     {portfolio.error ? <StateNotice tone="warning" message={portfolio.error} /> : null}
                 </Panel>
 
                 <Panel title="Wallet Context">
                     <StatRow label="Native PAS Balance" value={fmtToken(portfolio.nativePas, 18, 4)} />
                     <StatRow label="mUSDC Collateral Wallet" value={`${fmtToken(portfolio.pasCollateralWallet, 6, 2)} mUSDC`} />
-                    <StatRow label="Repayments" value={portfolio.pasRepaymentCount.toString()} />
-                    <StatRow label="Defaults" value={portfolio.pasDefaultCount.toString()} />
+                    <StatRow label="Repayments" value={fmtCount(portfolio.pasRepaymentCount)} />
+                    <StatRow label="Defaults" value={fmtCount(portfolio.pasDefaultCount)} />
                 </Panel>
             </Grid>
         </PageShell>

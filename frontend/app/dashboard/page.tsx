@@ -2,7 +2,7 @@
 
 import { useAccount } from 'wagmi';
 import { Grid, PageShell, Panel, StateNotice, StatRow, StatRowSkeleton } from '../../components/modules/ProtocolUI';
-import { bpsToPercent, fmtToken, useGlobalProtocolData, useUserPortfolio, useUserScore, tierLabel } from '../../hooks/useProtocolData';
+import { bpsToPercent, fmtToken, fmtOraclePrice8, fmtCount, fmtTimestamp, useGlobalProtocolData, useUserPortfolio, useUserScore, tierLabel } from '../../hooks/useProtocolData';
 
 export default function DashboardPage() {
     const { address, isConnected } = useAccount();
@@ -48,14 +48,14 @@ export default function DashboardPage() {
 
                 <Panel title="Wallet & Score" subtitle="Connected account risk posture and performance history.">
                     <StatRow label="Wallet" value={isConnected ? `${address?.slice(0, 6)}…${address?.slice(-4)}` : 'Not connected'} />
-                    <StatRow label="Score" value={score.score.score.toString()} />
+                    <StatRow label="Score" value={fmtCount(score.score.score)} />
                     <StatRow label="Tier" value={tierLabel(score.score.tier)} />
                     <StatRow label="Collateral Ratio" value={bpsToPercent(score.score.collateralRatioBps)} />
                     <StatRow label="Interest Rate" value={bpsToPercent(score.score.interestRateBps)} />
-                    <StatRow label="Lending Repayments" value={portfolio.lendingRepaymentCount.toString()} />
-                    <StatRow label="Lending Defaults" value={portfolio.lendingDefaultCount.toString()} />
-                    <StatRow label="PAS Repayments" value={portfolio.pasRepaymentCount.toString()} />
-                    <StatRow label="PAS Defaults" value={portfolio.pasDefaultCount.toString()} />
+                    <StatRow label="Lending Repayments" value={fmtCount(portfolio.lendingRepaymentCount)} />
+                    <StatRow label="Lending Defaults" value={fmtCount(portfolio.lendingDefaultCount)} />
+                    <StatRow label="PAS Repayments" value={fmtCount(portfolio.pasRepaymentCount)} />
+                    <StatRow label="PAS Defaults" value={fmtCount(portfolio.pasDefaultCount)} />
                     {!portfolio.loading && portfolio.lendingDeposit === 0n && portfolio.pasDeposit === 0n
                         ? <StateNotice tone="info" message="No lender positions yet. Open Lend routes to supply liquidity." />
                         : null}
@@ -65,9 +65,9 @@ export default function DashboardPage() {
 
             <Grid>
                 <Panel title="Oracle Status" subtitle="PAS valuation source and crash status.">
-                    <StatRow label="PAS Price (8d)" value={oracle.price8.toString()} />
-                    <StatRow label="Round ID" value={oracle.roundId.toString()} />
-                    <StatRow label="Updated At" value={oracle.updatedAt.toString()} />
+                    <StatRow label="PAS Price" value={fmtOraclePrice8(oracle.price8)} />
+                    <StatRow label="Round ID" value={fmtCount(oracle.roundId)} />
+                    <StatRow label="Updated" value={fmtTimestamp(oracle.updatedAt)} />
                     <StatRow label="Crash Mode" value={oracle.isCrashed ? 'Active' : 'Normal'} tone={oracle.isCrashed ? 'red' : 'green'} />
                     <button onClick={refresh} className="text-xs text-cyan-300 hover:underline">Refresh Oracle</button>
                 </Panel>

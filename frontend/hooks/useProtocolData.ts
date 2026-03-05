@@ -1,10 +1,10 @@
 'use client';
 
 import * as React from 'react';
-import { formatUnits } from 'viem';
 import { useAccount, useBalance, usePublicClient } from 'wagmi';
 import config from '../lib/addresses';
 import { ABIS } from '../lib/constants';
+import { formatInteger, formatTokenAmount } from '../lib/utils';
 
 export type MarketSnapshot = {
     totalDeposited: bigint;
@@ -292,12 +292,40 @@ export function bpsToPercent(bps: bigint | number, digits = 2) {
     return `${(raw / 100).toFixed(digits)}%`;
 }
 
+export function formatHealthFactor(bps: bigint | number, digits = 2) {
+    const raw = typeof bps === 'number' ? bps : Number(bps);
+    // If it's a huge number (like type(uint256).max), meaning no debt, show infinity
+    if (raw > 1e18) return '∞';
+    return (raw / 1e18).toFixed(digits);
+}
+
 export function fmtUsd6(value: bigint) {
-    return Number(formatUnits(value, 6));
+    return formatTokenAmount(value, 6, 2, false);
 }
 
 export function fmtToken(value: bigint, decimals: number, digits = 4) {
-    return Number(formatUnits(value, decimals)).toFixed(digits);
+    return formatTokenAmount(value, decimals, digits, false);
+}
+
+export function fmtCount(value: bigint | number) {
+    return formatInteger(value);
+}
+
+export function fmtOraclePrice8(value: bigint) {
+    return `$${formatTokenAmount(value, 8, 4, true)}`;
+}
+
+export function fmtTimestamp(seconds: bigint) {
+    const millis = Number(seconds) * 1000;
+    if (!Number.isFinite(millis) || millis <= 0) return 'N/A';
+    return new Date(millis).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+    });
 }
 
 export function healthState(healthBps: bigint) {
