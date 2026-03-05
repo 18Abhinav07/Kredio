@@ -15,10 +15,10 @@ function txExplorerUrl(txHash: string, chain?: 'hub' | 'people'): string {
 
 /* ── Level colour tokens ──────────────────────────────────────────────────── */
 const LEVEL: Record<string, { dot: string; border: string; bg: string; label: string }> = {
-    info:    { dot: 'bg-blue-400',    border: 'border-blue-500/20',    bg: 'bg-blue-500/5',    label: 'text-blue-300' },
+    info: { dot: 'bg-blue-400', border: 'border-blue-500/20', bg: 'bg-blue-500/5', label: 'text-blue-300' },
     success: { dot: 'bg-emerald-400', border: 'border-emerald-500/20', bg: 'bg-emerald-500/5', label: 'text-emerald-300' },
-    warning: { dot: 'bg-amber-400',   border: 'border-amber-500/20',   bg: 'bg-amber-500/5',   label: 'text-amber-300' },
-    error:   { dot: 'bg-rose-400',    border: 'border-rose-500/20',    bg: 'bg-rose-500/5',    label: 'text-rose-300' },
+    warning: { dot: 'bg-amber-400', border: 'border-amber-500/20', bg: 'bg-amber-500/5', label: 'text-amber-300' },
+    error: { dot: 'bg-rose-400', border: 'border-rose-500/20', bg: 'bg-rose-500/5', label: 'text-rose-300' },
 };
 
 const MARKET_TAG: Record<string, string> = { lending: 'USDC', pas: 'PAS', system: 'SYS' };
