@@ -9,6 +9,7 @@
 - KredioPASMarket (v1 — DEPRECATED, tx 0x82bebb136ca546b816908f40617916b545092e7d935c11249db8536e537d15a5): 0x079028376Dbb513C7240077b111E21045dc34770
 - KredioPASMarket (v2 — repay fix, tx 0x3b2e839eca6ba813a20ea836aae2463468ec0b4f0ceaad3ec5888d73289e3edb): 0xEB07B0A98b974552E79055C00d92dA04affEef71
 - KredioPASMarket (v3 — withdraw fix, tx 0x567730d88e21373ce15c32f9ab35a818eb5d138c70d427e378406673f3acb4b4): 0xE748Afa4c5e5bDD3c31c779759Baf294dFb7f95E
+- KredioSwap (v1, tx 0x729a0ed9dcdd72f0bc8cf391f407b2513bde627a99667741ec20dea011d68ada): 0xaF1d183F4550500Beb517A3249780290A88E6e39
 
 Accounts used in testing
 - ADMIN: 0xe37a8983570B39F305fe93D565A29F89366f3fFe
@@ -18,6 +19,8 @@ Accounts used in testing
 Notes
 - Pool seeded with 20,000,000,000 USDC liquidity; totalBorrowed=0 after demo liquidation.
 - Demo-mode liquidation executed with 1000x rate multiplier (borrow 823,000,000 vs 1,000,000,000 collateral); liquidated by USER2 once health < collateralRatioBps.
+- KredioSwap reserve seeded via `fundReserve(100000000000)`; `reserveBalance()` = 100000000000.
+- KredioSwap `quoteSwap(1e18)` at current oracle price returns 5020693 mUSDC units.
 
 FINAL-SIGNOFF (Phase 1 + 2)
 - Date: 2026-03-05

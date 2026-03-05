@@ -1,10 +1,10 @@
 'use client';
 import * as React from 'react';
-import { useAccount, useBalance, usePublicClient, useWalletClient } from 'wagmi';
+import { useAccount, useBalance, usePublicClient } from 'wagmi';
 import { formatUnits } from 'viem';
 import config, { isDeployed } from '../../lib/addresses';
 import { ABIS } from '../../lib/constants';
-import { ALL_TOKENS, TUSDC, type TokenDef } from '../../lib/tokens';
+import { ALL_TOKENS, type TokenDef } from '../../lib/tokens';
 import { formatTokenAmount } from '../../lib/utils';
 
 /* ── Row data ─────────────────────────────────────────────────────── */
@@ -37,12 +37,9 @@ function addrFor(token: TokenDef): `0x${string}` | null {
 export function WalletPanel({ onClose }: { onClose: () => void }) {
     const { address, isConnected } = useAccount();
     const publicClient = usePublicClient();
-    const { data: walletClient } = useWalletClient();
     const { data: pasBalance } = useBalance({ address });
 
     const [rows, setRows] = React.useState<Row[]>([]);
-    const [loading, setLoading] = React.useState(false);
-    const [mintStatus, setMintStatus] = React.useState('');
 
     /* ── Fetch all 4 balances ──────────────────────────────────────── */
     const fetchBalances = React.useCallback(async () => {
@@ -73,32 +70,9 @@ export function WalletPanel({ onClose }: { onClose: () => void }) {
         if (isConnected) fetchBalances();
     }, [isConnected, fetchBalances]);
 
-    /* ── mUSDC Faucet ─────────────────────────────────────────────── */
-    const handleMintTUSDC = async () => {
-        if (!walletClient || !publicClient || !address || !isDeployed(config.mUSDC)) return;
-        setLoading(true);
-        setMintStatus('');
-        try {
-            const tx = await walletClient.writeContract({
-                address: config.mUSDC,
-                abi: ABIS.MOCK_ASSET,
-                functionName: 'mint',
-                args: [address, TUSDC.faucet!.amount], // 1,000 x 10^6
-            });
-            await publicClient.waitForTransactionReceipt({ hash: tx });
-            setMintStatus('Minted 1,000 mUSDC!');
-            fetchBalances();
-        } catch (e: unknown) {
-            const msg = e instanceof Error ? e.message.slice(0, 80) : 'Unknown error';
-            setMintStatus(`Error: ${msg}`);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     /* ── Render ────────────────────────────────────────────────────── */
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
             <div
                 className="w-full max-w-sm rounded-2xl border border-glass-border bg-surface backdrop-blur-xl p-6 space-y-5 shadow-2xl"
                 onClick={e => e.stopPropagation()}
@@ -158,25 +132,6 @@ export function WalletPanel({ onClose }: { onClose: () => void }) {
                                 </div>
                             ))}
                         </div>
-
-                        {/* mUSDC Faucet */}
-                        {isDeployed(config.mUSDC) && (
-                            <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-3 space-y-2">
-                                <p className="text-xs text-yellow-300 font-medium">mUSDC Faucet</p>
-                                <button
-                                    onClick={handleMintTUSDC}
-                                    disabled={loading}
-                                    className="w-full py-2 rounded-lg bg-yellow-600 hover:bg-yellow-500 text-white text-xs font-medium disabled:opacity-50 transition-colors"
-                                >
-                                    {loading ? 'Minting\u2026' : 'Mint 1,000 mUSDC'}
-                                </button>
-                                {mintStatus && (
-                                    <p className={`text-xs ${mintStatus.startsWith('Error') ? 'text-red-400' : 'text-green-400'}`}>
-                                        {mintStatus}
-                                    </p>
-                                )}
-                            </div>
-                        )}
 
                         {/* Faucet link */}
                         {config.faucet && (

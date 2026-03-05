@@ -8,7 +8,8 @@ import { useAccess } from '../../hooks/useAccess';
 const LINKS = [
     { href: '/', label: 'Home' },
     { href: '/dashboard', label: 'Dashboard' },
-    { href: '/xcm-test', label: 'XCM Test' },
+    { href: '/xcm-test', label: 'Bridge' },
+    { href: '/swap', label: 'Swap' },
     { href: '/markets/usdc', label: 'Markets' },
     { href: '/borrow/usdc', label: 'Borrow' },
     { href: '/lend/usdc', label: 'Lend' },

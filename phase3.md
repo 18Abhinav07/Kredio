@@ -1,621 +1,584 @@
+Here are the segments in exact build order. Each is a self-contained unit the agent can execute fully before moving to the next.
+
+***
+
+## Segment 1 — Deploy KredioSwap Contract
+
 ```
-PHASE 3 BUILD GUIDE — KREDIO
-==============================
-This is a guidelines and architecture document.
-Do NOT copy-paste code from here.
-Read every section fully before writing any code.
-Execute in exact order. Verify each step before proceeding.
+SEGMENT 1: Deploy KredioSwap Contract
+======================================
+Goal: Deploy KredioSwap.sol and seed the mUSDC reserve.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 0 — GROUND RULES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONTEXT:
+  Network: Hub Testnet, chainId 420420417
+  RPC: https://eth-rpc-testnet.polkadot.io/
+  MockUSDC: 0x5998cE005b4f3923c988Ae31940fAa1DEAC0c646 (6 decimals, free mint)
+  MockPASOracle: 0x1494432a8Af6fa8c03C0d7DD7720E298D85C55c7 (PAS/USD, 8 dec)
+  Deployer: 0xe37a8983570B39F305fe93D565A29F89366f3fFe
 
-1. Do not modify any deployed contract.
-2. Do not redeploy any existing contract.
-3. Do not change oracle, lending pool, or PAS market logic.
-4. Every new UI feature must reuse existing wagmi hooks,
-   existing contract ABIs, and the proven XCM send flow.
-5. The XCM send flow that is proven working must not be changed.
-   It lives in lib/xcm.ts as a shared utility.
-6. All multi-step flows must be sequential.
-   Never show step N+1 until step N is confirmed on-chain.
-7. UI must match the existing design system exactly.
-   Use the same components, colors, spacing, and typography
-   already present in the codebase.
-8. Remove the mUSDC faucet/mint section from /xcm-test entirely.
+TASK:
+  1. Write contracts/evm/KredioSwap.sol with this exact spec:
+       - Reads MockPASOracle.latestRoundData() for price
+       - Reads MockPASOracle.isCrashed() — revert if true
+       - quoteSwap(uint256 pasWei) view returns mUSDC amount
+           formula: (pasWei × price) / 1e20, then subtract feeBps (default 30)
+           pasWei = 18 decimals, price = 8 decimals, output = 6 decimals
+       - swap(uint256 minMUSDCOut) external payable
+           uses msg.value as pasWei input
+           transfers mUSDC to msg.sender
+           emits Swapped(address user, uint256 pasWei, uint256 mUSDCOut)
+       - fundReserve(uint256 amount) onlyOwner
+           pulls mUSDC from owner via transferFrom
+       - withdrawPAS() onlyOwner — sends ETH balance to owner
+       - withdrawReserve(uint256 amount) onlyOwner
+       - setFee(uint256 bps) onlyOwner — max 100
+       - reserveBalance() view returns mUSDC.balanceOf(this)
+       - receive() external payable
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 1 — EXISTING CONTRACTS (READ ONLY)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  2. Deploy:
+       forge create evm/KredioSwap.sol:KredioSwap \
+         --rpc-url https://eth-rpc-testnet.polkadot.io/ \
+         --private-key $PRIVATE_KEY --legacy
 
-These are deployed and working. Do not touch them.
+  3. Seed reserve:
+       cast send MockUSDC "mint(address,uint256)" $DEPLOYER 100000000000 --legacy
+       cast send MockUSDC "approve(address,uint256)" $SWAP_ADDR 100000000000 --legacy
+       cast send $SWAP_ADDR "fundReserve(uint256)" 100000000000 --legacy
 
-  MockUSDC          0x5998cE005b4f3923c988Ae31940fAa1DEAC0c646
-  GovernanceCache   0xE4De7eade2C0A65bDa6863ad7BA22416c77f3e55
-  KreditAgent       0x8c13E6fFDf27bB51304Efff108C9B646d148E5F3
-  MockPASOracle     0x1494432a8Af6fa8c03C0d7DD7720E298D85C55c7
-  KredioLending     0x717A1e2967af17CbE92abd70072aCe823a9B22B4
-  KredioPASMarket   0xE748Afa4c5e5bDD3c31c779759Baf294dFb7f95E
-  Chain ID          420420417
-  Hub RPC           https://eth-rpc-testnet.polkadot.io/
-  People Chain RPC  wss://people-paseo.rpc.amforc.com
+  4. Verify:
+       cast call $SWAP_ADDR "reserveBalance()(uint256)"
+       → must return 100000000000
+       cast call $SWAP_ADDR "quoteSwap(uint256)(uint256)" 1000000000000000000
+       → must return ~500000
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 2 — NEW CONTRACT: KredioSwap
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  5. Save deployed address to:
+       contracts/addresses-latest.md as KredioSwap
+       frontend/src/lib/contracts.ts as KREDIO_SWAP_ADDRESS
+       Add full ABI from out/KredioSwap.sol/KredioSwap.json
+         as KREDIO_SWAP_ABI in contracts.ts
 
-PURPOSE:
-  Allows users with PAS on Hub EVM to swap PAS → mUSDC.
-  Uses MockPASOracle for live pricing.
-  Holds a mUSDC reserve seeded by admin.
-  No approval needed from user — swap takes msg.value (native PAS).
+DONE WHEN: reserveBalance and quoteSwap both return correct values.
+```
 
-CONTRACT SPEC:
+***
 
-  State variables:
-    mUSDC address     → MockUSDC contract
-    oracle address    → MockPASOracle contract
-    owner address     → deployer
-    feeBps uint256    → 30 (0.3%), settable by owner, max 100
+## Segment 2 — Shared XCM Utility
 
-  View functions:
-    quoteSwap(uint256 pasWei) returns (uint256 mUSDCOut)
-      → reads oracle latestRoundData()
-      → reverts if oracle.isCrashed()
-      → pasWei is 18 decimals (Hub EVM wei)
-      → price is 8 decimals (Chainlink style)
-      → mUSDCOut is 6 decimals
-      → formula: (pasWei × price) / 1e20, then deduct feeBps
-    
-    reserveBalance() returns (uint256)
-      → returns mUSDC.balanceOf(address(this))
+```
+SEGMENT 2: Build lib/xcm.ts
+============================
+Goal: Single shared file for all XCM operations.
+      All future pages import from here. No XCM logic in page files.
 
-  Write functions:
-    swap(uint256 minMUSDCOut) external payable
-      → calls quoteSwap(msg.value) internally
-      → requires result >= minMUSDCOut (slippage protection)
-      → requires reserveBalance >= output
-      → transfers mUSDC to msg.sender
-      → emits Swapped event
+CONTEXT:
+  People Chain RPC: wss://people-paseo.rpc.amforc.com
+  PAS on People Chain = 10 decimals
+  PAS on Hub EVM getBalance() = 18 decimals (wei)
+  XCM proven working with:
+    Builder(api).from('PeoplePaseo').to('AssetHubPaseo')
+    .currency({ symbol: 'PAS', amount }) — amount in 10 decimal string
+    .address(ss58Dest)   ← H160 converted to SS58 AccountId32
+    .senderAddress(talismanAddress)
+    .build()
+    then signAndSend with { signer: injector.signer, nonce: -1 }
 
-    fundReserve(uint256 amount) onlyOwner
-      → pulls mUSDC from owner via transferFrom
-      → emits ReserveFunded event
+FILE: frontend/src/lib/xcm.ts
 
-    withdrawPAS() onlyOwner
-      → sends all collected PAS to owner
+MUST EXPORT:
 
-    withdrawReserve(uint256 amount) onlyOwner
-      → sends mUSDC back to owner
+  1. Constants:
+       PEOPLE_RPC
+       PAS_SUBSTRATE_DECIMALS = 10
+       PAS_EVM_DECIMALS = 18
 
-    setFee(uint256 newFeeBps) onlyOwner
-      → max 100 bps (1%)
+  2. h160ToSS58(evmAddress: string): string
+       H160 (20 bytes) + 0xEE × 12 bytes = AccountId32 (32 bytes)
+       encodeAddress with prefix 0 (Paseo)
 
-  Events:
-    Swapped(address indexed user, uint256 pasWei, uint256 mUSDCOut)
-    ReserveFunded(address indexed by, uint256 amount)
+  3. formatPASFromEVM(wei: bigint, dp = 4): string
+       divide by 1e18
 
-DEPLOY SEQUENCE:
-  1. forge create KredioSwap with --legacy flag
-  2. mint 1000000 mUSDC to deployer via MockUSDC.mint()
-  3. approve KredioSwap to pull that amount
-  4. call fundReserve(100_000 * 1e6)
-  5. verify reserveBalance() returns 1000000000000
-  6. verify quoteSwap(1e18) returns ~500000 (0.5 mUSDC at $5 PAS)
-  7. save address to addresses-latest.md and contracts.ts
+  4. formatPASFromPeople(raw: bigint, dp = 4): string
+       divide by 1e10
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 3 — SHARED UTILITY: lib/xcm.ts
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  5. fetchPeopleBalance(address: string): Promise<bigint>
+       WsProvider → ApiPromise.create
+       api.query.system.account(address)
+       return free balance as bigint
+       disconnect in finally
 
-PURPOSE:
-  Single source of truth for all XCM operations.
-  All pages that need XCM import from here.
-  Never duplicate XCM logic in page files.
+  6. sendXCMToHub(params: {
+       senderAddress: string,
+       destinationEVM: string,
+       amountPAS: string,
+       onStatus: (msg: string) => void
+     }): Promise<{ blockHash: string }>
+       converts amountPAS → substrate units (× 1e10, as string)
+       converts destinationEVM → SS58 via h160ToSS58
+       creates ApiPromise with PEOPLE_RPC
+       builds and sends tx as proven working
+       resolves on isFinalized with no dispatchError
+       rejects with plain English message on cancel or error
+       always disconnects in finally
 
-MUST CONTAIN:
+  7. pollHubArrival(params: {
+       address: string,
+       before: bigint,
+       publicClient: any,
+       onArrival: (delta: bigint) => void,
+       onTick?: (current: bigint) => void,
+       intervalMs?: number
+     }): () => void
+       polls publicClient.getBalance every intervalMs (default 3000)
+       calls onTick on every poll
+       calls onArrival and stops when balance > before
+       returns cleanup function
 
-  Constants:
-    PEOPLE_RPC = 'wss://people-paseo.rpc.amforc.com'
-    PAS_SUBSTRATE_DECIMALS = 10   (People Chain balance)
-    PAS_EVM_DECIMALS = 18         (Hub EVM getBalance wei)
-    MUSDC_DECIMALS = 6
+DONE WHEN: File compiles with no TypeScript errors.
+```
 
-  h160ToSS58(evmAddress: string): string
-    → converts MetaMask H160 to SS58 AccountId32
-    → AccountId32 = H160 bytes (20) + 0xEE × 12 bytes
-    → encode with Paseo prefix 0
-    → this is required before passing any EVM address to ParaSpell
+***
 
-  formatPASFromEVM(wei: bigint): string
-    → divide by 1e18, return fixed 4 decimal string
+## Segment 3 — Cleanup /xcm-test Page
 
-  formatPASFromPeople(raw: bigint): string
-    → divide by 1e10, return fixed 4 decimal string
+```
+SEGMENT 3: Cleanup /xcm-test Page
+===================================
+Goal: Remove faucet, use shared lib/xcm.ts, fix balance display.
 
-  fetchPeopleBalance(address: string): Promise<bigint>
-    → creates WsProvider → ApiPromise with PEOPLE_RPC
-    → queries api.query.system.account(address)
-    → disconnects after query
-    → returns free balance as bigint
+CHANGES ONLY — do not rewrite the page from scratch:
 
-  sendXCMToHub(params): Promise<{ blockHash: string }>
-    → params: senderAddress, destinationEVM, amountPAS (human string), onStatus callback
-    → internally: converts amountPAS to substrate units (×10^10)
-    → converts destinationEVM to SS58 via h160ToSS58
-    → creates ApiPromise with PEOPLE_RPC
-    → builds tx via Builder(api).from('PeoplePaseo').to('AssetHubPaseo')
-      .currency({ symbol: 'PAS', amount }).address(ss58Dest)
-      .senderAddress(senderAddress).build()
-    → gets injector via web3FromAddress(senderAddress)
-    → calls tx.signAndSend with injector.signer and nonce: -1
-    → resolves on isFinalized with no dispatchError
-    → rejects with clear error message on failure or cancellation
-    → always disconnects api in finally block
+  1. REMOVE entirely:
+       Any mUSDC mint or faucet button, section, or state
+       Any inline h160ToSS58 function (import from lib/xcm.ts)
+       Any inline XCM send logic (replace with sendXCMToHub)
+       Any inline pollHubArrival logic (replace with imported version)
 
-  pollHubArrival(params): () => void (cleanup function)
-    → params: address, before (bigint), publicClient, onArrival, onTick, intervalMs
-    → polls publicClient.getBalance every intervalMs (default 3000)
-    → calls onTick(current) on every tick
-    → calls onArrival(delta) and stops when balance > before
-    → returns a cleanup function to stop polling
+  2. FIX balance display:
+       Hub EVM getBalance returns wei (18 decimals)
+       Replace any division by 1e10 with division by 1e18
+       Use formatPASFromEVM() from lib/xcm.ts
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 4 — DECIMAL REFERENCE (CRITICAL)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  3. IMPORT from lib/xcm.ts:
+       sendXCMToHub, pollHubArrival, fetchPeopleBalance,
+       formatPASFromEVM, formatPASFromPeople, PEOPLE_RPC
 
-Never get these wrong. Every conversion must use these exactly.
+  4. NAV label:
+       In the navigation component, label this route "Bridge"
+       Page h1 title stays "Cross-Chain Test"
 
-  SOURCE                          DECIMALS   DIVIDE BY
-  ──────────────────────────────────────────────────────
-  People Chain PAS balance        10         1e10
-  Hub EVM getBalance() (wei)      18         1e18
-  Hub EVM msg.value (contracts)   18         —
-  mUSDC ERC20 amounts             6          1e6
-  Oracle PAS/USD price answer     8          1e8
-  KredioSwap.quoteSwap() input    18 (wei)   —
-  KredioSwap.quoteSwap() output   6 (mUSDC)  1e6
-  XCM send amount parameter       10         —
+  5. Keep unchanged:
+       All UI layout and components
+       MetaMask connect (Step 1)
+       Talisman connect (Step 2)
+       Amount input and send button
+       Status messages and balance tracker
 
-  WHEN USER TYPES "1" PAS:
-    For XCM send        → multiply by 1e10 → "10000000000"
-    For swap msg.value  → multiply by 1e18 → BigInt("1000000000000000000")
-    For display         → keep as "1.0000"
+DONE WHEN: /xcm-test works identically to before,
+           balance shows correct PAS amount,
+           no faucet section visible.
+```
 
-  WHEN USER TYPES "100" mUSDC:
-    For borrow()        → multiply by 1e6 → 100000000
-    For deposit()       → multiply by 1e6 → 100000000
-    For approve()       → multiply by 1e6 → 100000000
+***
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 5 — UX ARCHITECTURE (READ CAREFULLY)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## Segment 4 — Build /swap Page
 
-GLOBAL PATTERN FOR ALL MULTI-STEP FLOWS:
+```
+SEGMENT 4: Build /swap Page
+============================
+Goal: PAS on Hub EVM → swap to mUSDC via KredioSwap contract.
+      Single transaction. No steps. Clean swap card UI.
 
-  Every multi-step action must follow this exact UX pattern:
+FILE: frontend/src/app/swap/page.tsx
 
-  1. SOURCE SELECTOR (tabs)
-     User first picks their asset source:
-       "PAS on Hub"       → they already have PAS in MetaMask
-       "PAS on People"    → they have PAS on People Chain in Talisman
-     
-     This selector is always shown first, before any input fields.
-     Switching tabs resets any in-progress flow state.
+CONTRACT CALLS:
+  Read: KredioSwap.quoteSwap(pasWei) — live quote as user types
+  Write: KredioSwap.swap(minOut) with msg.value = pasWei
 
-  2. STEP INDICATOR
-     Show a horizontal step bar:
-       ● Step 1  →  ○ Step 2  →  ○ Step 3
-     Active step is filled. Completed steps show a checkmark.
-     Future steps are greyed out.
-     This is always visible once a flow starts.
+UI LAYOUT (single card):
 
-  3. STEP CONTENT AREA
-     Only the current step's UI is shown.
-     Previous step results are summarized in a compact
-     "completed" card above the current step — not re-editable.
+  Header: "Swap" with subtitle "PAS → mUSDC"
 
-  4. ACTION BUTTON STATES
-     Every button must have four states:
-       Default:    shows action label
-       Loading:    shows spinner + action verb (e.g. "Signing...")
-       Success:    shows checkmark + result summary
-       Error:      shows error message + retry option
-     
-     Button must be disabled while loading.
-     Never show a spinner without a label explaining what is happening.
+  Input section — "You Pay":
+    Numeric input for PAS amount
+    Below input: "Balance: X.XXXX PAS" (from publicClient.getBalance)
+    "Max" button fills in full balance minus small gas buffer
 
-  5. STEP TRANSITION
-     After a step completes on-chain:
-       → Show a success state in current step card for 1.5s
-       → Auto-advance to next step
-       → Do NOT require manual "Next" click after on-chain confirmation
-     
-     Exception: if next step requires a new user decision
-     (e.g. choosing borrow amount), auto-advance is fine but
-     focus the input field.
+  Quote section — "You Receive":
+    Shows estimated mUSDC output from quoteSwap()
+    Updates with 300ms debounce as user types
+    Shows: exchange rate "1 PAS ≈ $X.XX" (from oracle answer / 1e8)
+    Shows: fee "0.3% = X.XX mUSDC"
+    Greyed placeholder until user types
 
-  6. LOADER MESSAGES (contextual, not generic)
-     Each async phase must show a specific message:
-       Connecting to People Chain...
-       Building XCM transaction...
-       Waiting for Talisman signature...
-       Broadcasting to network...
-       In block — waiting for finalization...
-       Waiting for PAS to arrive on Hub... (with live counter)
-       Submitting to Hub...
-       Waiting for confirmation...
-     
-     Never show just "Loading..." or a bare spinner.
+  Swap button:
+    Disabled states: no input, amount > balance, oracle crashed, loading
+    Default: "Swap PAS → mUSDC"
+    Loading (signing): spinner + "Waiting for MetaMask..."
+    Loading (confirming): spinner + "Confirming..."
+    Success: checkmark + "Done"
 
-  7. TALISMAN CONNECT
-     Only show Talisman connect UI on tabs that need it
-     ("PAS on People" tabs only).
-     Show it inline in the step, not in a modal or header.
-     Once connected, show account name + balance compactly.
-     Do not re-ask for connection if already connected in session.
+  Success banner (shows below button after tx):
+    "+X.XX mUSDC received"
+    Fades out after 5s, resets form
 
-  8. ERROR HANDLING
-     Every async operation must have a catch block.
-     User-facing errors must be plain English:
-       "Talisman was not found. Please install it."
-       "Transaction cancelled."
-       "Not enough PAS on People Chain."
-       "Swap failed: reserve is low."
-       "Borrow failed: health ratio too low."
-     
-     Never show raw error objects or contract revert strings to users.
-     Always show a Retry button on error.
+IMPLEMENTATION RULES:
+  Use useReadContract for quoteSwap (not useEffect + fetch)
+  Use useWriteContract for swap
+  msg.value = parseUnits(amount, 18) as bigint
+  minOut = quoteResult × 99n / 100n (1% slippage)
+  After success: invalidate/refetch PAS and mUSDC balances
+  Show mUSDC balance below the receive section
+  Do NOT use approve — swap() is payable, no ERC20 needed
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 6 — PAGE: /xcm-test (CLEANUP ONLY)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DECIMAL RULES:
+  User input "1" → parseUnits("1", 18) → 1000000000000000000n for msg.value
+  quoteSwap returns mUSDC in 6 decimals → divide by 1e6 for display
 
-Changes:
-  REMOVE: Any mUSDC faucet or mint button/section
-  REMOVE: Inline XCM logic — replace with calls to lib/xcm.ts
-  KEEP:   All existing working UI exactly as-is
-  FIX:    Balance display divisor must be 1e18 for Hub EVM wei
-  RENAME: Nav label to "Bridge" (page title stays "Cross-Chain Test")
+DONE WHEN:
+  Typing 1 PAS shows correct mUSDC estimate
+  Clicking Swap shows MetaMask popup with correct value
+  After confirm: mUSDC balance increases, PAS balance decreases
+```
 
-This page is a developer/test utility. Keep it simple.
-Do not add new features here.
+***
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 7 — PAGE: /swap
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## Segment 5 — Shared Step Components
 
-PURPOSE: User swaps PAS (Hub EVM) → mUSDC using KredioSwap contract.
+```
+SEGMENT 5: Build Shared Step UI Components
+============================================
+Goal: Reusable components for all multi-step flows.
+      Used by /borrow and /lend in Segments 6 and 7.
 
-LAYOUT:
-  Single card, no tabs, no steps (this is a single transaction).
-
-  Top section:
-    "You Pay" label
-    Input field: numeric, PAS amount, shows Hub EVM PAS balance below
-    Live quote updates as user types (debounced 300ms)
-    Quote reads KredioSwap.quoteSwap(pasWei) as a view call
-
-  Middle section:
-    "You Receive" label
-    Estimated mUSDC output (from quote, greyed until input)
-    Exchange rate: "1 PAS ≈ $X.XX" (derived from oracle)
-    Fee: "0.3% (X.XX mUSDC)"
-    Slippage: "Max slippage: 1%"
-
-  Bottom section:
-    Swap button (disabled if no amount, or amount > balance, or oracle crashed)
-    Button states: Default / Signing / Confirming / Done
-
-  After success:
-    Show inline success banner: "+X.XX mUSDC received"
-    Refresh PAS and mUSDC balances
-    Reset input after 3s
-
-IMPLEMENTATION NOTES:
-  Quote is a read call — use useReadContract or direct publicClient.readContract
-  Swap is a write call — use useWriteContract
-  msg.value = parseEther(amount) (18 decimals)
-  minOut = quoteResult × 99 / 100 (1% slippage)
-  Do not use approve — swap() is payable, no ERC20 input
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 8 — PAGE: /borrow (TAB UPDATES)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-EXISTING TABS: keep all existing tabs and their functionality unchanged.
-
-ADD a new top-level source selector with two options:
-  "PAS on Hub"     → existing PAS collateral flow (no changes)
-  "PAS on People"  → new multi-step bridge + borrow flow
-
-Both options use KredioPASMarket (same contract, same functions).
-The only difference is how PAS gets to Hub.
+BUILD TWO COMPONENTS:
 
 ──────────────────────────────────
-"PAS on Hub" tab:
-──────────────────────────────────
-  Show existing deposit collateral + borrow flow.
-  No changes. Just label it clearly.
-
-──────────────────────────────────
-"PAS on People" tab — 3-step flow:
+COMPONENT 1: StepFlow
+FILE: frontend/src/components/StepFlow.tsx
 ──────────────────────────────────
 
-  STEP 1: Bridge PAS from People Chain
+Props:
+  steps: Array<{ id: number, label: string, icon?: ReactNode }>
+  currentStep: number
+  completedSteps: number[]
+  children: ReactNode (only current step content rendered)
+
+Renders:
+  Horizontal step indicator bar at top:
+    Each step = circle + label
+    Completed = filled circle + checkmark
+    Current = filled circle + number + subtle pulse animation
+    Future = empty circle + greyed label
+    Connected by a line between circles
+    Line segment fills/colors as steps complete
+
+  Step cards below:
+    Only current step card is expanded
+    Completed steps shown as collapsed cards:
+      Compact row with: step number, step label, green checkmark,
+      one-line result summary (passed as completedSummary prop)
+    Collapsed cards have no interaction
+
+  Transition:
+    Collapse animation: 150ms ease-out
+    Expand animation: 150ms ease-in
+    Step indicator updates simultaneously with card transition
+
+──────────────────────────────────
+COMPONENT 2: TalismanConnect
+FILE: frontend/src/components/TalismanConnect.tsx
+──────────────────────────────────
+
+Props:
+  onConnected: (address: string) => void
+  onBalanceLoaded?: (balance: bigint) => void
+
+Internal states: idle | connecting | connected | error
+
+Renders by state:
+  idle:
+    Button "Connect Talisman" with Talisman logo icon
+  connecting:
+    Spinner + "Connecting to Talisman..."
+  connected:
+    Account name (from meta.name)
+    Address truncated: first 6 + ... + last 4 chars
+    Balance: "X.XXXX PAS on People Chain"
+    Small green dot indicator
+  error:
+    Red text with plain English error message
+    "Retry" button
+
+Behavior:
+  On mount: silently try web3Enable to detect existing session
+  If already enabled: skip to connected state
+  fetchPeopleBalance from lib/xcm.ts for balance
+  Multiple accounts: show dropdown selector, update balance on change
+
+──────────────────────────────────
+COMPONENT 3: StepActionButton
+FILE: frontend/src/components/StepActionButton.tsx
+──────────────────────────────────
+
+Props:
+  label: string
+  loadingLabel: string
+  isLoading: boolean
+  isSuccess: boolean
+  isDisabled: boolean
+  onClick: () => void
+
+Renders:
+  disabled: greyed button, no interaction
+  default: full color, shows label
+  loading: spinner on left + loadingLabel, non-interactive
+  success: checkmark icon + "Done", green tint, non-interactive
+
+DONE WHEN:
+  All three components render correctly
+  StepFlow transitions work smoothly
+  TalismanConnect detects existing session on mount
+```
+
+***
+
+## Segment 6 — Update /borrow Page
+
+```
+SEGMENT 6: Update /borrow Page
+================================
+Goal: Add "PAS on Hub" / "PAS on People" source selector.
+      "PAS on Hub" = existing flow unchanged.
+      "PAS on People" = new 3-step bridge + deposit + borrow flow.
+
+EXISTING PAGE: keep all existing functionality.
+Only add the source selector and new "PAS on People" tab content.
+
+──────────────────────────────────
+SOURCE SELECTOR (add at top of page):
+──────────────────────────────────
+  Two pill/tab buttons:
+    "PAS on Hub"      (default selected)
+    "PAS on People"
+  
+  Switching tabs resets any in-progress flow state.
+  Switching tabs does NOT reset wallet connections.
+
+──────────────────────────────────
+"PAS on Hub" tab content:
+──────────────────────────────────
+  Render existing borrow flow exactly as it is today.
+  No changes whatsoever.
+
+──────────────────────────────────
+"PAS on People" tab content:
+──────────────────────────────────
+  Uses StepFlow component (Segment 5) with 3 steps.
+  Uses TalismanConnect component (Segment 5) in Step 1.
+  Uses StepActionButton (Segment 5) for all action buttons.
+  Uses sendXCMToHub and pollHubArrival from lib/xcm.ts.
+
+  STEP 1 — Bridge PAS
+    Content:
+      TalismanConnect component
+      (only show amount input and button after connected)
+      Input: PAS amount to bridge
+      Info row: "Destination: your Hub address (MetaMask)"
+      Info row: "Estimated arrival: ~30 seconds"
     
-    Show:
-      Talisman connect (inline, compact)
-      People Chain balance once connected
-      Input: how much PAS to bridge
-      Estimated arrival time: ~30 seconds
-      Destination: user's Hub EVM address (from MetaMask)
+    Button: "Bridge X PAS to Hub"
     
-    Action: "Bridge PAS to Hub"
-    
-    Loader sequence:
+    Loader messages in order:
       "Connecting to People Chain..."
       "Building XCM transaction..."
       "Waiting for Talisman signature..."
-      "Broadcasting..."
-      "In block — waiting for arrival on Hub..."
-      Live balance counter polling Hub every 3s
+      "Broadcasting to network..."
+      "Waiting for PAS to arrive on Hub..." 
+        + live counter showing Hub balance delta every 3s
     
-    Completion:
-      Show "+X.XXXX PAS arrived on Hub"
-      Show completed card summary
-      Auto-advance to Step 2
+    On arrival detected:
+      completedSummary: "+X.XXXX PAS arrived on Hub"
+      auto-advance to Step 2 after 1.5s
 
-  STEP 2: Deposit PAS as Collateral
+  STEP 2 — Deposit Collateral
+    Content:
+      Info row: "Available: X.XXXX PAS on Hub" (live getBalance)
+      Input: amount to deposit (pre-filled with arrived amount)
+        user can reduce but not exceed Hub balance
+      Info row: "Collateral ratio: 65% LTV"
     
-    Show:
-      Arrived PAS amount (from Step 1)
-      Current Hub PAS balance (from getBalance)
-      Input: how much to deposit as collateral
-        (pre-filled with arrived amount, user can adjust)
-      Estimated max borrow (reads KredioPASMarket.maxBorrowable
-        after hypothetical deposit — or just show after deposit)
+    Button: "Deposit X PAS as Collateral"
+    Contract: KredioPASMarket.depositCollateral() payable
+      value = parseUnits(input, 18)
     
-    Action: "Deposit Collateral"
-    Contract: KredioPASMarket.depositCollateral()
-      payable — msg.value = depositAmount in wei (18 dec)
+    Loader messages:
+      "Waiting for MetaMask..."
+      "Confirming deposit..."
     
-    Loader sequence:
-      "Waiting for MetaMask confirmation..."
-      "Submitting to Hub..."
-      "Waiting for confirmation..."
+    On success:
+      completedSummary: "X.XXXX PAS deposited as collateral"
+      auto-advance to Step 3
+
+  STEP 3 — Borrow mUSDC
+    Content:
+      Info row: "Collateral: X.XXXX PAS"
+      Info row: "Max borrowable: X.XX mUSDC" (KredioPASMarket.maxBorrowable)
+      Input: mUSDC amount to borrow (max = maxBorrowable / 1e6)
+      Health ratio preview row:
+        updates live as user adjusts input
+        reads KredioPASMarket.healthRatio() after deposit
+        shows warning icon if projected ratio < 1.3
     
-    Completion:
-      Show collateral balance updated
-      Show max borrowable amount
-      Auto-advance to Step 3
-
-  STEP 3: Borrow mUSDC
+    Button: "Borrow X mUSDC"
+    Contract: KredioPASMarket.borrow(uint256) — amount × 1e6
     
-    Show:
-      Collateral deposited (from Step 2)
-      Max borrowable: reads KredioPASMarket.maxBorrowable(address)
-      Health ratio preview: reads KredioPASMarket.healthRatio(address)
-        Update preview live as user adjusts borrow amount
-      Warning if health ratio would go below 1.3
-      Input: borrow amount in mUSDC (slider or number input)
-        Max = maxBorrowable / 1e6
+    Loader messages:
+      "Waiting for MetaMask..."
+      "Confirming borrow..."
     
-    Action: "Borrow mUSDC"
-    Contract: KredioPASMarket.borrow(uint256 borrowAmount)
-      borrowAmount in 6 decimals
-    
-    Loader sequence:
-      "Waiting for MetaMask confirmation..."
-      "Submitting to Hub..."
-      "Waiting for confirmation..."
-    
-    Completion:
-      Show "+X.XX mUSDC received in wallet"
-      Show final position summary:
-        Collateral: X.XXXX PAS
-        Borrowed: X.XX mUSDC
-        Health Ratio: X.XX
-      Show "View Position" button linking to position details
+    On success:
+      Show final position card:
+        "Collateral: X.XXXX PAS"
+        "Borrowed: X.XX mUSDC"
+        "Health Ratio: X.XX"
+      Show "View Position" link to existing position section
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 9 — PAGE: /lend (TAB UPDATES)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-EXISTING TABS: keep all existing tabs and their functionality unchanged.
-
-ADD a new top-level source selector with three options:
-  "mUSDC"           → existing lend flow (no changes)
-  "Swap & Lend"     → PAS on Hub, swap to mUSDC then lend
-  "Bridge & Lend"   → PAS on People Chain, bridge then swap then lend
-
-──────────────────────────────────
-"mUSDC" tab:
-──────────────────────────────────
-  Keep exactly as-is.
-
-──────────────────────────────────
-"Swap & Lend" tab — 2-step flow (PAS already on Hub):
-──────────────────────────────────
-
-  STEP 1: Swap PAS → mUSDC
-    
-    Show:
-      Hub PAS balance (from getBalance)
-      Input: PAS amount to swap
-      Live quote from KredioSwap.quoteSwap()
-      Exchange rate and fee
-    
-    Action: "Swap PAS → mUSDC"
-    Contract: KredioSwap.swap(minOut) payable
-    
-    Completion:
-      Show "+X.XX mUSDC received"
-      Auto-advance to Step 2
-
-  STEP 2: Lend mUSDC
-    
-    Show:
-      mUSDC received in Step 1 (pre-fill amount)
-      Current pool APY (derived from KredioLending.utilizationRate())
-      Estimated yield preview
-    
-    Action: "Approve & Lend"
-    Sequence:
-      1. MockUSDC.approve(KredioLending, amount)
-      2. KredioLending.deposit(amount)
-    
-    Show two sub-steps in loader:
-      "Approving mUSDC..." (MetaMask step 1)
-      "Depositing to lending pool..." (MetaMask step 2)
-    
-    Completion:
-      Show lending position: X.XX mUSDC earning X.XX% APY
-
-──────────────────────────────────
-"Bridge & Lend" tab — 3-step flow (PAS on People Chain):
-──────────────────────────────────
-
-  STEP 1: Bridge PAS from People Chain
-    Identical to /borrow "PAS on People" Step 1.
-    Use the same sendXCMToHub() from lib/xcm.ts.
-    Completion: auto-advance to Step 2.
-
-  STEP 2: Swap PAS → mUSDC
-    Identical to "Swap & Lend" Step 1 above.
-    Pre-fill with arrived PAS amount.
-    Completion: auto-advance to Step 3.
-
-  STEP 3: Lend mUSDC
-    Identical to "Swap & Lend" Step 2 above.
-    Pre-fill with swapped mUSDC amount.
-    Completion: show final lending position.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 10 — SHARED STEP COMPONENT SPEC
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Build one reusable StepFlow component used by both /borrow and /lend.
-
-  Props:
-    steps: Step[]          each step has id, label, icon
-    currentStep: number
-    completedSteps: Set<number>
-
-  Step indicator renders as horizontal bar:
-    Completed step → filled circle with checkmark icon
-    Current step   → filled circle with step number, pulsing ring
-    Future step    → empty circle, greyed label
-
-  Step card:
-    Each step renders in a card with:
-      Step number badge (top left)
-      Step title (bold)
-      Content area (input, info, button)
-      Completed state: collapsed card with green checkmark
-        and one-line summary of what was done
-
-  Transition animation:
-    When step completes → card shrinks to collapsed state (200ms ease)
-    Next step card expands (200ms ease)
-    Step indicator updates simultaneously
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 11 — SHARED TALISMAN CONNECT COMPONENT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Build one reusable TalismanConnect component.
-Used inline inside steps that need People Chain.
-
-  States:
-    Not connected → shows "Connect Talisman" button
-    Connecting    → shows spinner + "Connecting..."
-    Connected     → shows account name, truncated address,
-                    People Chain PAS balance
-    Error         → shows error + retry
-
-  On connect:
-    Calls web3Enable('Kredio')
-    Calls web3Accounts() filtered to sr25519/ed25519
-    Fetches People Chain balance via fetchPeopleBalance() from lib/xcm.ts
-    Stores in local state
-
-  Session persistence:
-    If Talisman was connected earlier in the session,
-    auto-reconnect silently on mount (try web3Enable without UI)
-    If successful, skip the connect button entirely
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 12 — NAVIGATION UPDATES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Add to main navigation:
-  Swap     → /swap
-  Bridge   → /xcm-test  (label only, not page title)
-
-Existing nav items: keep all as-is.
-
-Do NOT add Talisman connect to the global header.
-Talisman connect only appears inside specific step flows.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 13 — DO NOT BUILD
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  ✗ KredioXCMReceiver contract — not needed
-  ✗ Reverse XCM (Hub → People Chain)
-  ✗ Any oracle changes
-  ✗ Any changes to existing contracts
-  ✗ WalletConnect or Coinbase connectors
-  ✗ Governance or voting UI
-  ✗ Any faucet or mock mint UI
-  ✗ Any new markets or pools
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 14 — VERIFICATION CHECKLIST
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-After deploying KredioSwap:
-  reserveBalance() returns 100000000000
-  quoteSwap(1e18) returns approximately 500000
-  swap() with 1e18 value transfers mUSDC and emits Swapped event
-
-After building /swap:
-  Typing PAS amount updates quote in under 500ms
-  Swap button is disabled with 0 input or amount > balance
-  MetaMask popup appears on click
-  mUSDC balance increases after confirmation
-  PAS balance decreases after confirmation
-
-After updating /borrow:
-  Source selector switches between "PAS on Hub" and "PAS on People"
-  "PAS on Hub" tab shows existing flow unchanged
-  "PAS on People" shows Step 1 first
-  Step indicator shows correct active state
-  After XCM arrival, Step 2 appears with pre-filled amount
-  After collateral deposit, Step 3 appears with maxBorrowable
-  After borrow, position summary shows correct values
-
-After updating /lend:
-  Source selector switches between all three options
-  "mUSDC" tab shows existing flow unchanged
-  "Swap & Lend" completes in 2 steps with correct amounts
-  "Bridge & Lend" completes in 3 steps with correct amounts
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 15 — BUILD ORDER (STRICT)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  1. Deploy KredioSwap.sol
-  2. Seed reserve and verify
-  3. Update contracts.ts with address + ABI
-  4. Build lib/xcm.ts shared utility
-  5. Cleanup /xcm-test (remove faucet, use lib/xcm.ts)
-  6. Build /swap page
-  7. Build shared StepFlow component
-  8. Build shared TalismanConnect component
-  9. Update /borrow page with source selector + PAS on People flow
-  10. Update /lend page with source selector + Swap & Lend + Bridge & Lend flows
-  11. Update navigation
-  12. Run full verification checklist
+DONE WHEN:
+  Source selector switches tabs cleanly
+  "PAS on Hub" tab is unchanged
+  "PAS on People" completes all 3 steps end to end
+  Position shows correctly after Step 3
 ```
+
+***
+
+## Segment 7 — Update /lend Page
+
+```
+SEGMENT 7: Update /lend Page
+==============================
+Goal: Add source selector with 3 options.
+      "mUSDC" = existing unchanged.
+      "Swap & Lend" = PAS on Hub, 2 steps.
+      "Bridge & Lend" = PAS on People, 3 steps.
+
+EXISTING PAGE: keep all existing functionality.
+Only add the source selector and new tab content.
+
+──────────────────────────────────
+SOURCE SELECTOR (add at top of page):
+──────────────────────────────────
+  Three pill/tab buttons:
+    "mUSDC"          (default selected)
+    "Swap & Lend"
+    "Bridge & Lend"
+  
+  Switching resets in-progress flow state, not wallet state.
+
+──────────────────────────────────
+"mUSDC" tab: unchanged.
+──────────────────────────────────
+
+──────────────────────────────────
+"Swap & Lend" tab — 2 steps:
+──────────────────────────────────
+  Uses StepFlow with 2 steps.
+
+  STEP 1 — Swap PAS → mUSDC
+    Content:
+      Input: PAS amount
+      Balance row: "X.XXXX PAS in wallet"
+      Live quote from KredioSwap.quoteSwap()
+      Rate row: "1 PAS ≈ $X.XX · Fee 0.3%"
+    
+    Button: "Swap X PAS → Y mUSDC"
+    Contract: KredioSwap.swap(minOut) payable
+      value = parseUnits(input, 18)
+      minOut = quote × 99n / 100n
+    
+    Loader: "Waiting for MetaMask..." → "Confirming swap..."
+    
+    On success:
+      completedSummary: "Swapped X PAS → Y mUSDC"
+      store received mUSDC amount in flow state
+      auto-advance to Step 2
+
+  STEP 2 — Lend mUSDC
+    Content:
+      Input: mUSDC to lend (pre-filled with Step 1 output)
+      APY row: derived from KredioLending.utilizationRate()
+      Yield preview: "Earning ~X.XX% APY"
+    
+    Action is TWO transactions — show clearly as sub-steps:
+      Sub-step 1: Approve
+        Button label changes to "Approving..." during tx
+      Sub-step 2: Deposit
+        Button label changes to "Depositing..." during tx
+      Single "Approve & Lend" button triggers both in sequence
+    
+    Contracts:
+      MockUSDC.approve(KredioLending, amount × 1e6)
+      KredioLending.deposit(amount × 1e6)
+    
+    On success:
+      Show: "Lending X.XX mUSDC at X.XX% APY"
+
+──────────────────────────────────
+"Bridge & Lend" tab — 3 steps:
+──────────────────────────────────
+  Uses StepFlow with 3 steps.
+
+  STEP 1 — Bridge PAS from People Chain
+    Identical to /borrow Segment 6 Step 1.
+    Same component logic, same lib/xcm.ts calls.
+    completedSummary: "+X.XXXX PAS arrived on Hub"
+    auto-advance to Step 2.
+
+  STEP 2 — Swap PAS → mUSDC
+    Identical to "Swap & Lend" Step 1 above.
+    Pre-fill input with arrived PAS amount from Step 1.
+    completedSummary: "Swapped X PAS → Y mUSDC"
+    auto-advance to Step 3.
+
+  STEP 3 — Lend mUSDC
+    Identical to "Swap & Lend" Step 2 above.
+    Pre-fill input with mUSDC from Step 2.
+    On success: show final position.
+
+DONE WHEN:
+  All three tabs switch cleanly
+  "mUSDC" tab unchanged
+  "Swap & Lend" completes in 2 steps with correct balances
+  "Bridge & Lend" completes in 3 steps with correct balances
+```
+
+***
+
+## Segment 8 — Navigation Update
+
+```
+SEGMENT 8: Update Navigation
+==============================
+Goal: Add Swap and Bridge to main nav. Nothing else changes.
+
+CHANGES:
+  In the main navigation component (wherever nav links are defined):
+  
+  ADD:
+    { label: "Swap",   href: "/swap" }
+    { label: "Bridge", href: "/xcm-test" }
+  
+  KEEP all existing nav items exactly as-is.
+  Order suggestion: Lend · Borrow · Swap · Bridge
+
+  Do NOT add Talisman connect button to the header.
+  Do NOT add any wallet UI to the nav bar.
+
+DONE WHEN: Both new links appear in nav and route correctly.
+```
+
+***
+
+**Execute in order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8.**
+Each segment is independent and verifiable before the next starts.

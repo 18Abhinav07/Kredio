@@ -4,7 +4,7 @@
   "rpc": "https://eth-rpc-testnet.polkadot.io/",
   "explorer": "https://paseo.subscan.io",
   "contracts": {
-    "swap": "0x5750782B954d36104Eb3d5e8CBd682c50998e7bA",
+    "swap": "0xaF1d183F4550500Beb517A3249780290A88E6e39",
     "vault": "0x0C2EF62925D376cCBa24da6633642c26Ca8bED79",
     "compute": null
   },

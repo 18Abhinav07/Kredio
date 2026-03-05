@@ -5,6 +5,7 @@ export const isDeployed = (addr: string | null | undefined): addr is `0x${string
     !!addr && addr !== ZERO_ADDR;
 
 export type NetworkConfig = {
+    swap: `0x${string}`;
     lending: `0x${string}`;
     pasMarket: `0x${string}`;
     mUSDC: `0x${string}`;
@@ -19,6 +20,7 @@ export type NetworkConfig = {
 };
 
 export const config: NetworkConfig = {
+    swap: asAddress(CONTRACTS.KREDIOSWAP),
     lending: asAddress(CONTRACTS.KREDIOLENDING),
     pasMarket: asAddress(CONTRACTS.KREDIOPASMARKET),
     mUSDC: asAddress(CONTRACTS.MOCKUSDC),

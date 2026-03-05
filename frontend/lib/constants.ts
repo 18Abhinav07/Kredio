@@ -91,6 +91,18 @@ export const ABIS = {
         'event Borrowed(address indexed borrower, uint256 usdcAmount)',
     ]),
 
+    KREDIO_SWAP: parseAbi([
+        'function feeBps() view returns (uint256)',
+        'function quoteSwap(uint256 pasWei) view returns (uint256 mUSDCOut)',
+        'function reserveBalance() view returns (uint256)',
+        'function swap(uint256 minMUSDCOut) payable',
+        'function fundReserve(uint256 amount) external',
+        'function withdrawPAS() external',
+        'function withdrawReserve(uint256 amount) external',
+        'function setFee(uint256 newFeeBps) external',
+        'event Swapped(address indexed user, uint256 pasWei, uint256 mUSDCOut)',
+    ]),
+
     PAS_ORACLE: parseAbi([
         'function latestRoundData() view returns (uint80, int256, uint256, uint256, uint80)',
         'function decimals() view returns (uint8)',

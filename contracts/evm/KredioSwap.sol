@@ -22,13 +22,18 @@ contract KredioSwap is Ownable, ReentrancyGuard {
     event Swapped(address indexed user, uint256 pasWei, uint256 mUSDCOut);
     event ReserveFunded(address indexed by, uint256 amount);
 
-    constructor(address _mUSDC, address _oracle) Ownable(msg.sender) {
+    constructor(
+        address _mUSDC,
+        address _oracle
+    ) Ownable(msg.sender) {
         require(_mUSDC != address(0) && _oracle != address(0), "zero addr");
         mUSDC = IERC20(_mUSDC);
         oracle = IPASOracleExtended(_oracle);
     }
 
-    function quoteSwap(uint256 pasWei) public view returns (uint256 mUSDCOut) {
+    function quoteSwap(
+        uint256 pasWei
+    ) public view returns (uint256 mUSDCOut) {
         require(pasWei > 0, "zero amount");
         require(!oracle.isCrashed(), "oracle crashed");
 
@@ -45,7 +50,9 @@ contract KredioSwap is Ownable, ReentrancyGuard {
         return mUSDC.balanceOf(address(this));
     }
 
-    function swap(uint256 minMUSDCOut) external payable nonReentrant {
+    function swap(
+        uint256 minMUSDCOut
+    ) external payable nonReentrant {
         uint256 out = quoteSwap(msg.value);
         require(out >= minMUSDCOut, "slippage");
         require(reserveBalance() >= out, "reserve low");
@@ -53,7 +60,9 @@ contract KredioSwap is Ownable, ReentrancyGuard {
         emit Swapped(msg.sender, msg.value, out);
     }
 
-    function fundReserve(uint256 amount) external onlyOwner {
+    function fundReserve(
+        uint256 amount
+    ) external onlyOwner {
         require(amount > 0, "zero amount");
         require(mUSDC.transferFrom(msg.sender, address(this), amount), "transfer fail");
         emit ReserveFunded(msg.sender, amount);
@@ -66,13 +75,19 @@ contract KredioSwap is Ownable, ReentrancyGuard {
         require(ok, "pas transfer fail");
     }
 
-    function withdrawReserve(uint256 amount) external onlyOwner nonReentrant {
+    function withdrawReserve(
+        uint256 amount
+    ) external onlyOwner nonReentrant {
         require(amount > 0, "zero amount");
         require(mUSDC.transfer(msg.sender, amount), "transfer fail");
     }
 
-    function setFee(uint256 newFeeBps) external onlyOwner {
+    function setFee(
+        uint256 newFeeBps
+    ) external onlyOwner {
         require(newFeeBps <= MAX_FEE_BPS, "fee too high");
         feeBps = newFeeBps;
     }
+
+    receive() external payable {}
 }

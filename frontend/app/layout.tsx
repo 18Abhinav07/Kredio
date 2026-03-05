@@ -1,6 +1,6 @@
 "use client"
 
-import { WagmiProvider, useAccount, useChainId, useSwitchChain, useBalance, usePublicClient, useWalletClient } from 'wagmi'
+import { WagmiProvider, useAccount, useChainId, useSwitchChain, useBalance, useWalletClient } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RainbowKitProvider, ConnectButton, darkTheme } from '@rainbow-me/rainbowkit'
 import { wagmiConfig, paseoTestnet } from '../lib/wagmi'
@@ -17,7 +17,6 @@ import '@rainbow-me/rainbowkit/styles.css'
 import { Plus_Jakarta_Sans } from 'next/font/google'
 import { formatDisplayBalance } from '../lib/utils'
 import config, { isDeployed } from '../lib/addresses'
-import { ABIS } from '../lib/constants'
 import { TUSDC } from '../lib/tokens'
 
 const jakarta = Plus_Jakarta_Sans({
@@ -31,11 +30,8 @@ const queryClient = new QueryClient()
 function FaucetsDropdown() {
     const [open, setOpen] = useState(false)
     const ref = useRef<HTMLDivElement>(null)
-    const { address, isConnected } = useAccount()
-    const publicClient = usePublicClient()
+    const { isConnected } = useAccount()
     const { data: walletClient } = useWalletClient()
-    const [minting, setMinting] = useState(false)
-    const [mintMsg, setMintMsg] = useState('')
     const [addedTokens, setAddedTokens] = useState<Set<string>>(new Set())
 
     // Tokens that can be added to wallet
@@ -62,28 +58,6 @@ function FaucetsDropdown() {
         return () => document.removeEventListener('mousedown', handler)
     }, [])
 
-    const handleMintTUSDC = async () => {
-        if (!walletClient || !publicClient || !address || !isDeployed(config.mUSDC)) return
-        setMinting(true)
-        setMintMsg('')
-        try {
-            const tx = await walletClient.writeContract({
-                address: config.mUSDC,
-                abi: ABIS.MOCK_ASSET,
-                functionName: 'mint',
-                args: [address, TUSDC.faucet!.amount],
-            })
-            await publicClient.waitForTransactionReceipt({ hash: tx })
-            setMintMsg('Minted 1,000 mUSDC!')
-            setTimeout(() => setMintMsg(''), 3000)
-        } catch (e: unknown) {
-            const msg = e instanceof Error ? e.message.slice(0, 60) : 'Unknown error'
-            setMintMsg(`Error: ${msg}`)
-        } finally {
-            setMinting(false)
-        }
-    }
-
     return (
         <div ref={ref} className="relative">
             <button
@@ -100,7 +74,7 @@ function FaucetsDropdown() {
             </button>
 
             {open && (
-                <div className="absolute right-0 top-full mt-2 w-72 rounded-2xl border border-white/15 bg-black/85 backdrop-blur-2xl shadow-2xl z-[60] overflow-hidden">
+                <div className="absolute right-0 top-full mt-2 w-72 rounded-2xl border border-white/15 bg-black/85 backdrop-blur-2xl shadow-2xl z-60 overflow-hidden">
                     {/* PAS Faucet */}
                     <a
                         href="https://faucet.polkadot.io/"
@@ -117,27 +91,6 @@ function FaucetsDropdown() {
                             <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
                     </a>
-
-                    {/* tUSDC Faucet — always visible, disabled when not connected */}
-                    <button
-                        onClick={handleMintTUSDC}
-                        disabled={minting || !isConnected || !isDeployed(config.mUSDC)}
-                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors text-left disabled:opacity-50"
-                    >
-                        <span className="w-9 h-9 rounded-xl bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center text-yellow-300 text-[10px] font-bold">mUSDC</span>
-                        <div>
-                            <p className="text-sm font-medium text-white">
-                                {!isConnected ? 'Connect wallet to mint' : minting ? 'Minting...' : 'Mint 1,000 mUSDC'}
-                            </p>
-                            <p className="text-xs text-slate-400">Protocol stablecoin (6 decimals)</p>
-                        </div>
-                    </button>
-
-                    {mintMsg && (
-                        <div className={`px-4 py-2 text-xs border-y border-white/10 ${mintMsg.startsWith('Error') ? 'text-red-300 bg-red-500/10' : 'text-emerald-300 bg-emerald-500/10'}`}>
-                            {mintMsg}
-                        </div>
-                    )}
 
                     {/* ── Add Tokens to Wallet ── */}
                     <div className="px-4 py-3 border-t border-white/10">
