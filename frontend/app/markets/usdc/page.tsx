@@ -1,11 +1,10 @@
 "use client";
 
 import { Grid, PageShell, Panel, StateNotice, StatRow, StatRowSkeleton } from '../../../components/modules/ProtocolUI';
-import { formatHealthFactor, bpsToPercent, fmtToken, healthState, tierLabel, useGlobalProtocolData, useUserPortfolio, useUserScore } from '../../../hooks/useProtocolData';
+import { formatHealthFactor, bpsToPercent, fmtToken, healthState, tierLabel, useGlobalProtocolData, useUserPortfolio } from '../../../hooks/useProtocolData';
 
 export default function MarketsUsdcPage() {
     const { lending, refresh, loading, error } = useGlobalProtocolData();
-    const score = useUserScore();
     const portfolio = useUserPortfolio();
     const healthTone = healthState(portfolio.lendingHealthRatio);
 
@@ -37,15 +36,6 @@ export default function MarketsUsdcPage() {
                     {portfolio.error ? <StateNotice tone="warning" message={portfolio.error} /> : null}
                 </Panel>
             </Grid>
-
-            <Panel title="Score Context" subtitle="Borrow terms are score-adjusted.">
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-sm">
-                    <div className="rounded-xl border border-white/10 bg-black/25 p-3"><p className="text-slate-400 text-xs">Score</p><p className="text-white font-medium">{score.score.score.toString()}</p></div>
-                    <div className="rounded-xl border border-white/10 bg-black/25 p-3"><p className="text-slate-400 text-xs">Tier</p><p className="text-white font-medium">{tierLabel(score.score.tier)}</p></div>
-                    <div className="rounded-xl border border-white/10 bg-black/25 p-3"><p className="text-slate-400 text-xs">Collateral Ratio</p><p className="text-white font-medium">{bpsToPercent(score.score.collateralRatioBps)}</p></div>
-                    <div className="rounded-xl border border-white/10 bg-black/25 p-3"><p className="text-slate-400 text-xs">Borrow Rate</p><p className="text-white font-medium">{bpsToPercent(score.score.interestRateBps)}</p></div>
-                </div>
-            </Panel>
         </PageShell>
     );
 }

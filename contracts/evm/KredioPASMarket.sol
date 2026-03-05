@@ -227,6 +227,29 @@ contract KredioPASMarket is Ownable, ReentrancyGuard, Pausable {
         _liquidate(borrower, true);
     }
 
+    /// @notice Force-close a position and any pending collateral without debt repayment.
+    /// @dev For testnet / demo resets only. Absorbs outstanding debt as a protocol loss.
+    function adminForceClose(
+        address user
+    ) external onlyOwner nonReentrant {
+        Position storage p = positions[user];
+        uint256 pasToReturn = collateralBalance[user];
+
+        if (p.active) {
+            if (p.debtUSDC <= totalBorrowed) totalBorrowed -= p.debtUSDC;
+            else totalBorrowed = 0;
+            pasToReturn += p.collateralPAS;
+            delete positions[user];
+        }
+        if (collateralBalance[user] > 0) collateralBalance[user] = 0;
+
+        if (pasToReturn > 0) {
+            (bool ok,) = payable(user).call{value: pasToReturn}("");
+            require(ok, "force-close pas return fail");
+        }
+        emit CollateralWithdrawn(user, pasToReturn);
+    }
+
     function _liquidate(
         address borrower,
         bool ignoreHealth

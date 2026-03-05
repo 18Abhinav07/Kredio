@@ -294,9 +294,10 @@ export function bpsToPercent(bps: bigint | number, digits = 2) {
 
 export function formatHealthFactor(bps: bigint | number, digits = 2) {
     const raw = typeof bps === 'number' ? bps : Number(bps);
-    // If it's a huge number (like type(uint256).max), meaning no debt, show infinity
-    if (raw > 1e18) return '∞';
-    return (raw / 1e18).toFixed(digits);
+    // type(uint256).max signals no active position — both contracts use this as sentinel
+    if (raw > 1_000_000_000) return '∞';
+    // Both KredioLending and KredioPASMarket return (collateral * 10000) / owed (BPS)
+    return (raw / 10000).toFixed(digits) + 'x';
 }
 
 export function fmtUsd6(value: bigint) {

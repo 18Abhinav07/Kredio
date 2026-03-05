@@ -8,12 +8,11 @@ import { useAccess } from '../../hooks/useAccess';
 const LINKS = [
     { href: '/', label: 'Home' },
     { href: '/dashboard', label: 'Dashboard' },
-    { href: '/xcm-test', label: 'Bridge' },
-    { href: '/swap', label: 'Swap' },
     { href: '/markets/usdc', label: 'Markets' },
-    { href: '/borrow/usdc', label: 'Borrow' },
     { href: '/lend/usdc', label: 'Lend' },
-    { href: '/score', label: 'Score' },
+    { href: '/borrow/usdc', label: 'Borrow' },
+    { href: '/swap', label: 'Swap' },
+    { href: '/xcm-test', label: 'Bridge' },
     { href: '/liquidate', label: 'Liquidate' },
     { href: '/admin', label: 'Admin' },
 ];
@@ -26,7 +25,9 @@ export function AppNavigation() {
     return (
         <div className="hidden lg:flex items-center gap-1 rounded-xl border border-white/10 bg-black/20 px-2 py-1">
             {visibleLinks.map((link) => {
-                const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
+                const active = link.href === '/'
+                    ? pathname === '/'
+                    : pathname === link.href || pathname.startsWith(`${link.href}/`);
                 return (
                     <Link
                         key={link.href}

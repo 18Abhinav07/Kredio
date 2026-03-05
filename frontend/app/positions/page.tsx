@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function ScorePage() {
+export default function PositionsPage() {
     const router = useRouter();
     useEffect(() => { router.replace('/dashboard'); }, [router]);
     return null;

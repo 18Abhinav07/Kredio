@@ -10,8 +10,8 @@ export default function Home() {
 
     return (
         <PageShell title="Kredio Credit Protocol" subtitle="Score-driven credit markets on Polkadot Hub with mUSDC liquidity and PAS collateral borrowing.">
-            <section className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-                <div className="xl:col-span-2 rounded-2xl border border-white/15 bg-black/30 p-6 backdrop-blur-xl">
+            <section className="grid grid-cols-1 gap-4">
+                <div className="rounded-2xl border border-white/15 bg-black/30 p-6 backdrop-blur-xl">
                     <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Protocol Overview</p>
                     <h2 className="text-2xl md:text-3xl font-semibold text-white mt-2 leading-tight">
                         Decentralized lending, dynamic risk scoring, and PAS-backed credit in one stack.
@@ -23,17 +23,6 @@ export default function Home() {
                         <Link href="/dashboard" className="px-3 py-2 rounded-xl border border-white/20 bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors">Open Dashboard</Link>
                         <Link href="/borrow/usdc" className="px-3 py-2 rounded-xl border border-white/20 text-sm text-white hover:bg-white/10 transition-colors">Start Borrow Flow</Link>
                         <Link href="/lend/usdc" className="px-3 py-2 rounded-xl border border-white/20 text-sm text-white hover:bg-white/10 transition-colors">Start Lend Flow</Link>
-                    </div>
-                </div>
-
-                <div className="rounded-2xl border border-white/10 bg-black/30 p-5 backdrop-blur-xl">
-                    <p className="text-xs text-slate-400">Network</p>
-                    <p className="text-sm text-white mt-1">Polkadot Hub Testnet</p>
-                    <p className="text-xs text-slate-400 mt-3">Chain ID</p>
-                    <p className="text-sm text-white">{config.chainId}</p>
-                    <div className="mt-4 space-y-2">
-                        <a href={config.explorer} target="_blank" rel="noopener noreferrer" className="block text-xs text-cyan-300 hover:underline">Explorer ↗</a>
-                        <a href={config.faucet} target="_blank" rel="noopener noreferrer" className="block text-xs text-cyan-300 hover:underline">PAS Faucet ↗</a>
                     </div>
                 </div>
             </section>

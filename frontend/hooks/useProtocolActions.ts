@@ -130,6 +130,12 @@ export function useProtocolActions() {
             functionName: 'adminLiquidate',
             args: [borrower],
         })),
+        adminForceCloseLending: (user: `0x${string}`) => tx('Force-close KredioLending position', 'lending', () => walletClient!.writeContract({
+            address: config.lending,
+            abi: ABIS.KREDIO_LENDING,
+            functionName: 'adminForceClose',
+            args: [user],
+        })),
         sweepLendingFees: (to: `0x${string}`) => tx('Sweep Lending protocol fees', 'lending', () => walletClient!.writeContract({
             address: config.lending,
             abi: ABIS.KREDIO_LENDING,
@@ -194,6 +200,12 @@ export function useProtocolActions() {
             abi: ABIS.KREDIO_PAS_MARKET,
             functionName: 'adminLiquidate',
             args: [borrower],
+        })),
+        adminForceClosePas: (user: `0x${string}`) => tx('Force-close PAS market position', 'pas', () => walletClient!.writeContract({
+            address: config.pasMarket,
+            abi: ABIS.KREDIO_PAS_MARKET,
+            functionName: 'adminForceClose',
+            args: [user],
         })),
         sweepPasFees: (to: `0x${string}`) => tx('Sweep PAS market fees', 'pas', () => walletClient!.writeContract({
             address: config.pasMarket,

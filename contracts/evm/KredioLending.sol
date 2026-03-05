@@ -2,12 +2,7 @@
 pragma solidity ^0.8.24;
 
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-
-interface IGovernanceCache {
-    function getGovernanceData(
-        address user
-    ) external view returns (uint64, uint8, uint256);
-}
+import {IGovernanceCache} from "./interfaces/IGovernanceCache.sol";
 
 interface IMockUSDC {
     function balanceOf(
@@ -348,6 +343,30 @@ contract KredioLending is ReentrancyGuard {
         address borrower
     ) external onlyAdmin nonReentrant {
         _liquidate(borrower, true);
+    }
+
+    /// @notice Force-close a position and any pending collateral without debt repayment.
+    /// @dev For testnet / demo resets only. Absorbs outstanding debt as a protocol loss.
+    function adminForceClose(
+        address user
+    ) external onlyAdmin nonReentrant {
+        Position storage p = positions[user];
+        uint256 collateralToReturn = p.active ? p.collateral : 0;
+        uint256 pendingCollateral = collateralBalance[user];
+
+        if (p.active) {
+            if (p.debt <= totalBorrowed) totalBorrowed -= p.debt;
+            else totalBorrowed = 0;
+            delete positions[user];
+        }
+        if (pendingCollateral > 0) {
+            collateralBalance[user] = 0;
+            collateralToReturn += pendingCollateral;
+        }
+        if (collateralToReturn > 0) {
+            require(usdc.transfer(user, collateralToReturn), "force-close return fail");
+        }
+        emit CollateralWithdrawn(user, collateralToReturn);
     }
 
     // SCALE shim: [4-byte selector][LE u64 per arg] → [0x00][LE u64 result]

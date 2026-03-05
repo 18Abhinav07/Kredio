@@ -184,6 +184,26 @@ export default function AdminPage() {
                     />
                 </Panel>
             </Grid>
+
+            <Panel title="Force Close Position (Testnet Reset)" subtitle="Wipes a user's position and returns their collateral. Absorbs outstanding debt as a protocol loss. For testnet resets only.">
+                <ActionInput label="User Address" value={targetUser} onChange={setTargetUser} placeholder="0x..." />
+                <div className="flex flex-wrap gap-2 mt-2">
+                    <ActionButton
+                        label="Force Close Lending Position"
+                        variant="danger"
+                        loading={busy}
+                        disabled={busy || !safeTarget}
+                        onClick={() => run(() => actions.adminForceCloseLending(safeTarget!))}
+                    />
+                    <ActionButton
+                        label="Force Close PAS Position"
+                        variant="danger"
+                        loading={busy}
+                        disabled={busy || !safeTarget}
+                        onClick={() => run(() => actions.adminForceClosePas(safeTarget!))}
+                    />
+                </div>
+            </Panel>
         </PageShell>
     );
 }
