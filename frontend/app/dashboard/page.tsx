@@ -1,7 +1,7 @@
 "use client";
 
 import { useAccount } from 'wagmi';
-import { Grid, PageShell, Panel, RouteShortcut, StatRow } from '../../components/modules/ProtocolUI';
+import { Grid, PageShell, Panel, StateNotice, StatRow, StatRowSkeleton } from '../../components/modules/ProtocolUI';
 import { bpsToPercent, fmtToken, useGlobalProtocolData, useUserPortfolio, useUserScore, tierLabel } from '../../hooks/useProtocolData';
 
 export default function DashboardPage() {
@@ -11,23 +11,42 @@ export default function DashboardPage() {
     const portfolio = useUserPortfolio();
 
     return (
-        <PageShell title="Dashboard" subtitle="Protocol state, wallet snapshot, and fast route navigation.">
+        <PageShell title="Dashboard" subtitle="Live protocol telemetry, wallet risk profile, and execution shortcuts.">
+            <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+                <div className="rounded-xl border border-white/10 bg-black/25 p-4 hover:border-white/20 transition-colors">
+                    <p className="text-[11px] uppercase tracking-wider text-slate-400">Total Liquidity</p>
+                    <p className="text-xl text-white font-semibold mt-1">{fmtToken(lending.totalDeposited + pasMarket.totalDeposited, 6, 2)} mUSDC</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-black/25 p-4 hover:border-white/20 transition-colors">
+                    <p className="text-[11px] uppercase tracking-wider text-slate-400">Total Borrowed</p>
+                    <p className="text-xl text-white font-semibold mt-1">{fmtToken(lending.totalBorrowed + pasMarket.totalBorrowed, 6, 2)} mUSDC</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-black/25 p-4 hover:border-white/20 transition-colors">
+                    <p className="text-[11px] uppercase tracking-wider text-slate-400">My Tier</p>
+                    <p className="text-xl text-white font-semibold mt-1">{tierLabel(score.score.tier)}</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-black/25 p-4 hover:border-white/20 transition-colors">
+                    <p className="text-[11px] uppercase tracking-wider text-slate-400">Oracle Status</p>
+                    <p className={`text-xl font-semibold mt-1 ${oracle.isCrashed ? 'text-rose-300' : 'text-emerald-300'}`}>{oracle.isCrashed ? 'Crash Mode' : 'Healthy'}</p>
+                </div>
+            </section>
+
             <Grid>
-                <Panel title="Protocol Snapshot" subtitle="Live total deposits, borrows, fees and utilization.">
-                    <StatRow label="Lending Deposits" value={`${fmtToken(lending.totalDeposited, 6, 2)} mUSDC`} />
-                    <StatRow label="Lending Borrowed" value={`${fmtToken(lending.totalBorrowed, 6, 2)} mUSDC`} />
-                    <StatRow label="Lending Utilization" value={bpsToPercent(lending.utilizationBps)} />
-                    <StatRow label="PAS Deposits" value={`${fmtToken(pasMarket.totalDeposited, 6, 2)} mUSDC`} />
-                    <StatRow label="PAS Borrowed" value={`${fmtToken(pasMarket.totalBorrowed, 6, 2)} mUSDC`} />
-                    <StatRow label="PAS Utilization" value={bpsToPercent(pasMarket.utilizationBps)} />
+                <Panel title="Protocol Snapshot" subtitle="Core lending and PAS market metrics.">
+                    {loading ? <StatRowSkeleton label="Lending Deposits" /> : <StatRow label="Lending Deposits" value={`${fmtToken(lending.totalDeposited, 6, 2)} mUSDC`} />}
+                    {loading ? <StatRowSkeleton label="Lending Borrowed" /> : <StatRow label="Lending Borrowed" value={`${fmtToken(lending.totalBorrowed, 6, 2)} mUSDC`} />}
+                    {loading ? <StatRowSkeleton label="Lending Utilization" /> : <StatRow label="Lending Utilization" value={bpsToPercent(lending.utilizationBps)} />}
+                    {loading ? <StatRowSkeleton label="PAS Deposits" /> : <StatRow label="PAS Deposits" value={`${fmtToken(pasMarket.totalDeposited, 6, 2)} mUSDC`} />}
+                    {loading ? <StatRowSkeleton label="PAS Borrowed" /> : <StatRow label="PAS Borrowed" value={`${fmtToken(pasMarket.totalBorrowed, 6, 2)} mUSDC`} />}
+                    {loading ? <StatRowSkeleton label="PAS Utilization" /> : <StatRow label="PAS Utilization" value={bpsToPercent(pasMarket.utilizationBps)} />}
                     <div className="pt-2">
                         <button onClick={refresh} className="text-xs text-cyan-300 hover:underline">Refresh Snapshot</button>
                     </div>
                     {loading ? <p className="text-xs text-slate-500">Refreshing…</p> : null}
-                    {error ? <p className="text-xs text-rose-300">{error}</p> : null}
+                    {error ? <StateNotice tone="error" message={error} /> : null}
                 </Panel>
 
-                <Panel title="Wallet & Score" subtitle="Connected account score/tier and activity profile.">
+                <Panel title="Wallet & Score" subtitle="Connected account risk posture and performance history.">
                     <StatRow label="Wallet" value={isConnected ? `${address?.slice(0, 6)}…${address?.slice(-4)}` : 'Not connected'} />
                     <StatRow label="Score" value={score.score.score.toString()} />
                     <StatRow label="Tier" value={tierLabel(score.score.tier)} />
@@ -37,6 +56,10 @@ export default function DashboardPage() {
                     <StatRow label="Lending Defaults" value={portfolio.lendingDefaultCount.toString()} />
                     <StatRow label="PAS Repayments" value={portfolio.pasRepaymentCount.toString()} />
                     <StatRow label="PAS Defaults" value={portfolio.pasDefaultCount.toString()} />
+                    {!portfolio.loading && portfolio.lendingDeposit === 0n && portfolio.pasDeposit === 0n
+                        ? <StateNotice tone="info" message="No lender positions yet. Open Lend routes to supply liquidity." />
+                        : null}
+                    {portfolio.error ? <StateNotice tone="warning" message={portfolio.error} /> : null}
                 </Panel>
             </Grid>
 
@@ -46,16 +69,10 @@ export default function DashboardPage() {
                     <StatRow label="Round ID" value={oracle.roundId.toString()} />
                     <StatRow label="Updated At" value={oracle.updatedAt.toString()} />
                     <StatRow label="Crash Mode" value={oracle.isCrashed ? 'Active' : 'Normal'} tone={oracle.isCrashed ? 'red' : 'green'} />
+                    <button onClick={refresh} className="text-xs text-cyan-300 hover:underline">Refresh Oracle</button>
                 </Panel>
-                <Panel title="Quick Routes" subtitle="Navigate directly to core action pages.">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <RouteShortcut href="/markets/usdc" label="USDC Market" description="Read pool metrics and fees" />
-                        <RouteShortcut href="/markets/pas" label="PAS Market" description="Read oracle-linked market state" />
-                        <RouteShortcut href="/borrow/usdc" label="Borrow USDC" description="Lending collateral/borrow/repay" />
-                        <RouteShortcut href="/borrow/pas" label="Borrow vs PAS" description="PAS collateralized borrow flow" />
-                        <RouteShortcut href="/lend/usdc" label="Lend USDC" description="Deposit/withdraw/harvest in lending" />
-                        <RouteShortcut href="/lend/pas" label="Lend PAS Market" description="Deposit/withdraw/harvest in PAS pool" />
-                    </div>
+                <Panel title="Data Freshness" subtitle="State updates are polled every 30 seconds; use refresh buttons for immediate reads.">
+                    <StateNotice tone="info" message="Use the top navbar for navigation across Borrow, Lend, Markets, Score, and Admin sections." />
                 </Panel>
             </Grid>
         </PageShell>

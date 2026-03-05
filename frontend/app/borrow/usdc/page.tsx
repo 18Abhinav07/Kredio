@@ -57,12 +57,14 @@ export default function BorrowUsdcPage() {
                     <div className="flex flex-wrap gap-2">
                         <ActionButton
                             label="Approve Collateral"
+                            loading={busy}
                             disabled={busy || !collateralAmount}
                             onClick={() => run(() => actions.approveMUSDC(config.lending, collateralAmount!))}
                         />
                         <ActionButton
                             label="Deposit Collateral"
                             variant="ghost"
+                            loading={busy}
                             disabled={busy || !collateralAmount}
                             onClick={() => {
                                 if (!collateralAmount) {
@@ -78,6 +80,7 @@ export default function BorrowUsdcPage() {
                     <div className="flex flex-wrap gap-2">
                         <ActionButton
                             label="Borrow"
+                            loading={busy}
                             disabled={busy || !borrowAmount}
                             onClick={() => {
                                 if (!borrowAmount) {
@@ -90,12 +93,14 @@ export default function BorrowUsdcPage() {
                         <ActionButton
                             label="Repay"
                             variant="ghost"
+                            loading={busy}
                             disabled={busy}
                             onClick={() => run(() => actions.repayLending())}
                         />
                         <ActionButton
                             label="Withdraw Collateral"
                             variant="ghost"
+                            loading={busy}
                             disabled={busy}
                             onClick={() => run(() => actions.withdrawLendingCollateral())}
                         />

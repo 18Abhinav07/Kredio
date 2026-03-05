@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { PageShell, Panel, RouteShortcut } from '../components/modules/ProtocolUI';
+import { PageShell, Panel } from '../components/modules/ProtocolUI';
 import config from '../lib/addresses';
 import { useAccess } from '../hooks/useAccess';
 
@@ -9,30 +9,98 @@ export default function Home() {
     const { isAdmin } = useAccess();
 
     return (
-        <PageShell title="Kredio Credit Protocol" subtitle="Live frontend for lending, PAS-backed borrowing, liquidation and admin control on Polkadot Hub.">
-            <Panel title="Start" subtitle="Open one of the primary workflows.">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <RouteShortcut href="/dashboard" label="Dashboard" description="Protocol state, account snapshot and quick routes" />
-                    <RouteShortcut href="/markets" label="Markets" description="USDC and PAS market liquidity/borrow metrics" />
-                    <RouteShortcut href="/borrow/usdc" label="Borrow" description="Borrower flows for KredioLending and PAS market" />
-                    <RouteShortcut href="/lend/usdc" label="Lend" description="Lender deposit, withdraw and harvest actions" />
-                    {isAdmin ? <RouteShortcut href="/liquidate" label="Liquidate" description="At-risk position checks and liquidation actions" /> : null}
-                    {isAdmin ? <RouteShortcut href="/admin" label="Admin" description="Owner-only risk controls and emergency operations" /> : null}
+        <PageShell title="Kredio Credit Protocol" subtitle="Score-driven credit markets on Polkadot Hub with mUSDC liquidity and PAS collateral borrowing.">
+            <section className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+                <div className="xl:col-span-2 rounded-2xl border border-white/15 bg-black/30 p-6 backdrop-blur-xl">
+                    <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Protocol Overview</p>
+                    <h2 className="text-2xl md:text-3xl font-semibold text-white mt-2 leading-tight">
+                        Decentralized lending, dynamic risk scoring, and PAS-backed credit in one stack.
+                    </h2>
+                    <p className="text-sm text-slate-300 mt-3 max-w-2xl">
+                        Lenders deposit mUSDC for yield, borrowers unlock credit through score-aware terms, and PAS collateral markets adjust risk using a live oracle.
+                    </p>
+                    <div className="flex flex-wrap gap-2 mt-5">
+                        <Link href="/dashboard" className="px-3 py-2 rounded-xl border border-white/20 bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors">Open Dashboard</Link>
+                        <Link href="/borrow/usdc" className="px-3 py-2 rounded-xl border border-white/20 text-sm text-white hover:bg-white/10 transition-colors">Start Borrow Flow</Link>
+                        <Link href="/lend/usdc" className="px-3 py-2 rounded-xl border border-white/20 text-sm text-white hover:bg-white/10 transition-colors">Start Lend Flow</Link>
+                    </div>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-black/30 p-5 backdrop-blur-xl">
+                    <p className="text-xs text-slate-400">Network</p>
+                    <p className="text-sm text-white mt-1">Polkadot Hub Testnet</p>
+                    <p className="text-xs text-slate-400 mt-3">Chain ID</p>
+                    <p className="text-sm text-white">{config.chainId}</p>
+                    <div className="mt-4 space-y-2">
+                        <a href={config.explorer} target="_blank" rel="noopener noreferrer" className="block text-xs text-cyan-300 hover:underline">Explorer ↗</a>
+                        <a href={config.faucet} target="_blank" rel="noopener noreferrer" className="block text-xs text-cyan-300 hover:underline">PAS Faucet ↗</a>
+                    </div>
+                </div>
+            </section>
+
+            <Panel title="Core Contracts" subtitle="Frontend contract wiring and responsibilities.">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 text-xs">
+                    <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                        <p className="text-white font-medium">KredioLending</p>
+                        <p className="text-slate-400 mt-1">mUSDC deposit/borrow market with score-based ratios and rates.</p>
+                        <p className="text-slate-500 mt-2 break-all">{config.lending}</p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                        <p className="text-white font-medium">KredioPASMarket</p>
+                        <p className="text-slate-400 mt-1">Borrow mUSDC against PAS collateral and oracle valuation.</p>
+                        <p className="text-slate-500 mt-2 break-all">{config.pasMarket}</p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                        <p className="text-white font-medium">MockPASOracle</p>
+                        <p className="text-slate-400 mt-1">Feeds PAS price and crash simulation for risk testing.</p>
+                        <p className="text-slate-500 mt-2 break-all">{config.oracle}</p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                        <p className="text-white font-medium">GovernanceCache</p>
+                        <p className="text-slate-400 mt-1">Caches vote/conviction data for score computation.</p>
+                        <p className="text-slate-500 mt-2 break-all">{config.governanceCache}</p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                        <p className="text-white font-medium">MockUSDC (mUSDC)</p>
+                        <p className="text-slate-400 mt-1">Protocol quote asset used by lending and PAS markets.</p>
+                        <p className="text-slate-500 mt-2 break-all">{config.mUSDC}</p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                        <p className="text-white font-medium">KreditAgent</p>
+                        <p className="text-slate-400 mt-1">Computes score, tier, collateral ratio, and interest curves.</p>
+                        <p className="text-slate-500 mt-2 break-all">{config.kreditAgent}</p>
+                    </div>
                 </div>
             </Panel>
 
-            <Panel title="Network" subtitle="Canonical deployed addresses from protocol config.">
-                <div className="text-xs text-slate-300 space-y-2">
-                    <p>Chain ID: {config.chainId}</p>
-                    <p>Explorer: <a href={config.explorer} target="_blank" rel="noopener noreferrer" className="text-cyan-300 hover:underline">Open Subscan ↗</a></p>
-                    <p>Faucet: <a href={config.faucet} target="_blank" rel="noopener noreferrer" className="text-cyan-300 hover:underline">Request PAS ↗</a></p>
-                    <p className="break-all">KredioLending: {config.lending}</p>
-                    <p className="break-all">KredioPASMarket: {config.pasMarket}</p>
-                    <p className="break-all">mUSDC: {config.mUSDC}</p>
+            <Panel title="How It Works" subtitle="Simplified lifecycle across scoring, borrowing, and settlement.">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
+                    <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                        <p className="text-white font-medium">1. Fund</p>
+                        <p className="text-slate-400 mt-1">Mint mUSDC and supply liquidity to lending pools.</p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                        <p className="text-white font-medium">2. Score</p>
+                        <p className="text-slate-400 mt-1">KreditAgent + GovernanceCache derive borrower tier and terms.</p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                        <p className="text-white font-medium">3. Borrow</p>
+                        <p className="text-slate-400 mt-1">Borrow using mUSDC or PAS collateral with health tracking.</p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                        <p className="text-white font-medium">4. Repay / Liquidate</p>
+                        <p className="text-slate-400 mt-1">Repay to close position, or admin executes liquidation controls.</p>
+                    </div>
                 </div>
-                <Link href="/dashboard" className="inline-flex mt-2 px-3 py-2 rounded-xl border border-white/20 text-sm text-white hover:bg-white/10">
-                    Open Dashboard
-                </Link>
+            </Panel>
+
+            <Panel title="Start" subtitle="Use the top navbar for global navigation; keep only core quick entry points here.">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <Link href="/dashboard" className="px-3 py-2 rounded-xl border border-white/20 text-sm text-white hover:bg-white/10 transition-colors">Dashboard</Link>
+                    <Link href="/borrow/usdc" className="px-3 py-2 rounded-xl border border-white/20 text-sm text-white hover:bg-white/10 transition-colors">Borrow</Link>
+                    <Link href="/lend/usdc" className="px-3 py-2 rounded-xl border border-white/20 text-sm text-white hover:bg-white/10 transition-colors">Lend</Link>
+                    {isAdmin ? <Link href="/admin" className="px-3 py-2 rounded-xl border border-white/20 text-sm text-white hover:bg-white/10 transition-colors">Admin</Link> : null}
+                </div>
             </Panel>
         </PageShell>
     );

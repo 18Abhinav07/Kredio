@@ -84,7 +84,7 @@ export default function LiquidatePage() {
             <Grid>
                 <Panel title="Inspect Borrower">
                     <ActionInput label="Borrower Address" value={borrowerInput} onChange={setBorrowerInput} placeholder="0x…" />
-                    <ActionButton label="Load Health" disabled={busy || !borrower} onClick={inspect} />
+                    <ActionButton label="Load Health" loading={busy} disabled={busy || !borrower} onClick={inspect} />
                     <StatRow label="Lending Position Active" value={exists.lending ? 'Yes' : 'No'} />
                     <StatRow label="Lending Health" value={bpsToPercent(lendingHealth)} tone={Number(lendingHealth) < 11000 ? 'red' : Number(lendingHealth) < 15000 ? 'yellow' : 'green'} />
                     <StatRow label="PAS Position Active" value={exists.pas ? 'Yes' : 'No'} />
@@ -95,12 +95,14 @@ export default function LiquidatePage() {
                     <div className="flex flex-wrap gap-2">
                         <ActionButton
                             label="Liquidate Lending"
+                            loading={busy}
                             disabled={busy || !borrower || !exists.lending}
                             variant="danger"
                             onClick={() => run(() => actions.liquidateLending(borrower!))}
                         />
                         <ActionButton
                             label="Liquidate PAS"
+                            loading={busy}
                             disabled={busy || !borrower || !exists.pas}
                             variant="danger"
                             onClick={() => run(() => actions.liquidatePas(borrower!))}

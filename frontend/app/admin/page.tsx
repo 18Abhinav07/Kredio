@@ -70,11 +70,12 @@ export default function AdminPage() {
                     <ActionInput label="Target User" value={targetUser} onChange={setTargetUser} placeholder="0x..." />
                     <ActionInput label="Demo Multiplier" value={multiplier} onChange={setMultiplier} placeholder="e.g. 12000" />
                     <div className="flex flex-wrap gap-2">
-                        <ActionButton label="Sweep Lending Fees" disabled={busy || !safeReceiver} onClick={() => run(() => actions.sweepLendingFees(safeReceiver!))} />
-                        <ActionButton label="Sweep PAS Fees" disabled={busy || !safeReceiver} onClick={() => run(() => actions.sweepPasFees(safeReceiver!))} />
+                        <ActionButton label="Sweep Lending Fees" loading={busy} disabled={busy || !safeReceiver} onClick={() => run(() => actions.sweepLendingFees(safeReceiver!))} />
+                        <ActionButton label="Sweep PAS Fees" loading={busy} disabled={busy || !safeReceiver} onClick={() => run(() => actions.sweepPasFees(safeReceiver!))} />
                         <ActionButton
                             label="Set Lending Multiplier"
                             variant="ghost"
+                            loading={busy}
                             disabled={busy || !safeTarget}
                             onClick={() => {
                                 const value = numeric(multiplier);
@@ -88,6 +89,7 @@ export default function AdminPage() {
                         <ActionButton
                             label="Set PAS Multiplier"
                             variant="ghost"
+                            loading={busy}
                             disabled={busy || !safeTarget}
                             onClick={() => {
                                 const value = numeric(multiplier);
@@ -106,6 +108,7 @@ export default function AdminPage() {
                     <div className="flex flex-wrap gap-2">
                         <ActionButton
                             label="Set Oracle Price"
+                            loading={busy}
                             onClick={() => {
                                 const value = numeric(oraclePrice8);
                                 if (value === null) {
@@ -119,6 +122,7 @@ export default function AdminPage() {
                         <ActionButton
                             label="Crash Oracle"
                             variant="danger"
+                            loading={busy}
                             onClick={() => {
                                 const value = numeric(oraclePrice8);
                                 if (value === null) {
@@ -129,7 +133,7 @@ export default function AdminPage() {
                             }}
                             disabled={busy}
                         />
-                        <ActionButton label="Recover Oracle" variant="ghost" onClick={() => run(() => actions.oracleRecover())} disabled={busy} />
+                        <ActionButton label="Recover Oracle" variant="ghost" loading={busy} onClick={() => run(() => actions.oracleRecover())} disabled={busy} />
                     </div>
                 </Panel>
 
@@ -141,6 +145,7 @@ export default function AdminPage() {
                     <div className="flex flex-wrap gap-2">
                         <ActionButton
                             label="Set Risk Params"
+                            loading={busy}
                             onClick={() => {
                                 const ltv = numeric(ltvBps);
                                 const bonus = numeric(liqBonusBps);
@@ -154,8 +159,8 @@ export default function AdminPage() {
                             }}
                             disabled={busy}
                         />
-                        <ActionButton label="Pause PAS" variant="danger" onClick={() => run(() => actions.pausePas())} disabled={busy} />
-                        <ActionButton label="Unpause PAS" variant="ghost" onClick={() => run(() => actions.unpausePas())} disabled={busy} />
+                        <ActionButton label="Pause PAS" variant="danger" loading={busy} onClick={() => run(() => actions.pausePas())} disabled={busy} />
+                        <ActionButton label="Unpause PAS" variant="ghost" loading={busy} onClick={() => run(() => actions.unpausePas())} disabled={busy} />
                     </div>
                 </Panel>
 
@@ -165,6 +170,7 @@ export default function AdminPage() {
                     <ActionInput label="Conviction" value={conviction} onChange={setConviction} placeholder="2" />
                     <ActionButton
                         label="Set Governance Data"
+                        loading={busy}
                         disabled={busy || !safeTarget}
                         onClick={() => {
                             const voteCount = numeric(votes);

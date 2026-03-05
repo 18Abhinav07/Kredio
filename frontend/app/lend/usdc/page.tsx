@@ -54,6 +54,7 @@ export default function LendUsdcPage() {
                     <div className="flex flex-wrap gap-2">
                         <ActionButton
                             label="Approve"
+                            loading={busy}
                             disabled={busy || !amount}
                             onClick={() => {
                                 if (!amount) {
@@ -66,6 +67,7 @@ export default function LendUsdcPage() {
                         <ActionButton
                             label="Deposit"
                             variant="ghost"
+                            loading={busy}
                             disabled={busy || !amount}
                             onClick={() => {
                                 if (!amount) {
@@ -78,6 +80,7 @@ export default function LendUsdcPage() {
                         <ActionButton
                             label="Withdraw"
                             variant="ghost"
+                            loading={busy}
                             disabled={busy || !amount}
                             onClick={() => {
                                 if (!amount) {
@@ -90,6 +93,7 @@ export default function LendUsdcPage() {
                         <ActionButton
                             label="Harvest Yield"
                             variant="ghost"
+                            loading={busy}
                             disabled={busy}
                             onClick={() => run(() => actions.harvestLending())}
                         />

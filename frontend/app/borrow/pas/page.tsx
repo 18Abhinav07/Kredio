@@ -62,6 +62,7 @@ export default function BorrowPasPage() {
                     <div className="flex flex-wrap gap-2">
                         <ActionButton
                             label="Deposit PAS"
+                            loading={busy}
                             disabled={busy || !pasCollateralAmount}
                             onClick={() => {
                                 if (!pasCollateralAmount) {
@@ -74,6 +75,7 @@ export default function BorrowPasPage() {
                         <ActionButton
                             label="Withdraw PAS Collateral"
                             variant="ghost"
+                            loading={busy}
                             disabled={busy}
                             onClick={() => run(() => actions.withdrawPasCollateral())}
                         />
@@ -83,6 +85,7 @@ export default function BorrowPasPage() {
                     <div className="flex flex-wrap gap-2">
                         <ActionButton
                             label="Borrow mUSDC"
+                            loading={busy}
                             disabled={busy || !borrowAmount}
                             onClick={() => {
                                 if (!borrowAmount) {
@@ -95,12 +98,14 @@ export default function BorrowPasPage() {
                         <ActionButton
                             label="Repay"
                             variant="ghost"
+                            loading={busy}
                             disabled={busy}
                             onClick={() => run(() => actions.repayPas())}
                         />
                         <ActionButton
                             label="Approve mUSDC"
                             variant="ghost"
+                            loading={busy}
                             disabled={busy || !borrowAmount}
                             onClick={() => {
                                 if (!borrowAmount) {
