@@ -19,129 +19,196 @@ export function TiersSection() {
     return (
         <section style={{ ...SECTION }}>
             <style>{`
-                .tiers-wrap { max-width: 1200px; margin: 0 auto; width: 100%; }
-                .tiers-grid {
-                    display: grid;
-                    grid-template-columns: repeat(6, 1fr);
-                    gap: 16px;
+                .tiers-wrap {
+                    max-width: 1200px; 
+                    margin: 0 auto; 
                     width: 100%;
+                    display: grid;
+                    grid-template-columns: 1fr 1.2fr;
+                    gap: 64px;
+                    align-items: flex-start;
                 }
-                /* Row 1 — 4 small equal tiers */
-                .tc-1 { grid-column: 1/3; grid-row: 1; }
-                .tc-2 { grid-column: 3/5; grid-row: 1; }
-                .tc-3 { grid-column: 1/3; grid-row: 2; }
-                .tc-4 { grid-column: 3/5; grid-row: 2; }
-                /* Row — Platinum wide, Diamond wider */
-                .tc-5 { grid-column: 5/7; grid-row: 1; }
-                .tc-6 { grid-column: 5/7; grid-row: 2; }
+                
+                @media (max-width: 900px) {
+                    .tiers-wrap { grid-template-columns: 1fr; gap: 48px; }
+                    .sticky-left { position: relative !important; top: 0 !important; }
+                }
 
-                @media (max-width:720px) {
-                    .tiers-grid { grid-template-columns: repeat(2,1fr); }
-                    .tc-1,.tc-2,.tc-3,.tc-4,.tc-5,.tc-6 { grid-column:auto; grid-row:auto; }
+                .sticky-left {
+                    position: sticky;
+                    top: 120px;
                 }
-                @media (max-width:480px) {
-                    .tiers-grid { grid-template-columns: 1fr; }
+
+                .ladder-container {
+                    display: flex;
+                    flex-direction: column;
+                    position: relative;
+                    padding-bottom: 80px;
+                }
+
+                /* Background timeline rail */
+                .ladder-container::before {
+                    content: '';
+                    position: absolute;
+                    left: -24px;
+                    top: 24px;
+                    bottom: 24px;
+                    width: 2px;
+                    background: rgba(255,255,255,0.05);
+                    border-radius: 2px;
                 }
 
                 .tier-card {
-                    border-radius: 20px;
+                    border-radius: 24px;
                     border: 1px solid rgba(255,255,255,0.06);
-                    background: rgba(10,12,16,0.5);
+                    background: rgba(10,12,16,0.65);
                     backdrop-filter: blur(24px);
                     -webkit-backdrop-filter: blur(24px);
-                    padding: 32px;
+                    padding: 36px 40px;
                     display: flex;
                     flex-direction: column;
                     gap: 16px;
-                    cursor: default;
-                    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-                    min-height: 200px;
+                    min-height: 220px;
                     position: relative;
                     overflow: hidden;
+                    box-shadow: 0 -12px 32px rgba(0,0,0,0.5);
+                    /* Margin top pulls the card up to overlap the previous one slightly */
+                    margin-top: -40px;
+                    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
                 }
+                
+                /* First card doesn't overlap anything */
+                .tier-card:first-child { margin-top: 0; }
+
                 .tier-card::before {
                     content: '';
                     position: absolute;
                     inset: 0;
-                    background: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.04) 0%, transparent 60%);
+                    background: radial-gradient(circle at 100% 0%, rgba(255,255,255,0.05) 0%, transparent 60%);
                     pointer-events: none;
                 }
+                
                 .tier-card:hover { 
-                    border-color: rgba(255,255,255,0.15); 
-                    background: rgba(18,22,28,0.7);
-                    transform: translateY(-4px); 
-                    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+                    transform: translateY(-8px); 
                 }
+
+                /* The active timeline dot beside each card */
+                .timeline-dot {
+                    position: absolute;
+                    left: -24px;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 50%;
+                    background: #0f172a;
+                    border: 2px solid;
+                    z-index: 10;
+                }
+
                 .tier-card.hero-card {
-                    border-color: rgba(232,28,255,0.25);
-                    background: rgba(232,28,255,0.04);
-                    box-shadow: 0 0 40px rgba(232,28,255,0.08);
+                    border-color: rgba(232,28,255,0.3);
+                    background: rgba(15,10,20,0.85);
+                    box-shadow: 0 -16px 48px rgba(0,0,0,0.6), 0 0 80px rgba(232,28,255,0.1);
+                    margin-top: -20px; /* Hero card pops out a bit more */
                 }
-                .tier-card.hero-card:hover { 
-                    border-color: rgba(232,28,255,0.4); 
-                    transform: translateY(-5px); 
-                    box-shadow: 0 16px 40px rgba(232,28,255,0.15), 0 0 40px rgba(232,28,255,0.1);
+                .tier-card.hero-card::before {
+                    background: radial-gradient(circle at 100% 0%, rgba(232,28,255,0.15) 0%, transparent 70%);
                 }
             `}</style>
 
-            <motion.div
-                className="tiers-wrap"
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, margin: '-60px' }}
-                variants={container}
-            >
-                {/* Header */}
-                <motion.div variants={card} style={{ marginBottom: '22px' }}>
-                    <p style={LABEL_STYLE}>Your Reputation</p>
-                    <h2 style={{ fontSize: 'clamp(24px, 3vw, 38px)', fontWeight: 700, color: T.white, letterSpacing: '-0.04em', lineHeight: 1.08, marginBottom: '6px' }}>
-                        Score up.{' '}
-                        <span style={{ opacity: 0.35 }}>Borrow better.</span>
+            <div className="tiers-wrap">
+                {/* Left side — Sticky Header */}
+                <motion.div 
+                    className="sticky-left"
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: '-100px' }}
+                    transition={{ duration: 0.6 }}
+                >
+                    <p style={LABEL_STYLE}>The Path to Diamond</p>
+                    <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: T.white, letterSpacing: '-0.04em', lineHeight: 1.05, marginBottom: '16px' }}>
+                        Climb the Ladder.<br/>
+                        <span style={{ color: '#E81CFF' }}>Unlock Capital.</span>
                     </h2>
-                    <p style={{ fontSize: '14px', color: '#E2E8F0', lineHeight: 1.7, maxWidth: '460px' }}>
-                        Every repayment, vote, and bridge permanently builds your on-chain score.
+                    <p style={{ fontSize: '15px', color: '#E2E8F0', lineHeight: 1.7, maxWidth: '420px', marginBottom: '32px' }}>
+                        Kredio replaces fragmented identity with a unified on-chain reputation. Start at Anon with basic terms. Prove your reliability through repayments and governance. Unlock institutional-grade liquidity at Diamond.
                     </p>
+                    
+                    <div style={{ display: 'flex', gap: '24px' }}>
+                        <div>
+                            <p style={{ fontSize: '28px', fontWeight: 700, color: T.white, letterSpacing: '-0.04em' }}>6</p>
+                            <p style={{ fontSize: '10px', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.15em' }}>Tiers</p>
+                        </div>
+                        <div>
+                            <p style={{ fontSize: '28px', fontWeight: 700, color: '#00E2FF', letterSpacing: '-0.04em' }}>85<span style={{ fontSize: '18px' }}>%</span></p>
+                            <p style={{ fontSize: '10px', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.15em' }}>Max LTV</p>
+                        </div>
+                        <div>
+                            <p style={{ fontSize: '28px', fontWeight: 700, color: '#E81CFF', letterSpacing: '-0.04em' }}>3<span style={{ fontSize: '18px' }}>%</span></p>
+                            <p style={{ fontSize: '10px', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.15em' }}>Base Rate</p>
+                        </div>
+                    </div>
                 </motion.div>
 
-                {/* Bento tier grid */}
-                <div className="tiers-grid">
-                    {TIERS.map((t) => (
+                {/* Right side — Overlapping Stacking Cards */}
+                <motion.div 
+                    className="ladder-container"
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, margin: '-100px' }}
+                    variants={container}
+                >
+                    {TIERS.map((t, index) => (
                         <motion.div
                             key={t.name}
                             variants={card}
-                            className={`tier-card ${t.cls}${t.hero ? ' hero-card' : ''}`}
+                            className={`tier-card ${t.hero ? 'hero-card' : ''}`}
+                            style={{ 
+                                zIndex: index, // Ensure natural stacking order
+                                // Slight tilt based on index to make it feel like scattered cards
+                                transformOrigin: 'center center'
+                            }}
                         >
-                            {/* Tier name */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <span style={{ width: 8, height: 8, borderRadius: '50%', background: t.color, boxShadow: `0 0 10px ${t.color}AA`, flexShrink: 0, display: 'inline-block' }} />
-                                <span style={{ fontSize: '11px', fontFamily: 'ui-monospace,monospace', fontWeight: 700, color: t.color, letterSpacing: '2.5px' }}>
-                                    {t.name}
-                                </span>
-                                {t.hero && (
-                                    <span style={{ marginLeft: 'auto', fontSize: '8px', fontFamily: 'ui-monospace,monospace', color: T.pink, letterSpacing: '1px', background: 'rgba(232,28,255,0.15)', padding: '3px 8px', borderRadius: '6px' }}>BEST VALUE</span>
-                                )}
+                            <div className="timeline-dot" style={{ borderColor: t.color, boxShadow: `0 0 12px ${t.color}` }} />
+
+                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                                <div>
+                                    {/* Tier name */}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                                        <span style={{ width: 10, height: 10, borderRadius: '50%', background: t.color, boxShadow: `0 0 16px ${t.color}`, flexShrink: 0, display: 'inline-block' }} />
+                                        <span style={{ fontSize: '14px', fontFamily: 'ui-monospace,monospace', fontWeight: 800, color: t.color, letterSpacing: '3px' }}>
+                                            {t.name}
+                                        </span>
+                                        {t.hero && (
+                                            <span style={{ marginLeft: '12px', fontSize: '9px', fontFamily: 'ui-monospace,monospace', color: T.pink, letterSpacing: '1.5px', background: 'rgba(232,28,255,0.15)', padding: '4px 10px', borderRadius: '6px' }}>ULTIMATE TIER</span>
+                                        )}
+                                    </div>
+                                    
+                                    {/* Min points */}
+                                    <p style={{ fontSize: '11px', fontFamily: 'ui-monospace,monospace', color: '#CBD5E1', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                                        {t.pts} SCORE REQUIRED
+                                    </p>
+                                </div>
                             </div>
 
-                            {/* Min points */}
-                            <p style={{ fontSize: '9px', fontFamily: 'ui-monospace,monospace', color: '#94A3B8', marginTop: '-6px' }}>
-                                {t.pts} pts min
-                            </p>
-
-                            {/* Stats */}
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                            {/* Stats Flex Row */}
+                            <div style={{ display: 'flex', gap: '48px', marginTop: 'auto', paddingTop: '24px' }}>
                                 <div>
-                                    <p style={{ fontSize: '9px', fontFamily: 'ui-monospace,monospace', color: '#CBD5E1', letterSpacing: '1.5px', marginBottom: '4px', textTransform: 'uppercase' }}>Max LTV</p>
-                                    <p style={{ fontSize: '26px', fontWeight: 700, color: T.white, letterSpacing: '-0.04em', lineHeight: 1 }}>{t.ltv}</p>
+                                    <p style={{ fontSize: '10px', fontFamily: 'ui-monospace,monospace', color: '#94A3B8', letterSpacing: '1.5px', marginBottom: '6px', textTransform: 'uppercase' }}>Max LTV</p>
+                                    <p style={{ fontSize: '36px', fontWeight: 700, color: T.white, letterSpacing: '-0.04em', lineHeight: 1 }}>{t.ltv}</p>
                                 </div>
+                                <div style={{ width: '1px', background: 'rgba(255,255,255,0.08)' }} />
                                 <div>
-                                    <p style={{ fontSize: '9px', fontFamily: 'ui-monospace,monospace', color: '#CBD5E1', letterSpacing: '1.5px', marginBottom: '4px', textTransform: 'uppercase' }}>Int. Rate</p>
-                                    <p style={{ fontSize: '26px', fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: t.hero ? T.pink : T.white }}>{t.rate}</p>
+                                    <p style={{ fontSize: '10px', fontFamily: 'ui-monospace,monospace', color: '#94A3B8', letterSpacing: '1.5px', marginBottom: '6px', textTransform: 'uppercase' }}>Borrow Rate</p>
+                                    <p style={{ fontSize: '36px', fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: t.hero ? T.pink : T.white }}>{t.rate}</p>
                                 </div>
                             </div>
                         </motion.div>
                     ))}
-                </div>
-            </motion.div>
+                </motion.div>
+            </div>
         </section>
     );
 }

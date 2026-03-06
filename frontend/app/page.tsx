@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import {
     HeroSection,
+    TopologySection,
     FeaturesSection,
     TiersSection,
     CTASection,
@@ -26,6 +27,7 @@ export default function Home() {
         /* width:100% — stays within the layout container, no overflow */
         <div style={{ width: '100%', maxWidth: '100%' }}>
             <HeroSection />
+            <TopologySection />
             <FeaturesSection />
             <TiersSection />
             <CTASection />

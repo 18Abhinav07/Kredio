@@ -142,6 +142,15 @@ function Navbar() {
     const chainId = useChainId()
     const { switchChain } = useSwitchChain()
     const [walletPanelOpen, setWalletPanelOpen] = useState(false)
+    const [scrolled, setScrolled] = useState(false)
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20)
+        }
+        window.addEventListener('scroll', handleScroll)
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [])
 
     const { data: balanceData } = useBalance({
         address,
@@ -152,7 +161,9 @@ function Navbar() {
 
     return (
         <>
-            <nav className="flex justify-between items-center p-4 lg:p-6 sticky top-0 z-50">
+            <nav className={`flex justify-between items-center p-4 lg:px-6 lg:py-4 sticky top-0 z-50 transition-all duration-300 ${
+                scrolled ? 'bg-black/40 backdrop-blur-xl border-b border-white/10 shadow-[0_4px_32px_rgba(0,0,0,0.5)]' : 'bg-transparent border-b border-transparent'
+            }`}>
                 <div className="flex items-center gap-4 cursor-pointer">
                     <div className="w-8 h-8 rounded-none border border-white/20 flex items-center justify-center bg-white/5 backdrop-blur-md">
                         <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
