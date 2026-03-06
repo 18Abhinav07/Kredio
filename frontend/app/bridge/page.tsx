@@ -175,7 +175,7 @@ export default function XCMTestPage() {
 
     return (
         <PageShell
-            title="Cross-Chain Test"
+            title="Cross-Chain Transfer"
             subtitle="Bridge PAS from People Chain to Hub EVM via XCM. Connects Talisman (Substrate) with your MetaMask (EVM) address."
         >
             <Grid>

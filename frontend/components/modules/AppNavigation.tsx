@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { cn } from '../../lib/utils';
 import { useAccess } from '../../hooks/useAccess';
 
@@ -12,7 +13,7 @@ const LINKS = [
     { href: '/lend/usdc', label: 'Lend' },
     { href: '/borrow/usdc', label: 'Borrow' },
     { href: '/swap', label: 'Swap' },
-    { href: '/xcm-test', label: 'Bridge' },
+    { href: '/bridge', label: 'Bridge' },
     { href: '/liquidate', label: 'Liquidate' },
     { href: '/admin', label: 'Admin' },
 ];
@@ -20,7 +21,15 @@ const LINKS = [
 export function AppNavigation() {
     const pathname = usePathname();
     const { isAdmin } = useAccess();
-    const visibleLinks = LINKS.filter((link) => isAdmin || (link.href !== '/liquidate' && link.href !== '/admin'));
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const visibleLinks = LINKS.filter((link) =>
+        (mounted && isAdmin) || (link.href !== '/liquidate' && link.href !== '/admin'),
+    );
 
     return (
         <div className="hidden lg:flex items-center gap-1 rounded-xl border border-white/10 bg-black/20 px-2 py-1">
