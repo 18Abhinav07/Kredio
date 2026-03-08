@@ -1,7 +1,5 @@
 # Foundry
 cache/
-out/
-
 # Broadcast logs (keep run-latest, ignore dry-runs)
 !/broadcast
 /broadcast/*/31337/

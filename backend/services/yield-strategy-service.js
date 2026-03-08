@@ -11,11 +11,15 @@ const path = require('path');
 const fs = require('fs');
 const { HUB, KEY, YIELD_STRATEGY } = require('../config');
 
-// ─── Load ABIs (from compiled Foundry output) ─────────────────────────────
+// ─── Load ABIs ────────────────────────────────────────────────────────────
 function loadABI(name) {
-    const p = path.resolve(__dirname, '../../contracts/out', `${name}.sol`, `${name}.json`);
-    if (!fs.existsSync(p)) return null;
-    return require(p).abi;
+    // 1. Check committed abis/ directory (used in all deployed environments)
+    const bundled = path.resolve(__dirname, '../abis', `${name}.json`);
+    if (fs.existsSync(bundled)) return require(bundled);
+    // 2. Fall back to local Foundry output (dev only)
+    const forgeOut = path.resolve(__dirname, '../../contracts/out', `${name}.sol`, `${name}.json`);
+    if (fs.existsSync(forgeOut)) return require(forgeOut).abi;
+    return null;
 }
 
 // ─── State ────────────────────────────────────────────────────────────────
