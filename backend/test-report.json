@@ -1,0 +1,861 @@
+{
+  "runAt": "2026-03-08T09:42:41.875Z",
+  "elapsed_s": 637.4,
+  "chain": {
+    "rpc": "https://eth-rpc-testnet.polkadot.io/",
+    "chainId": 420420417
+  },
+  "contracts": {
+    "MUSDC": "0x5998cE005b4f3923c988Ae31940fAa1DEAC0c646",
+    "LENDING": "0x1eDaD1271FB9d1296939C6f4Fb762752b041C64E",
+    "PAS_MARKET": "0x0F90Fe6141AC29a6031C3ae2155749e9f38a0174",
+    "YIELD_POOL": "0x1dB4Faad3081aAfe26eC0ef6886F04f28D944AAB",
+    "ORACLE": "0x1494432a8Af6fa8c03C0d7DD7720E298D85C55c7"
+  },
+  "accounts": {
+    "ADMIN": "0xe37a8983570B39F305fe93D565A29F89366f3fFe",
+    "USER1": "0x5EF0a87f578778Fc78cbFe318D3444D71Ff638da",
+    "USER2": "0x8fb792EdBbA0A3b4e83Fffe790a8F080FD9C46CE",
+    "USER3": "0x7B8428750F29381Ef4190a0a9F8c294ac123014e",
+    "USER4": "0x6bA56a179ff0C0E08B60EBe2a3f03141CEacE50F",
+    "USER5": "0x105952E94C36916757785C4F7f92DAf5f1cC99ad",
+    "USER6": "0x863930353d628aA250fB98A4Eb2C1bAa649d5617"
+  },
+  "phase0_state": {
+    "lending": {
+      "totalDeposited": "500000000000",
+      "totalBorrowed": "0",
+      "investedAmount": "0",
+      "globalTick": "0",
+      "usdcBal": "500000000000"
+    },
+    "pasMarket": {
+      "totalDeposited": "300000000000",
+      "totalBorrowed": "0",
+      "usdcBal": "300000000000"
+    },
+    "yieldPool": {
+      "totalPrincipal": "244995780822",
+      "yieldRateBps": "100000",
+      "pendingForLending": "0"
+    }
+  },
+  "finalState": {
+    "lending": {
+      "totalDeposited": "500000000000",
+      "totalBorrowed": "0",
+      "investedAmount": "200000000000",
+      "protocolFees": "4582304",
+      "utilization": "0",
+      "globalTick": "1440"
+    },
+    "pasMarket": {
+      "totalDeposited": "300000000000",
+      "totalBorrowed": "0",
+      "protocolFees": "622733",
+      "utilization": "0"
+    },
+    "yieldPool": {
+      "principal": "444995780822",
+      "pendingYield": "5327245",
+      "rateBps": "100000"
+    }
+  },
+  "finalBalances": {
+    "ADMIN": {
+      "address": "0xe37a8983570B39F305fe93D565A29F89366f3fFe",
+      "mUSDC": "188120776509",
+      "PAS": "15563673516993137353848"
+    },
+    "USER1": {
+      "address": "0x5EF0a87f578778Fc78cbFe318D3444D71Ff638da",
+      "mUSDC": "1071134586151",
+      "PAS": "1999894572283100000000"
+    },
+    "USER2": {
+      "address": "0x8fb792EdBbA0A3b4e83Fffe790a8F080FD9C46CE",
+      "mUSDC": "389968636610",
+      "PAS": "1099811675934000000000"
+    },
+    "USER3": {
+      "address": "0x7B8428750F29381Ef4190a0a9F8c294ac123014e",
+      "mUSDC": "6350001182050",
+      "PAS": "1099874548958000000000"
+    },
+    "USER4": {
+      "address": "0x6bA56a179ff0C0E08B60EBe2a3f03141CEacE50F",
+      "mUSDC": "399997395169",
+      "PAS": "1099890749044900000000"
+    },
+    "USER5": {
+      "address": "0x105952E94C36916757785C4F7f92DAf5f1cC99ad",
+      "mUSDC": "834133614994",
+      "PAS": "1465614855989181546152"
+    },
+    "USER6": {
+      "address": "0x863930353d628aA250fB98A4Eb2C1bAa649d5617",
+      "mUSDC": "831129008194",
+      "PAS": "1999998392000000000000"
+    }
+  },
+  "steps": [
+    {
+      "step": 1,
+      "actor": "ADMIN",
+      "action": "Bulk-withdraw 1 depositor(s) from KredioLending",
+      "contract": "KredioLending",
+      "expected": "depositBalance zeroed for all; USDC returned to depositors",
+      "status": "PASS",
+      "txHash": "0x195e094232c451b626799a9b8a44f9a7dea9969235f89ceadf7dc2c65fda6fb6",
+      "gasUsed": "0",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 2,
+      "actor": "ADMIN",
+      "action": "Force-close all borrower positions in KredioLending",
+      "contract": "KredioLending",
+      "expected": "All borrow positions closed; USDC collateral returned; totalBorrowed → 0",
+      "status": "PASS",
+      "txHash": "0x2109a0e8cd14e9ec0fa2a5d7a6b33e00ed018bcdce6cc2da755b4d41475944af",
+      "gasUsed": "4961",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 3,
+      "actor": "ADMIN",
+      "action": "Hard-reset KredioLending (sweep all USDC dust to admin)",
+      "contract": "KredioLending",
+      "expected": "totalDeposited=0, totalBorrowed=0, accYieldPerShare=0, globalTick=0",
+      "status": "PASS",
+      "txHash": "0x3b017583316ae3a3582fb52bd5876cf7af7bad42152b7e3490af2bfa4abb2575",
+      "gasUsed": "2135",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 4,
+      "actor": "ADMIN",
+      "action": "Reset credit scores for all known addresses (KredioLending)",
+      "contract": "KredioLending",
+      "expected": "repaymentCount/liquidationCount/totalDepositedEver = 0 for all",
+      "status": "PASS",
+      "txHash": "0x9701985661afdad45a16b0a5aa3e1da5d9e0534c921c3029f087e4df2a612afd",
+      "gasUsed": "0",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 5,
+      "actor": "ADMIN",
+      "action": "Force-close all positions in KredioPASMarket (return PAS collateral)",
+      "contract": "KredioPASMarket",
+      "expected": "All PAS positions closed; PAS returned to borrowers; totalBorrowed → 0",
+      "status": "PASS",
+      "txHash": "0x1e0e2093ab258c3f32a39ef731899d8be05bd40634e532a297973876e4a069ac",
+      "gasUsed": "5863",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 6,
+      "actor": "ADMIN",
+      "action": "Bulk-withdraw 1 depositor(s) from KredioPASMarket",
+      "contract": "KredioPASMarket",
+      "expected": "PM depositBalances zeroed; mUSDC returned",
+      "status": "PASS",
+      "txHash": "0xdbc1fe6622e970700055080ee424c62eb66eacff372281f3a933d5f18bcc5484",
+      "gasUsed": "0",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 7,
+      "actor": "ADMIN",
+      "action": "Hard-reset KredioPASMarket",
+      "contract": "KredioPASMarket",
+      "expected": "PM totalDeposited=0, totalBorrowed=0, accYieldPerShare=0",
+      "status": "PASS",
+      "txHash": "0xb1edb3b6326277baf355c74aedccfac488c23db3b5301652a81df93b59c7ae22",
+      "gasUsed": "2045",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 8,
+      "actor": "ADMIN",
+      "action": "Reset credit scores for all known addresses (KredioPASMarket)",
+      "contract": "KredioPASMarket",
+      "expected": "PM credit scores cleared",
+      "status": "PASS",
+      "txHash": "0xa9ffa6e49258269f687c2cbc6d6f76d335142ec2a6aa7f7941212d729004382b",
+      "gasUsed": "0",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 9,
+      "actor": "ADMIN",
+      "action": "Mint 200,000 mUSDC to USER1",
+      "contract": "MockUSDC",
+      "expected": "USER1.mUSDC = 200 000 (fresh mint)",
+      "status": "PASS",
+      "txHash": "0xfb8afded26f9cd323a869baf2add2c3a9135dd0df01951255df6df44e763ff91",
+      "gasUsed": "1528",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 10,
+      "actor": "ADMIN",
+      "action": "Mint 200,000 mUSDC to USER2",
+      "contract": "MockUSDC",
+      "expected": "USER2.mUSDC = 200 000 (fresh mint)",
+      "status": "PASS",
+      "txHash": "0x41f4318401e3050b9e61baa55b243f9ceaaedb3ce570c9276d6b2276f26b5c51",
+      "gasUsed": "1528",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 11,
+      "actor": "ADMIN",
+      "action": "Mint 200,000 mUSDC to USER3",
+      "contract": "MockUSDC",
+      "expected": "USER3.mUSDC = 200 000 (fresh mint)",
+      "status": "PASS",
+      "txHash": "0x46a1d0139d171c860ae618e03bc735d7232d96fd364601bcdf41ffe9a1652756",
+      "gasUsed": "1528",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 12,
+      "actor": "ADMIN",
+      "action": "Mint 200,000 mUSDC to USER4",
+      "contract": "MockUSDC",
+      "expected": "USER4.mUSDC = 200 000 (fresh mint)",
+      "status": "PASS",
+      "txHash": "0x4cc3abf88bd32f9b7e41f50efec801ab02056eee78d3735df74505d10e57896e",
+      "gasUsed": "1528",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 13,
+      "actor": "ADMIN",
+      "action": "Mint 200,000 mUSDC to USER5",
+      "contract": "MockUSDC",
+      "expected": "USER5.mUSDC = 200 000 (fresh mint)",
+      "status": "PASS",
+      "txHash": "0x2df84fc6390e55449dd98e45fbc3c0d59d24185c7f73a37c808dbf46e392afbe",
+      "gasUsed": "1528",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 14,
+      "actor": "ADMIN",
+      "action": "Mint 200,000 mUSDC to USER6",
+      "contract": "MockUSDC",
+      "expected": "USER6.mUSDC = 200 000 (fresh mint)",
+      "status": "PASS",
+      "txHash": "0x44c484185184c3227a40060fc31eb121e1790da068def2372753cb22fffa97a3",
+      "gasUsed": "1528",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 15,
+      "actor": "ADMIN",
+      "action": "Set yield pool rate to 100 000 bps (1 000% APY)",
+      "contract": "MockYieldPool",
+      "expected": "yieldRateBps = 100 000; yield accrues rapidly for demo",
+      "status": "PASS",
+      "txHash": "0xb2f4ea960ed466989d74ece0520f04c138a14de994d169cea384346c85a36ca1",
+      "gasUsed": "1180",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 16,
+      "actor": "ADMIN",
+      "action": "Set KredioLending globalTick = 1 440 (1 s = 24 min interest)",
+      "contract": "KredioLending",
+      "expected": "globalTick = 1440",
+      "status": "PASS",
+      "txHash": "0x5e9a799296bbda84ffe133403272ada15e743b57ffcd6bfd36ae56f887b2a368",
+      "gasUsed": "21820",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 17,
+      "actor": "ADMIN",
+      "action": "Set KredioPASMarket globalTick = 1 440",
+      "contract": "KredioPASMarket",
+      "expected": "globalTick = 1440",
+      "status": "PASS",
+      "txHash": "0xabd6ab2ab1c822b50dd17dc635208a4f0de362339e2ec20bdb268e9e3be7ef42",
+      "gasUsed": "21820",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 18,
+      "actor": "ADMIN",
+      "action": "Wire MockYieldPool to KredioLending",
+      "contract": "KredioLending",
+      "expected": "yieldPool set; lending can now invest/pull/claim",
+      "status": "PASS",
+      "txHash": "0xfafb223126bf5207c60d6c76d8325a2d837d5be14544472c2477d338fc35db38",
+      "gasUsed": "1271",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 19,
+      "actor": "ADMIN",
+      "action": "Set KredioPASMarket risk params (stalenessLimit=86400, others unchanged)",
+      "contract": "KredioPASMarket",
+      "expected": "stalenessLimit = 86400 s (24 h); ltvBps=6500, liqBonusBps=800, protocolFeeBps=1000",
+      "status": "PASS",
+      "txHash": "0x37f7590b6cd3861ffafc43c3317b42e372bcd5823d0f8a5f6131efffedc8a7d5",
+      "gasUsed": "1940",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 20,
+      "actor": "ADMIN",
+      "action": "Refresh oracle price to 608220000 (reset updatedAt)",
+      "contract": "MockPASOracle",
+      "expected": "oracle.updatedAt = now; staleness check will pass for 86400 s",
+      "status": "PASS",
+      "txHash": "0xd9992440b87e7f0c7f8f51206ce172f65e5815dbdf6e190ec7c09ddfa3a450ae",
+      "gasUsed": "1543",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 21,
+      "actor": "ADMIN",
+      "action": "Approve MaxUint256 mUSDC to KredioLending",
+      "contract": "MockUSDC",
+      "expected": "Admin can deposit + fundReserve without re-approving",
+      "status": "PASS",
+      "txHash": "0x05558f877138de74237e56e9071252d728d3d77f3083bedf8e52f00539902fe6",
+      "gasUsed": "21895",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 22,
+      "actor": "ADMIN",
+      "action": "Approve MaxUint256 mUSDC to KredioPASMarket",
+      "contract": "MockUSDC",
+      "expected": "Admin can deposit + liquidate without re-approving",
+      "status": "PASS",
+      "txHash": "0x322158ae821c37997730690a79754feaaac977d633782709d4bb8350c2d6a628",
+      "gasUsed": "21895",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 23,
+      "actor": "ADMIN",
+      "action": "Deposit 500 000 mUSDC into KredioLending (admin liquidity base)",
+      "contract": "KredioLending",
+      "expected": "KredioLending.totalDeposited = 500 000; admin is a lender",
+      "status": "PASS",
+      "txHash": "0x2aa49053a66dddfde1909f6e236e8c5ee6642e7203bf81825a06a9d034d0e207",
+      "gasUsed": "106701",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 24,
+      "actor": "ADMIN",
+      "action": "Deposit 300 000 mUSDC into KredioPASMarket (admin liquidity base)",
+      "contract": "KredioPASMarket",
+      "expected": "KredioPASMarket.totalDeposited = 300 000",
+      "status": "PASS",
+      "txHash": "0x46491b760ab8b5cb4be87710c77dba979ed9df2de4496ac4c3b531c64f811d5b",
+      "gasUsed": "106792",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 25,
+      "actor": "USER1",
+      "action": "Approve 50 000 mUSDC to KredioLending",
+      "contract": "MockUSDC",
+      "expected": "Allowance set",
+      "status": "PASS",
+      "txHash": "0x0e506a7b84b3cf8fafadec1f9119aec42b4071f3ded1d8ab4238efc259734ca9",
+      "gasUsed": "21885",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 26,
+      "actor": "USER1",
+      "action": "Deposit 50 000 mUSDC into KredioLending",
+      "contract": "KredioLending",
+      "expected": "depositBalance[USER1] += 50 000; KredioLending.totalDeposited += 50 000",
+      "status": "PASS",
+      "txHash": "0xd63ab2fb16b5ccc1fe54936f6e5389ec140dac185ef3598163e723aa56ddcffd",
+      "gasUsed": "44766",
+      "error": null,
+      "observedBefore": {
+        "depositBalance": "0",
+        "totalDeposited": "500000000000"
+      },
+      "observedAfter": {
+        "depositBalance": "50000000000",
+        "totalDeposited": "550000000000"
+      }
+    },
+    {
+      "step": 27,
+      "actor": "USER3",
+      "action": "Approve 80 000 mUSDC to KredioPASMarket",
+      "contract": "MockUSDC",
+      "expected": "Allowance set",
+      "status": "PASS",
+      "txHash": "0x8ff2a24c386f598bc06735239d25607181d0c00ca6008833bd5444439af7b82b",
+      "gasUsed": "21885",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 28,
+      "actor": "USER3",
+      "action": "Deposit 80 000 mUSDC into KredioPASMarket",
+      "contract": "KredioPASMarket",
+      "expected": "PM depositBalance[USER3] += 80 000; PM totalDeposited += 80 000",
+      "status": "PASS",
+      "txHash": "0x17965637e939fd92ab7311fff469471caa21f3559462c8dbc0a867135d9d7624",
+      "gasUsed": "44862",
+      "error": null,
+      "observedBefore": {
+        "depositBalance": "0",
+        "totalDeposited": "300000000000"
+      },
+      "observedAfter": {
+        "depositBalance": "80000000000",
+        "totalDeposited": "380000000000"
+      }
+    },
+    {
+      "step": 29,
+      "actor": "USER2",
+      "action": "Approve 20 000 mUSDC to KredioLending (collateral)",
+      "contract": "MockUSDC",
+      "expected": "Allowance set",
+      "status": "PASS",
+      "txHash": "0xb3140bef7060c1260b4eb9b67bc93d6e0edd188da993234e507fb743ab1babe5",
+      "gasUsed": "21885",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 30,
+      "actor": "USER2",
+      "action": "Deposit 20 000 mUSDC as USDC collateral into KredioLending",
+      "contract": "KredioLending",
+      "expected": "collateralBalance[USER2] += 20 000",
+      "status": "PASS",
+      "txHash": "0xb820051887aac6993312a4470389a3ab5f93ffeb6fbb56ff4dabe625e4dd2943",
+      "gasUsed": "2308",
+      "error": null,
+      "observedBefore": {
+        "collateralBalance": "0"
+      },
+      "observedAfter": {
+        "collateralBalance": "20000000000"
+      }
+    },
+    {
+      "step": 31,
+      "actor": "USER2",
+      "action": "Borrow 10,000.00 mUSDC from KredioLending (credit-score gated)",
+      "contract": "KredioLending",
+      "expected": "Position opened: debt=10,000.00, collateral=20 000; totalBorrowed += 10,000.00",
+      "status": "PASS",
+      "txHash": "0x81ff031b01582fc4d7c9e45157e8ce5d1b0998931b238ddd09c0d202f706bb41",
+      "gasUsed": "86860",
+      "error": null,
+      "observedBefore": {
+        "totalBorrowed": "0",
+        "mUSDCBal": "370000000000"
+      },
+      "observedAfter": {
+        "totalBorrowed": "10000000000",
+        "mUSDCBal": "380000000000"
+      }
+    },
+    {
+      "step": 32,
+      "actor": "USER4",
+      "action": "depositCollateral — lock 300 PAS in KredioPASMarket",
+      "contract": "KredioPASMarket",
+      "expected": "collateralBalance[USER4] += 300 PAS (wei)",
+      "status": "PASS",
+      "txHash": "0xa02001ba6c06f37b0f62242013dc646c180afda8f2b4b8b3529a5b3fdd6b0ca9",
+      "gasUsed": "22057",
+      "error": null,
+      "observedBefore": {
+        "collateralBalance": "0"
+      },
+      "observedAfter": {
+        "collateralBalance": "300000000000000000000"
+      }
+    },
+    {
+      "step": 33,
+      "actor": "USER4",
+      "action": "Borrow 830.2203 mUSDC from KredioPASMarket (PAS-collateral gated)",
+      "contract": "KredioPASMarket",
+      "expected": "Position opened; USER4 receives 830.2203 mUSDC; PM totalBorrowed += 830.2203",
+      "status": "PASS",
+      "txHash": "0x9d23841a167cdd22f7e1a52467421cbca2ea784038ef78b1b0a1923066821942",
+      "gasUsed": "108093",
+      "error": null,
+      "observedBefore": {
+        "totalBorrowed": "0",
+        "mUSDCBal": "399999998888"
+      },
+      "observedAfter": {
+        "totalBorrowed": "830220300",
+        "mUSDCBal": "400830219188"
+      }
+    },
+    {
+      "step": 34,
+      "actor": "USER5",
+      "action": "depositCollateral — lock 400 PAS in KredioPASMarket",
+      "contract": "KredioPASMarket",
+      "expected": "collateralBalance[USER5] += 400 PAS",
+      "status": "PASS",
+      "txHash": "0x38e5a65a72b7a41d8b7891b5692c2dc4beed864466f10a97406262cee47c7b4d",
+      "gasUsed": "22057",
+      "error": null,
+      "observedBefore": {
+        "collateralBalance": "0"
+      },
+      "observedAfter": {
+        "collateralBalance": "400000000000000000000"
+      }
+    },
+    {
+      "step": 35,
+      "actor": "USER5",
+      "action": "Borrow 1,502.3034 mUSDC at 95% LTV (near liquidation)",
+      "contract": "KredioPASMarket",
+      "expected": "Position opened at 95% LTV; interest accrual will breach health threshold",
+      "status": "PASS",
+      "txHash": "0x81a4ac2b27c7a4ac69a7a1bb1e20d989a339dcde09de898e2fa2eb4d04eb9875",
+      "gasUsed": "87454",
+      "error": null,
+      "observedBefore": {
+        "totalBorrowed": "830220300"
+      },
+      "observedAfter": {
+        "totalBorrowed": "2332523700"
+      }
+    },
+    {
+      "step": 36,
+      "actor": "ADMIN",
+      "action": "Invest 200,000.00 mUSDC from KredioLending into yield pool",
+      "contract": "KredioLending",
+      "expected": "KredioLending.investedAmount += 200 000; YieldPool.totalPrincipal += 200 000; yield starts accruing",
+      "status": "PASS",
+      "txHash": "0x2a4f7c0a10fc312b108a198a5e46095d6043d90c544358c5a557a370b3414294",
+      "gasUsed": "65737",
+      "error": null,
+      "observedBefore": {
+        "investedAmount": "0",
+        "yieldPrincipal": "244995780822"
+      },
+      "observedAfter": {
+        "investedAmount": "200000000000",
+        "yieldPrincipal": "444995780822"
+      }
+    },
+    {
+      "step": 37,
+      "actor": "ADMIN",
+      "action": "adminTickPool for USER2 in KredioLending",
+      "contract": "KredioLending",
+      "expected": "USER2 interest capitalised into debt; accYieldPerShare++ for all lenders",
+      "status": "PASS",
+      "txHash": "0x67409bd19177bf5b08ecafd04b9f6c68536d704d20acf65e34e06e8024c61b10",
+      "gasUsed": "44510",
+      "error": null,
+      "observedBefore": {
+        "accruedInterest": "8438356",
+        "pendingUser1": "0"
+      },
+      "observedAfter": {
+        "debtFull": "[\"20000000000\",\"10009643835\",\"0\",\"10009643835\",\"2200\",\"0\",true]",
+        "pendingUser1": "789041"
+      }
+    },
+    {
+      "step": 38,
+      "actor": "ADMIN",
+      "action": "adminTickPool for USER4 + USER5 in KredioPASMarket",
+      "contract": "KredioPASMarket",
+      "expected": "USER4/USER5 interest capitalised; accYieldPerShare++ for PM lenders",
+      "status": "PASS",
+      "txHash": "0x3b8c1a9257e644614f77ce018191e55aeb37de735e37f7d030ee60c3014820c9",
+      "gasUsed": "46576",
+      "error": null,
+      "observedBefore": {
+        "u3Pending": "0"
+      },
+      "observedAfter": {
+        "u3Pending": "304307",
+        "adminPending": "1141153"
+      }
+    },
+    {
+      "step": 39,
+      "actor": "ADMIN",
+      "action": "adminLiquidate USER5 (totalOwed≈1,504.2961 mUSDC, seize PAS + bonus)",
+      "contract": "KredioPASMarket",
+      "expected": "USER5 position deleted; admin pays 1,504.2961 mUSDC; admin receives ~400 PAS (with bonus); interest distributed to PM lenders",
+      "status": "PASS",
+      "txHash": "0xcff4edaa8ad413baf2c4d335d25912def0e1c96050610ccbca8cc4cc94755dcb",
+      "gasUsed": "0",
+      "error": null,
+      "observedBefore": {
+        "active": "true",
+        "lenderYieldBefore": "304307",
+        "adminPASBefore": "15296220395410177760280"
+      },
+      "observedAfter": {
+        "active": "false",
+        "lenderYieldAfter": "681984",
+        "adminPASAfter": "15563572503946345074738"
+      }
+    },
+    {
+      "step": 40,
+      "actor": "ADMIN",
+      "action": "adminClaimAndInjectYield — mint 11.4155 mUSDC yield → distribute to lenders",
+      "contract": "KredioLending",
+      "expected": "MockYieldPool mints fresh mUSDC to KredioLending; accYieldPerShare增加; USER1+ADMIN earn pro-rata yield",
+      "status": "PASS",
+      "txHash": "0x1f4af041bf7fae4ce9b6297f1e6a6a4e2b16c5a7d77ceeae58e7c3f7743a285d",
+      "gasUsed": "24152",
+      "error": null,
+      "observedBefore": {
+        "pendingUser1": "789041",
+        "pendingAdmin": "7890410",
+        "totalEarned": "0"
+      },
+      "observedAfter": {
+        "pendingUser1": "1723038",
+        "pendingAdmin": "17230385"
+      }
+    },
+    {
+      "step": 41,
+      "actor": "USER1",
+      "action": "Harvest 1.723 mUSDC yield from KredioLending",
+      "contract": "KredioLending",
+      "expected": "USER1.mUSDC += 1.723; pendingYield[USER1] → 0",
+      "status": "PASS",
+      "txHash": "0x12370963fd3ea3e56d344a3d283f98486786e8a33976530a19c2930a758b71c6",
+      "gasUsed": "23039",
+      "error": null,
+      "observedBefore": {
+        "mUSDCBal": "1021130836992",
+        "pendingYield": "1723038"
+      },
+      "observedAfter": {
+        "mUSDCBal": "1021131626033",
+        "pendingYield": "1183063"
+      }
+    },
+    {
+      "step": 42,
+      "actor": "USER3",
+      "action": "Harvest 0.8193 mUSDC yield from KredioPASMarket",
+      "contract": "KredioPASMarket",
+      "expected": "USER3.mUSDC += 0.8193; pendingYield[USER3] → 0",
+      "status": "PASS",
+      "txHash": "0xf026987c0912f2353a290c54e843024bb2528104cafee4ef2bef87174a6eaaed",
+      "gasUsed": "23039",
+      "error": null,
+      "observedBefore": {
+        "mUSDCBal": "6270000002132",
+        "pendingYield": "819321"
+      },
+      "observedAfter": {
+        "mUSDCBal": "6270000821453",
+        "pendingYield": "0"
+      }
+    },
+    {
+      "step": 43,
+      "actor": "USER2",
+      "action": "Approve 10,080.1567 mUSDC to KredioLending for repayment",
+      "contract": "MockUSDC",
+      "expected": "Allowance ≥ totalOwed",
+      "status": "PASS",
+      "txHash": "0xd472eec0e340a0515396cdc794a33d83466594a2b9481e1e54b6dc5ca97b5a16",
+      "gasUsed": "21885",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 44,
+      "actor": "USER2",
+      "action": "repay() — pay 10,030.1567 mUSDC (principal + interest)",
+      "contract": "KredioLending",
+      "expected": "Position deleted; collateral 20 000 mUSDC returned to USER2; interest distributed to lenders; repaymentCount[USER2]++",
+      "status": "PASS",
+      "txHash": "0x10cd3b65e736845a7e8f66f99b39145846b43ccbd73568cb8d64eae58bdd03a6",
+      "gasUsed": "0",
+      "error": null,
+      "observedBefore": {
+        "active": "true",
+        "totalBorrowed": "10009643835",
+        "mUSDCBal": "380000000000"
+      },
+      "observedAfter": {
+        "active": "false",
+        "totalBorrowed": "0",
+        "mUSDCBal": "389968636610"
+      }
+    },
+    {
+      "step": 45,
+      "actor": "USER4",
+      "action": "Approve 882.7239 mUSDC to KredioPASMarket",
+      "contract": "MockUSDC",
+      "expected": "Allowance set",
+      "status": "PASS",
+      "txHash": "0x44c6688fd403b82d35b65eb4f10cf1bf0b40f28b7ba909a9dd4476999989eaf6",
+      "gasUsed": "21885",
+      "error": null,
+      "observedBefore": null,
+      "observedAfter": null
+    },
+    {
+      "step": 46,
+      "actor": "USER4",
+      "action": "repay() — pay 832.7239 mUSDC (principal + interest)",
+      "contract": "KredioPASMarket",
+      "expected": "Position inactive; totalBorrowed decreases; interest to PM lenders; repaymentCount[USER4]++",
+      "status": "PASS",
+      "txHash": "0xc5a23df7bb8b859bd222c95ebdbdd794c8b9a8ae43468a2890421e031ad43000",
+      "gasUsed": "0",
+      "error": null,
+      "observedBefore": {
+        "totalBorrowed": "830920869",
+        "mUSDCBal": "400830219188"
+      },
+      "observedAfter": {
+        "totalBorrowed": "0",
+        "mUSDCBal": "399997395169"
+      }
+    },
+    {
+      "step": 47,
+      "actor": "USER4",
+      "action": "withdrawCollateral() — retrieve 300 PAS from KredioPASMarket",
+      "contract": "KredioPASMarket",
+      "expected": "USER4 receives 300 PAS; collateralBalance[USER4] → 0",
+      "status": "PASS",
+      "txHash": "0xef7d982615d66ed325ff61b13bac2fa1bb3f0dedf64903c3a2ef4ab3c3126f81",
+      "gasUsed": "0",
+      "error": null,
+      "observedBefore": {
+        "pasBal": "799871711477300000000"
+      },
+      "observedAfter": {
+        "pasBal": "1099890749044900000000"
+      }
+    },
+    {
+      "step": 48,
+      "actor": "USER1",
+      "action": "withdraw(50,000.00) — full withdrawal from KredioLending",
+      "contract": "KredioLending",
+      "expected": "USER1 gets deposit back (auto-pulls from yield pool if needed) + any remaining yield; totalDeposited decreases",
+      "status": "PASS",
+      "txHash": "0x4c38861d3cbf9b5f04727dc4c0973e04a162722523d101d7fb6705b0f7cf06a9",
+      "gasUsed": "0",
+      "error": null,
+      "observedBefore": {
+        "depositBalance": "50000000000",
+        "lendingUSDC": "350045034014",
+        "user1USDC": "1021131626033"
+      },
+      "observedAfter": {
+        "depositBalance": "0",
+        "lendingUSDC": "300042073896",
+        "user1USDC": "1071134586151"
+      }
+    },
+    {
+      "step": 49,
+      "actor": "USER3",
+      "action": "withdraw(80,000.00) — full withdrawal from KredioPASMarket",
+      "contract": "KredioPASMarket",
+      "expected": "USER3 gets deposit back; PM totalDeposited decreases",
+      "status": "PASS",
+      "txHash": "0x284c57be22235c5b5a89ee940f223529f2bbfc3e8cc4cf575bc9cef43165b4cc",
+      "gasUsed": "0",
+      "error": null,
+      "observedBefore": {
+        "depositBalance": "80000000000",
+        "user3USDC": "6270000821453"
+      },
+      "observedAfter": {
+        "depositBalance": "0",
+        "user3USDC": "6350001182050"
+      }
+    }
+  ],
+  "summary": {
+    "total": 49,
+    "passed": 49,
+    "failed": 0
+  }
+}

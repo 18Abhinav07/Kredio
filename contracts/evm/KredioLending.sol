@@ -593,6 +593,7 @@ contract KredioLending is ReentrancyGuard {
         accYieldPerShare = 0;
         protocolFees = 0;
         globalTick = 0;
+        investedAmount = 0;
         uint256 bal = usdc.balanceOf(address(this));
         if (bal > 0) require(usdc.transfer(to, bal), "sweep fail");
         emit HardReset(to, bal);
