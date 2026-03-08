@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   // Turbopack's SSR bundler rejects (strict-mode parse error). Mark them external
   // so Node.js loads the CJS bundles natively and bypasses the bundler.
   serverExternalPackages: ["@polkadot/api", "@polkadot/util-crypto", "@polkadot/util", "@polkadot/types", "@polkadot/rpc-provider", "@polkadot/rpc-core", "@polkadot/api-base", "@polkadot/types-known", "@polkadot/keyring"],
+
+  output: "export",
 };
 
 export default nextConfig;
