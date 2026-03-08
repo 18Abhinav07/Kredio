@@ -43,31 +43,31 @@ const CRASH_PRICE = process.env.CRASH_PRICE_8DEC
 
 // ─── Intelligent yield strategy ───────────────────────────────────────────
 const YIELD_STRATEGY = {
-    enabled:               process.env.YIELD_STRATEGY_ENABLED === 'true',
-    lendingAddr:           (process.env.LENDING_ADDR  || '').toLowerCase(),
-    yieldPoolAddr:         (process.env.YIELD_POOL_ADDR || '').toLowerCase(),
+    enabled: process.env.YIELD_STRATEGY_ENABLED === 'true',
+    lendingAddr: (process.env.LENDING_ADDR || '').toLowerCase(),
+    yieldPoolAddr: (process.env.YIELD_POOL_ADDR || '').toLowerCase(),
 
     // Rebalance: invest 50% of idle, keep 20% of deposits liquid as min buffer
-    investRatioBps:        Number(process.env.INVEST_RATIO_BPS        || 5000),
-    minBufferBps:          Number(process.env.MIN_BUFFER_BPS          || 2000),
+    investRatioBps: Number(process.env.INVEST_RATIO_BPS || 5000),
+    minBufferBps: Number(process.env.MIN_BUFFER_BPS || 2000),
 
     // Zone thresholds (utilization in BPS)
-    investThresholdBps:    Number(process.env.INVEST_THRESHOLD_BPS    || 4000),
-    pullbackThresholdBps:  Number(process.env.PULLBACK_THRESHOLD_BPS  || 6500),
+    investThresholdBps: Number(process.env.INVEST_THRESHOLD_BPS || 4000),
+    pullbackThresholdBps: Number(process.env.PULLBACK_THRESHOLD_BPS || 6500),
     emergencyThresholdBps: Number(process.env.EMERGENCY_THRESHOLD_BPS || 8000),
 
     // Dead-band: ignore rebalance deltas smaller than 100 mUSDC (prevents dust txs)
-    deadBandUsdc:          process.env.DEAD_BAND_USDC           || '100000000',
+    deadBandUsdc: process.env.DEAD_BAND_USDC || '100000000',
 
     // Claim yield when pending > 10 mUSDC OR max interval exceeded
-    claimThresholdUsdc:    process.env.CLAIM_THRESHOLD_USDC     || '10000000',
-    maxClaimIntervalMs:    Number(process.env.MAX_CLAIM_INTERVAL_MS || 3_600_000), // 1 hr
+    claimThresholdUsdc: process.env.CLAIM_THRESHOLD_USDC || '10000000',
+    maxClaimIntervalMs: Number(process.env.MAX_CLAIM_INTERVAL_MS || 3_600_000), // 1 hr
 
     // Cooldown between invest txs (2 min) to avoid spam on volatile utilization
-    investCooldownMs:      Number(process.env.INVEST_COOLDOWN_MS || 120_000),
+    investCooldownMs: Number(process.env.INVEST_COOLDOWN_MS || 120_000),
 
     // Poll interval
-    pollMs:                Number(process.env.STRATEGY_POLL_MS  || 30_000),
+    pollMs: Number(process.env.STRATEGY_POLL_MS || 30_000),
 };
 
 module.exports = { CHAINS, HUB, BRIDGE_FEE_BPS, MAX_PRICE_DIVERGENCE_PCT, MODE, TICK_MS, KEY, PORT, CRASH_PRICE, YIELD_STRATEGY };

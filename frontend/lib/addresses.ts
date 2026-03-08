@@ -12,6 +12,7 @@ export type NetworkConfig = {
     oracle: `0x${string}`;
     governanceCache: `0x${string}`;
     kreditAgent: `0x${string}`;
+    yieldPool: `0x${string}`;
     chainId: number;
     rpc: string;
     explorer: string;
@@ -27,6 +28,7 @@ export const config: NetworkConfig = {
     oracle: asAddress(CONTRACTS.MOCKPASORACLE),
     governanceCache: asAddress(CONTRACTS.GOVERNANCECACHE),
     kreditAgent: asAddress(CONTRACTS.KREDITAGENT),
+    yieldPool: asAddress(CONTRACTS.MOCKYIELDPOOL),
     chainId: CONTRACTS.CHAIN_ID,
     rpc: CONTRACTS.RPC,
     explorer: CONTRACTS.EXPLORER,

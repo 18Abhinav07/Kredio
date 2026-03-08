@@ -340,5 +340,42 @@ export function useProtocolActions() {
             functionName: 'setGovernanceData',
             args: [user, votes, conviction],
         })),
+
+        // ── Intelligent Yield Strategy ────────────────────────────────────
+        yieldSetPool: (pool: `0x${string}`) => tx('Set yield pool address', 'lending', () => walletClient!.writeContract({
+            address: config.lending,
+            abi: ABIS.KREDIO_LENDING,
+            functionName: 'adminSetYieldPool',
+            args: [pool],
+        })),
+        yieldInvest: (amount: bigint) => tx('Invest into yield pool', 'lending', () => walletClient!.writeContract({
+            address: config.lending,
+            abi: ABIS.KREDIO_LENDING,
+            functionName: 'adminInvest',
+            args: [amount],
+        })),
+        yieldPullBack: (amount: bigint) => tx('Pull back from yield pool', 'lending', () => walletClient!.writeContract({
+            address: config.lending,
+            abi: ABIS.KREDIO_LENDING,
+            functionName: 'adminPullBack',
+            args: [amount],
+        })),
+        yieldClaimAndInject: () => tx('Claim yield and inject into lender pool', 'lending', () => walletClient!.writeContract({
+            address: config.lending,
+            abi: ABIS.KREDIO_LENDING,
+            functionName: 'adminClaimAndInjectYield',
+        })),
+        yieldSetStrategyParams: (investRatioBps: bigint, minBufferBps: bigint) => tx('Update yield strategy params', 'lending', () => walletClient!.writeContract({
+            address: config.lending,
+            abi: ABIS.KREDIO_LENDING,
+            functionName: 'adminSetStrategyParams',
+            args: [investRatioBps, minBufferBps],
+        })),
+        yieldSetRate: (rateBps: bigint) => tx('Set MockYieldPool yield rate', 'system', () => walletClient!.writeContract({
+            address: config.yieldPool,
+            abi: ABIS.MOCK_YIELD_POOL,
+            functionName: 'setYieldRate',
+            args: [rateBps],
+        })),
     };
 }

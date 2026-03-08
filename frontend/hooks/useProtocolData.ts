@@ -358,6 +358,70 @@ export function healthState(healthBps: bigint) {
     return 'green';
 }
 
+// ── Intelligent Yield Strategy data ───────────────────────────────────────
+
+export type StrategySnapshot = {
+    pool: string;
+    investedAmount: bigint;
+    totalStrategyYieldEarned: bigint;
+    pendingStrategyYield: bigint;
+    investRatioBps: bigint;
+    minBufferBps: bigint;
+    isActive: boolean;
+};
+
+const STRATEGY_ZERO_ADDR = '0x0000000000000000000000000000000000000000';
+
+const defaultStrategy: StrategySnapshot = {
+    pool: STRATEGY_ZERO_ADDR,
+    investedAmount: 0n,
+    totalStrategyYieldEarned: 0n,
+    pendingStrategyYield: 0n,
+    investRatioBps: 5000n,
+    minBufferBps: 2000n,
+    isActive: false,
+};
+
+export function useStrategyData() {
+    const publicClient = usePublicClient();
+    const [strategy, setStrategy] = React.useState<StrategySnapshot>(defaultStrategy);
+    const [loading, setLoading] = React.useState(false);
+
+    const refresh = React.useCallback(async () => {
+        if (!publicClient) return;
+        setLoading(true);
+        try {
+            const result = await publicClient.readContract({
+                address: config.lending,
+                abi: ABIS.KREDIO_LENDING,
+                functionName: 'strategyStatus',
+            }) as readonly [string, bigint, bigint, bigint, bigint, bigint];
+
+            setStrategy({
+                pool: result[0],
+                investedAmount: result[1],
+                totalStrategyYieldEarned: result[2],
+                pendingStrategyYield: result[3],
+                investRatioBps: result[4],
+                minBufferBps: result[5],
+                isActive: result[1] > 0n,
+            });
+        } catch {
+            // Strategy not yet deployed on this lending contract — keep defaults silently.
+        } finally {
+            setLoading(false);
+        }
+    }, [publicClient]);
+
+    React.useEffect(() => {
+        refresh();
+        const id = window.setInterval(refresh, 30_000);
+        return () => window.clearInterval(id);
+    }, [refresh]);
+
+    return { strategy, loading, refresh };
+}
+
 // ── Lending history (on-chain event log) ──────────────────────────────────
 
 export type LendHistoryEntry = {

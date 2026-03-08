@@ -6,8 +6,10 @@ const cors = require('cors');
 const { PORT } = require('./config');
 const oracle = require('./services/oracle-service');
 const bridge = require('./services/bridge-service');
+const yieldStrategy = require('./services/yield-strategy-service');
 const oracleRoutes = require('./routes/oracle');
 const bridgeRoutes = require('./routes/bridge');
+const yieldStrategyRoutes = require('./routes/yield-strategy');
 
 const app = express();
 
@@ -23,6 +25,7 @@ app.use(express.json());
 // ─── Routes ───────────────────────────────────────────────────────────────
 app.use('/oracle', oracleRoutes);
 app.use('/bridge', bridgeRoutes);
+app.use('/yield-strategy', yieldStrategyRoutes);
 
 // ─── Health check ─────────────────────────────────────────────────────────
 app.get('/health', (_req, res) => {
@@ -37,6 +40,7 @@ app.use((_req, res) => {
 // ─── Start services ───────────────────────────────────────────────────────
 oracle.start().catch(err => console.error('[oracle] start error:', err.message));
 bridge.start();
+yieldStrategy.start().catch(err => console.error('[yield-strategy] start error:', err.message));
 
 // ─── Listen ───────────────────────────────────────────────────────────────
 const server = app.listen(PORT, () => {
@@ -51,6 +55,7 @@ const server = app.listen(PORT, () => {
     console.log(`  GET  /bridge/quote?chainId=11155111&ethAmount=0.01`);
     console.log(`  POST /bridge/deposit   { chainId, txHash, hubRecipient }`);
     console.log(`  GET  /bridge/status?txHash=0x...`);
+    console.log(`  GET  /yield-strategy/status`);
     console.log(`════════════════════════════════════════\n`);
 });
 

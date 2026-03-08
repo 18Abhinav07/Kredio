@@ -16,6 +16,26 @@ interface IMockUSDC {
         address to,
         uint256 amount
     ) external returns (bool);
+    function approve(
+        address spender,
+        uint256 amount
+    ) external returns (bool);
+}
+
+interface IYieldPool {
+    function deposit(
+        uint256 amount
+    ) external;
+    function withdraw(
+        address to,
+        uint256 amount
+    ) external;
+    function claimYield(
+        address to
+    ) external returns (uint256);
+    function pendingYield(
+        address who
+    ) external view returns (uint256);
 }
 
 interface IKreditAgent {
@@ -59,6 +79,15 @@ contract KredioLending is ReentrancyGuard {
     uint256 public totalBorrowed;
     uint256 public accYieldPerShare;
     uint256 public protocolFees;
+
+    // ── Intelligent yield strategy ──────────────────────────────────────────
+    IYieldPool public yieldPool; // MockYieldPool address
+    uint256 public investedAmount; // mUSDC currently deployed externally
+    uint256 public totalStrategyYieldEarned; // lifetime cumulative yield injected
+
+    // Strategy config (all admin-settable)
+    uint256 public investRatioBps = 5000; // invest 50% of idle capital
+    uint256 public minBufferBps = 2000; // always keep 20% of deposits liquid
 
     // Lender mappings
     mapping(address => uint256) public depositBalance;
@@ -116,6 +145,13 @@ contract KredioLending is ReentrancyGuard {
     event PoolTicked(uint256 totalInterestDistributed);
     event HardReset(address indexed to, uint256 usdcSwept);
 
+    // Strategy events
+    event YieldPoolSet(address indexed pool);
+    event FundsInvested(uint256 amount, uint256 totalInvested);
+    event FundsPulledBack(uint256 amount, uint256 totalInvested);
+    event ExternalYieldInjected(uint256 amount, uint256 totalStrategyYieldEarned);
+    event StrategyParamsUpdated(uint256 investRatioBps, uint256 minBufferBps);
+
     // Convenience getters for checklist tooling
     function getAgent() external view returns (address) {
         return kreditAgent;
@@ -123,6 +159,107 @@ contract KredioLending is ReentrancyGuard {
 
     function getUsdc() external view returns (address) {
         return address(usdc);
+    }
+
+    // ── Strategy view helpers ──────────────────────────────────────────────
+
+    /// @notice Pending yield sitting in the yield pool waiting to be claimed.
+    function pendingStrategyYield() external view returns (uint256) {
+        if (address(yieldPool) == address(0)) return 0;
+        return yieldPool.pendingYield(address(this));
+    }
+
+    /// @notice Full strategy status in one call (for frontend + backend monitor).
+    function strategyStatus()
+        external
+        view
+        returns (
+            address pool,
+            uint256 invested,
+            uint256 totalEarned,
+            uint256 pendingYield_,
+            uint256 investRatio_,
+            uint256 minBuffer_
+        )
+    {
+        return (
+            address(yieldPool),
+            investedAmount,
+            totalStrategyYieldEarned,
+            address(yieldPool) != address(0) ? yieldPool.pendingYield(address(this)) : 0,
+            investRatioBps,
+            minBufferBps
+        );
+    }
+
+    // ── Strategy admin functions ───────────────────────────────────────────
+
+    /// @notice Wire the yield pool. One-time setup after deploying MockYieldPool.
+    function adminSetYieldPool(
+        address pool
+    ) external onlyAdmin {
+        require(pool != address(0), "zero addr");
+        yieldPool = IYieldPool(pool);
+        emit YieldPoolSet(pool);
+    }
+
+    /// @notice Deploy idle capital to the yield pool.
+    /// @dev Enforces min-buffer: 20% of totalDeposited must remain liquid after invest.
+    function adminInvest(
+        uint256 amount
+    ) external onlyAdmin nonReentrant {
+        require(address(yieldPool) != address(0), "no pool");
+        require(amount > 0, "zero amt");
+
+        uint256 idle = totalDeposited > totalBorrowed ? totalDeposited - totalBorrowed : 0;
+        uint256 curLiquid = idle > investedAmount ? idle - investedAmount : 0;
+        require(curLiquid >= amount, "not enough liquid capital");
+
+        uint256 liquidAfter = curLiquid - amount;
+        uint256 minBuffer = (totalDeposited * minBufferBps) / BPS_DIVISOR;
+        require(liquidAfter >= minBuffer, "would breach min buffer");
+
+        investedAmount += amount;
+        require(usdc.approve(address(yieldPool), amount), "approve fail");
+        yieldPool.deposit(amount);
+        emit FundsInvested(amount, investedAmount);
+    }
+
+    /// @notice Pull principal back from yield pool to this contract.
+    /// @dev Yield accumulated in the pool is NOT claimed here — call adminClaimAndInjectYield separately.
+    function adminPullBack(
+        uint256 amount
+    ) external onlyAdmin nonReentrant {
+        require(address(yieldPool) != address(0), "no pool");
+        require(amount > 0, "zero amt");
+        require(investedAmount >= amount, "exceeds invested");
+        investedAmount -= amount;
+        yieldPool.withdraw(address(this), amount);
+        emit FundsPulledBack(amount, investedAmount);
+    }
+
+    /// @notice Claim yield from pool and distribute it to lenders via accYieldPerShare.
+    /// @dev Yield is minted directly into this contract by MockYieldPool.claimYield(),
+    ///      then flows through _distributeInterest so all lenders earn their pro-rata share.
+    function adminClaimAndInjectYield() external onlyAdmin nonReentrant {
+        require(address(yieldPool) != address(0), "no pool");
+        uint256 amount = yieldPool.claimYield(address(this));
+        require(amount > 0, "no yield"); // should not happen but guard against it
+        _distributeInterest(amount);
+        totalStrategyYieldEarned += amount;
+        emit ExternalYieldInjected(amount, totalStrategyYieldEarned);
+    }
+
+    /// @notice Tune strategy parameters.
+    function adminSetStrategyParams(
+        uint256 _investRatioBps,
+        uint256 _minBufferBps
+    ) external onlyAdmin {
+        require(_investRatioBps <= 7000, "max 70%");
+        require(_minBufferBps >= 1000 && _minBufferBps <= 5000, "buffer 10%-50%");
+        investRatioBps = _investRatioBps;
+        minBufferBps = _minBufferBps;
+        emit StrategyParamsUpdated(_investRatioBps, _minBufferBps);
     }
 
     modifier onlyAdmin() {
@@ -193,6 +330,11 @@ contract KredioLending is ReentrancyGuard {
     ) external nonReentrant {
         require(amount > 0, "zero amt");
         require(depositBalance[msg.sender] >= amount, "insufficient");
+
+        // Auto-pull from yield pool if the liquid lending balance is short.
+        // Computed BEFORE decrementing totalDeposited so the math is correct.
+        _ensureLiquidity(amount);
+
         _harvest(msg.sender);
         depositBalance[msg.sender] -= amount;
         totalDeposited -= amount;
@@ -237,8 +379,13 @@ contract KredioLending is ReentrancyGuard {
         uint256 maxBorrow = (userCollateral * BPS_DIVISOR) / ratioBps;
         require(borrowAmount <= maxBorrow, "exceeds ratio");
 
-        uint256 available = totalDeposited > totalBorrowed ? totalDeposited - totalBorrowed : 0;
-        require(available >= borrowAmount, "insufficient liquidity");
+        // Total capacity check (ignores where the capital physically is).
+        uint256 idle = totalDeposited > totalBorrowed ? totalDeposited - totalBorrowed : 0;
+        require(idle >= borrowAmount, "insufficient liquidity");
+
+        // Auto-pull invested capital if needed so the borrow can proceed.
+        _ensureLiquidity(borrowAmount);
+
         require(usdc.transfer(msg.sender, borrowAmount), "transfer fail");
 
         p.collateral = userCollateral;
@@ -451,7 +598,27 @@ contract KredioLending is ReentrancyGuard {
         emit HardReset(to, bal);
     }
 
-    // -------- TIER 2: Risk Management --------
+    // ── TIER 2: Risk Management ────────────────────────────────────────────
+
+    // ── Internal helpers ──────────────────────────────────────────────────
+
+    /// @dev Pulls `amount` mUSDC back from yield pool if the current liquid
+    ///      lending balance would be insufficient.  Called from withdraw() and
+    ///      borrow() so those functions don't accumulate extra stack variables.
+    function _ensureLiquidity(
+        uint256 amount
+    ) internal {
+        if (address(yieldPool) == address(0) || investedAmount == 0) return;
+        uint256 idle = totalDeposited > totalBorrowed ? totalDeposited - totalBorrowed : 0;
+        uint256 lendingLiquid = idle > investedAmount ? idle - investedAmount : 0;
+        if (lendingLiquid < amount) {
+            uint256 deficit = amount - lendingLiquid;
+            uint256 toPull = deficit > investedAmount ? investedAmount : deficit;
+            investedAmount -= toPull;
+            yieldPool.withdraw(address(this), toPull);
+            emit FundsPulledBack(toPull, investedAmount);
+        }
+    }
 
     function liquidate(
         address borrower
