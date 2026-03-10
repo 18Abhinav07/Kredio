@@ -8,7 +8,7 @@ const ALL = [
     { cls: 'fc-pas', icon: '◈', title: 'PAS Markets', desc: 'Isolated borrow/lend markets for native Polkadot assets. Dynamic LTV up to 85%, real floating APY.', color: '#22C55E', stat: '85%', statLabel: 'Max LTV' },
     { cls: 'fc-flash', icon: '◎', title: 'Flashloan Shield', desc: 'Manipulation-resistant v5 interest accrual. Protects the protocol from single-block price manipulation and flashloan attacks.', color: '#A78BFA' },
     { cls: 'fc-xcm', icon: '⇌', title: 'XCM Deposits', desc: 'Bridge PAS from People Chain via native XCM.', color: T.cyan },
-    { cls: 'fc-eth', icon: '⬡', title: 'ETH Bridge', desc: 'Bring liquidity from 5 different EVM chains into Polkadot Asset Hub. Minted 1:1 on-chain.', color: '#F59E0B' },
+    { cls: 'fc-eth', icon: '⬡', title: 'ETH Bridge', desc: 'Bring liquidity from different EVM chains into Polkadot Asset Hub. Minted 1:1 on-chain.', color: '#F59E0B' },
     { cls: 'fc-gov', icon: '⬥', title: 'Governance Rewards', desc: 'Vote on Asset Hub governance and earn score multipliers. Consistency unlocks higher tiers permanently.', color: '#818CF8', stat: '6 →',  statLabel: 'Tiers' },
     { cls: 'fc-musdc', icon: '◇', title: 'mUSDC Markets', desc: 'Bridged EVM USDC pools with real-time yield.', color: '#38BDF8' },
     { cls: 'fc-swap', icon: '↻', title: 'KredioSwap', desc: 'Swap PAS, mUSDC and lending positions atomically.', color: '#F472B6' },
