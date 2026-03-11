@@ -8,8 +8,8 @@ Solidity and ink! / Rust smart contracts for the Kredio DeFi credit protocol, de
 
 1. [Overview](#overview)
 2. [Directory Structure](#directory-structure)
-3. [Contract Reference — EVM](#contract-reference--evm)
-4. [Contract Reference — ink!](#contract-reference--ink)
+3. [Contract Reference - EVM](#contract-reference--evm)
+4. [Contract Reference - ink!](#contract-reference--ink)
 5. [Credit Scoring Algorithm](#credit-scoring-algorithm)
 6. [Deployed Addresses](#deployed-addresses)
 7. [Prerequisites](#prerequisites)
@@ -21,9 +21,15 @@ Solidity and ink! / Rust smart contracts for the Kredio DeFi credit protocol, de
 
 ## Overview
 
-The Kredio contract suite is a hybrid Solidity + ink! system. EVM contracts handle capital flows, position management, and protocol actions. The `KreditAgent` ink! Wasm contract implements the deterministic credit scoring algorithm. The two layers communicate within the same block via SCALE-encoded cross-VM `staticcall` — a capability unique to Polkadot's hybrid Asset Hub runtime.
+The Kredio contract suite spans three execution layers on Polkadot Asset Hub EVM:
 
-Three additional ink! contracts compiled for the PVM (PolkaVM) runtime provide continuous AI-layer scoring: `NeuralScorer`, `RiskAssessor`, and `YieldMind`. These are called by the AI Engine backend service in response to on-chain lending events.
+**EVM (Solidity)** - User-facing capital flows: lending, collateral markets, swapping, cross-chain bridging, XCM intent settlement, account identity, and governance participation caching. All capital state lives here.
+
+**ink! Wasm - `KreditAgent`** - Deterministic on-chain credit scoring engine. Invoked by EVM market contracts via SCALE-encoded cross-VM `staticcall` in the same block, with no off-chain dependency. Every borrow computes a fresh score atomically and locks the resulting collateral ratio and rate into the position.
+
+**ink! PVM - `NeuralScorer`, `RiskAssessor`, `YieldMind`** - Continuous AI-layer assessment. The backend AI Engine calls these three contracts on every `KredioLending` event and during a 50-block (~5-minute) periodic sweep. Each run emits a full on-chain audit event (`ScoreInferred`, `RiskAssessed`, `AllocationComputed`) visible on the block explorer.
+
+> The EVM ↔ Wasm cross-VM `staticcall` using hardcoded SCALE selectors is a capability unique to Polkadot's hybrid Asset Hub runtime - no other EVM environment supports atomic reads from a live Wasm contract within the same transaction.
 
 ---
 
@@ -66,7 +72,7 @@ contracts/
 
 ---
 
-## Contract Reference — EVM
+## Contract Reference - EVM
 
 ### KredioLending
 
@@ -92,9 +98,9 @@ The primary lending pool for mUSDC-collateralised borrowing. Lenders supply mUSD
 | `withdrawCollateral()` | Retrieve collateral after full repayment |
 | `healthRatio(address)` | View current position health: `collateral / (debt × ratioBps / 10000)` |
 
-**Liquidation:** `liquidate(address borrower)` — callable by anyone when `healthRatio < 1.0`; caller seizes collateral plus 8% bonus.
+**Liquidation:** `liquidate(address borrower)` - callable by anyone when `healthRatio < 1.0`; caller seizes collateral plus 8% bonus.
 
-**Yield distribution:** Interest and claimed yield flow through `_distributeInterest()`, updating `accYieldPerShare`. Lender shares settle lazily on next deposit/withdraw/harvest — gas cost is constant regardless of lender count.
+**Yield distribution:** Interest and claimed yield flow through `_distributeInterest()`, updating `accYieldPerShare`. Lender shares settle lazily on next deposit/withdraw/harvest - gas cost is constant regardless of lender count.
 
 **Key events:** `Deposited`, `Borrowed`, `Repaid`, `Liquidated`, `CollateralDeposited`, `YieldHarvested`
 
@@ -108,7 +114,7 @@ Borrowing market backed by **native PAS token** collateral. Uses the on-chain Ch
 
 | Function | Description |
 |----------|-------------|
-| `depositCollateral()` | `payable` — deposits `msg.value` PAS as collateral |
+| `depositCollateral()` | `payable` - deposits `msg.value` PAS as collateral |
 | `borrow(uint256 amount)` | Draw mUSDC against collateral at oracle-determined LTV; rate set by `KreditAgent` |
 | `repay()` | Repay full position; transfers debt + accrued interest |
 | `withdrawCollateral()` | Withdraw PAS collateral (position must be fully repaid) |
@@ -128,8 +134,8 @@ Single-direction swap: native PAS in, mUSDC out, at the current oracle price.
 
 | Function | Description |
 |----------|-------------|
-| `quoteSwap(uint256 pasWei)` | View-only — returns mUSDC out for a given PAS input |
-| `swap(uint256 minMUSDCOut)` | `payable` — executes swap with slippage guard |
+| `quoteSwap(uint256 pasWei)` | View-only - returns mUSDC out for a given PAS input |
+| `swap(uint256 minMUSDCOut)` | `payable` - executes swap with slippage guard |
 
 Fee: `feeBps` (default 30 bps / 0.3%; maximum 100 bps / 1%). Reverts while `oracle.isCrashed()` is true.
 
@@ -151,11 +157,11 @@ Hub-side contract for the cross-chain ETH → mUSDC bridge. Called by the author
 
 ### EthBridgeInbox
 
-**`evm/EthBridgeInbox.sol`** — deployed on Ethereum Sepolia
+**`evm/EthBridgeInbox.sol`** - deployed on Ethereum Sepolia
 
 Source-chain deposit contract. Users send ETH here; the emitted event is picked up by the backend relayer.
 
-- `deposit(address hubRecipient)` — `payable`; enforces per-deposit min/max bounds
+- `deposit(address hubRecipient)` - `payable`; enforces per-deposit min/max bounds
 - **Event:** `EthDeposited(address indexed depositor, uint256 ethAmount, address indexed hubRecipient)`
 
 ---
@@ -217,7 +223,7 @@ Stores each user's Polkadot OpenGov participation on-chain, written by an author
 
 **`evm/MockPASOracle.sol`**
 
-Chainlink `AggregatorV3`-compatible price feed for PAS/USD. Updated by the authorised owner (the backend oracle service). In a production deployment this would be replaced by a decentralised oracle — Chainlink on Asset Hub or an Acurast-powered off-chain computation.
+Chainlink `AggregatorV3`-compatible price feed for PAS/USD. Updated by the authorised owner (the backend oracle service). In a production deployment this would be replaced by a decentralised oracle - Chainlink on Asset Hub or an Acurast-powered off-chain computation.
 
 | Function | Description |
 |----------|-------------|
@@ -251,7 +257,7 @@ External yield source integrated with `KredioLending` for idle capital managemen
 
 ---
 
-## Contract Reference — ink!
+## Contract Reference - ink!
 
 ### KreditAgent
 

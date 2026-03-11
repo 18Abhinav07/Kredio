@@ -1,6 +1,6 @@
 # Kredio Backend
 
-Node.js service layer for the Kredio protocol. A single Express process runs on port `3002`, hosts three REST-accessible services, and starts three concurrent background loops — all connected to smart contracts on Polkadot Asset Hub EVM.
+Node.js service layer for the Kredio protocol. A single Express process runs on port `3002`, hosts three REST-accessible services, and starts three concurrent background loops - all connected to smart contracts on Polkadot Asset Hub EVM.
 
 ---
 
@@ -59,13 +59,13 @@ backend/
 
 ## Services
 
-### Oracle Service — `services/oracle-service.js`
+### Oracle Service - `services/oracle-service.js`
 
 Feeds PAS/USD prices to the on-chain `PASOracle` contract at a configurable interval. Reads from a pre-loaded historical price sequence (`data/pas_oracle_feed.json`) and writes each tick on-chain.
 
 **Modes:**
-- `DEMO` — ticks every 60 seconds, cycling through the feed file. Designed for development and demonstrations.
-- `REAL` — ticks every 15 minutes. Replace the feed source with a live aggregator for production.
+- `DEMO` - ticks every 60 seconds, cycling through the feed file. Designed for development and demonstrations.
+- `REAL` - ticks every 15 minutes. Replace the feed source with a live aggregator for production.
 
 On startup the service reads the oracle contract's `stalenessLimit` and caps its tick interval to 80% of that value, ensuring the oracle data never expires from the market contract's perspective.
 
@@ -73,12 +73,12 @@ On startup the service reads the oracle contract's `stalenessLimit` and caps its
 
 ---
 
-### Bridge Service — `services/bridge-service.js`
+### Bridge Service - `services/bridge-service.js`
 
 Processes ETH deposits from the source chain and mints mUSDC on Asset Hub.
 
 **Deposit flow:**
-1. User deposits ETH to `EthBridgeInbox` on source chain — emits `EthDeposited(depositor, ethAmount, hubRecipient)`.
+1. User deposits ETH to `EthBridgeInbox` on source chain - emits `EthDeposited(depositor, ethAmount, hubRecipient)`.
 2. Frontend calls `POST /bridge/deposit` with `{ chainId, txHash, hubRecipient }`.
 3. Service fetches the transaction receipt and validates the `EthDeposited` log.
 4. ETH/USD price is cross-referenced between CoinGecko (30s TTL cache) and the on-chain Chainlink feed. Deposits are rejected if the two sources diverge by more than 2%.
@@ -89,7 +89,7 @@ Replay protection is enforced by the contract: each source transaction hash can 
 
 ---
 
-### Yield Strategy Service — `services/yield-strategy-service.js`
+### Yield Strategy Service - `services/yield-strategy-service.js`
 
 Monitors `KredioLending` pool utilisation and automatically rebalances capital between the lending pool and the external yield source.
 
@@ -106,7 +106,7 @@ Yield is claimed and injected into the lending pool when pending yield exceeds 1
 
 ---
 
-### AI Engine — `src/aiEngine.js`
+### AI Engine - `src/aiEngine.js`
 
 Event-driven orchestrator for the three PVM ink! contracts. Listens to `KredioLending` events and calls the on-chain scoring layer in response.
 
@@ -125,21 +125,21 @@ Each PVM call emits an on-chain event (`ScoreInferred`, `RiskAssessed`, `Allocat
 
 ---
 
-### XCM Acknowledger — `src/xcmAcknowledger.js`
+### XCM Acknowledger - `src/xcmAcknowledger.js`
 
 Polls `KredioXCMSettler` for `IntentSettled` and `IntentFailed` events and logs them for off-chain audit.
 
 ---
 
-### Protocol Ping — `src/protocolPing.js`
+### Protocol Ping - `src/protocolPing.js`
 
-Keeps three non-core contracts active with periodic background transactions.
+Keeps three non-core contracts active with periodic background transactions. Contract addresses are hardcoded in the source and do not require env configuration.
 
-| Contract | Activity | Interval |
-|----------|----------|----------|
-| `GovernanceCache` | `setGovernanceData()` — writes simulated governance vote counts | Every 60 blocks |
-| `KredioAccountRegistry` | `attestedUnlink()` + `attestedLink()` cycle — emits `AccountLinked` / `AccountUnlinked` | Every 300 blocks |
-| `KredioSwap` | `quoteSwap()` + `reserveBalance()` view calls — logged locally | Every 50 blocks |
+| Contract | Address | Activity | Interval |
+|----------|---------|----------|---------|
+| `GovernanceCache` | `0xe4DE7eadE2c0A65BdA6863Ad7bA22416c77F3e55` | `setGovernanceData()` - writes governance vote counts | Every 60 blocks |
+| `KredioAccountRegistry` | `0xBf7ac0e6f0024ED0F2Cf2efb3669E7c389258BFf` | `attestedUnlink()` + `attestedLink()` cycle - emits `AccountLinked` / `AccountUnlinked` | Every 300 blocks |
+| `KredioSwap` | `0xaF1d183F4550500Beb517A3249780290A88E6e39` | `quoteSwap()` + `reserveBalance()` view calls - logged locally | Every 50 blocks |
 
 ---
 
@@ -201,7 +201,7 @@ MINTER_ADDR=0x...                    # KredioBridgeMinter on Asset Hub
 INBOX_ADDR_11155111=0x...            # EthBridgeInbox on Ethereum Sepolia
 BRIDGE_FEE_BPS=20                    # 0.2%
 
-# ── AI Engine — PVM contracts ─────────────────────────────────────────────────
+# ── AI Engine - PVM contracts ─────────────────────────────────────────────────
 NEURAL_SCORER_ADDRESS=0xac6bd3ff3447d8d1689dd4f02899ff558f108e0d
 RISK_ASSESSOR_ADDRESS=0xdB9E48932E061D95E22370235ac3a35332d289f7
 YIELD_MIND_ADDRESS=0x0b68fbfb596846e4f3a23da10365e0888a182ef3
@@ -261,4 +261,4 @@ Set `CORS_ORIGINS` to the deployed frontend domain. If running behind a reverse 
 - **CORS**: Always set `CORS_ORIGINS` explicitly in production.
 - **Input validation**: All bridge route inputs are validated (hex format, length) before any on-chain call is made.
 - **Price manipulation**: The bridge cross-references CoinGecko and Chainlink and rejects deposits when the two prices diverge by more than 2%.
-- **Replay protection**: `KredioBridgeMinter` enforces one-time processing per source transaction hash — double-minting is impossible at the contract level.
+- **Replay protection**: `KredioBridgeMinter` enforces one-time processing per source transaction hash - double-minting is impossible at the contract level.

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RainbowKitProvider, ConnectButton, darkTheme } from '@rainbow-me/rainbowkit'
 import { wagmiConfig, paseoTestnet } from '../lib/wagmi'
 import { ReactNode, useState, useRef, useEffect } from 'react'
+import Link from 'next/link'
 import { ThemeProvider } from '../components/providers/ThemeProvider'
 import { ActionLogProvider } from '../components/providers/ActionLogProvider'
 import { Toaster } from 'sonner'
@@ -186,6 +187,14 @@ function Navbar() {
                             Switch to Polkadot Hub
                         </button>
                     )}
+                    <div className="hidden sm:block">
+                        <Link 
+                            href="/docs" 
+                            className="text-sm font-medium text-slate-300 hover:text-white px-3 py-2 transition-colors inline-block"
+                        >
+                            Docs
+                        </Link>
+                    </div>
                     <div className="hidden sm:block">
                         <FaucetsDropdown />
                     </div>

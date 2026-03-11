@@ -23,14 +23,14 @@ Next.js application for the Kredio DeFi credit protocol on Polkadot Asset Hub EV
 
 | Package | Version | Purpose |
 |---------|---------|---------|
-| Next.js | 16 (App Router) | React framework — SSR, routing, API routes |
+| Next.js | 16 (App Router) | React framework - SSR, routing, API routes |
 | React | 19 | UI library |
 | TypeScript | 5 | Type safety |
 | Tailwind CSS | 3 | Utility-first styling |
 | wagmi | v3 | EVM wallet hooks and transaction management |
 | viem | v2 | Low-level EVM RPC client |
 | RainbowKit | v2 | Wallet connect UX |
-| @polkadot/api | 16 | Substrate/AssetHub RPC — for XCM and native queries |
+| @polkadot/api | 16 | Substrate/AssetHub RPC - for XCM and native queries |
 | @paraspell/sdk-pjs | Latest | XCM intent builder |
 
 ---
@@ -116,7 +116,7 @@ Reads all live on-chain state needed to render the protocol pages.
 
 ```ts
 const {
-  creditScore,       // u64 — raw score from KreditAgent
+  creditScore,       // u64 - raw score from KreditAgent
   creditTier,        // 0–5
   collateralRatio,   // bps
   interestRate,      // bps
@@ -189,7 +189,7 @@ Client-side (localStorage) append-only log for submitted transactions. Used by `
 
 ## Contract Configuration
 
-**`config/contracts.ts`** — typed address map keyed by chain ID:
+**`config/contracts.ts`** - typed address map keyed by chain ID:
 
 | Contract Name | Chain ID `420420417` |
 |---------------|---------------------|
@@ -203,6 +203,14 @@ Client-side (localStorage) append-only log for submitted transactions. Used by `
 | `GovernanceCache` | `0xe4DE7eadE2c0A65BdA6863Ad7bA22416c77F3e55` |
 | `YieldPool` | `0x1dB4Faad3081aAfe26eC0ef6886F04f28D944AAB` |
 | `KreditAgent` (ink!) | `0x8c13E6fFDf27bB51304Efff108C9B646d148E5F3` |
+
+The following contracts are called by the backend AI Engine and are not directly queried by the frontend. They are listed here as a deployment reference:
+
+| Contract | Address |
+|---|---|
+| `NeuralScorer` (PVM) | `0xac6bd3ff3447d8d1689dd4f02899ff558f108e0d` |
+| `RiskAssessor` (PVM) | `0xdB9E48932E061D95E22370235ac3a35332d289f7` |
+| `YieldMind` (PVM) | `0x0b68fbfb596846e4f3a23da10365e0888a182ef3` |
 
 ---
 

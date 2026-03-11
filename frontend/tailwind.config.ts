@@ -28,7 +28,10 @@ const config: Config = {
             }
         },
     },
-    plugins: [],
+    plugins: [
+        "tailwindcss-animate",
+        require('@tailwindcss/typography'),
+    ],
     darkMode: 'class', // enable next-themes .dark class
 };
 export default config;
