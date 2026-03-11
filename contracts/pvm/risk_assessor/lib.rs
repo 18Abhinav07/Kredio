@@ -67,7 +67,7 @@ mod risk_assessor {
         }
 
         /// Assess up to 16 positions in one transaction.
-        /// Only entries [0..active_count) are real — the rest return zero-value.
+        /// Only entries [0..active_count) are real - the rest return zero-value.
         /// Emits RiskAssessed only for active entries.
         #[ink(message)]
         pub fn assess_batch(
@@ -105,7 +105,7 @@ mod risk_assessor {
         #[ink(message)]
         pub fn owner(&self) -> Address { self.owner }
 
-        // ── Pure computation — no state access ───────────────────────────
+        // ── Pure computation - no state access ───────────────────────────
 
         fn compute_risk(
             collateral_usd_x6:   u64,
@@ -125,7 +125,7 @@ mod risk_assessor {
                 };
             }
 
-            // Health ratio in basis points — u128 intermediate prevents overflow
+            // Health ratio in basis points - u128 intermediate prevents overflow
             // (max collateral_usd_x6 ≈ 10^15; × 10_000 = 10^19 < u128::MAX ~3.4×10^38)
             let health_bps = ((collateral_usd_x6 as u128 * 10_000)
                 / debt_usd_x6 as u128) as u32;

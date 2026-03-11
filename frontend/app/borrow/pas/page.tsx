@@ -66,7 +66,7 @@ function InfoRow({ label, value, tone }: { label: string; value: string; tone?: 
 }
 
 function HealthBar({ ratio }: { ratio: bigint }) {
-    // Both market contracts return healthRatio as (collateral * 10000) / owed — BPS format
+    // Both market contracts return healthRatio as (collateral * 10000) / owed - BPS format
     const isInfinite = ratio > 1_000_000_000n;
     const num = isInfinite ? Infinity : Number(ratio) / 10000;
     const display = isInfinite ? '∞' : num.toFixed(2) + 'x';
@@ -126,7 +126,7 @@ function DepositStep({ prefillAmount, onSuccess }: {
     const { data: ltvBpsRaw } = useReadContract({ address: config.pasMarket, abi: ABIS.KREDIO_PAS_MARKET, functionName: 'ltvBps' });
     const ltvBps = (ltvBpsRaw as bigint | undefined) ?? 6500n;
 
-    // KredioPASMarket exposes no public getScore — read from KredioLending which
+    // KredioPASMarket exposes no public getScore - read from KredioLending which
     // calls the same KreditAgent and returns the same score/rate for this user.
     const { data: scoreRaw } = useReadContract({
         address: config.lending, abi: ABIS.KREDIO_LENDING,
@@ -179,10 +179,10 @@ function DepositStep({ prefillAmount, onSuccess }: {
 
             <div className={cn('rounded-xl border px-4 py-3 space-y-0 transition-opacity',
                 debouncedInput && Number(debouncedInput) > 0 ? 'border-white/10 bg-black/30 opacity-100' : 'border-white/5 bg-black/10 opacity-35 pointer-events-none')}>
-                <InfoRow label="Collateral value" value={preview ? `~$${preview.collateralUsd.toFixed(2)}` : '—'} />
-                <InfoRow label="Credit score" value={score ? `${score[0].toString()} (${score[1] > 0 ? scoreTierLabels[score[1]] : 'ANON'})` : '—'} />
+                <InfoRow label="Collateral value" value={preview ? `~$${preview.collateralUsd.toFixed(2)}` : '-'} />
+                <InfoRow label="Credit score" value={score ? `${score[0].toString()} (${score[1] > 0 ? scoreTierLabels[score[1]] : 'ANON'})` : '-'} />
                 <InfoRow label="LTV" value={`${(Number(ltvBps) / 100).toFixed(0)}%`} />
-                <InfoRow label="You can borrow" value={preview ? `~${formatTokenAmount(preview.maxBorrowAtoms, 6, 2, false)} mUSDC` : '—'} tone="green" />
+                <InfoRow label="You can borrow" value={preview ? `~${formatTokenAmount(preview.maxBorrowAtoms, 6, 2, false)} mUSDC` : '-'} tone="green" />
                 <InfoRow label="Interest rate" value={`${(interestBps / 100).toFixed(2)}% APY`} />
             </div>
 
@@ -198,7 +198,7 @@ function DepositStep({ prefillAmount, onSuccess }: {
                             : 'bg-indigo-600 hover:bg-indigo-500 text-white')}>
                 {busy ? <><Spinner />{statusMsg}</> : `Deposit ${input || '0'} PAS as Collateral`}
             </button>
-            {oracle.isCrashed && <StateNotice tone="error" message="Oracle is down — collateral deposits paused." />}
+            {oracle.isCrashed && <StateNotice tone="error" message="Oracle is down - collateral deposits paused." />}
         </div>
     );
 }
@@ -310,7 +310,7 @@ function BorrowStep({ depositedWei, maxBorrowAtoms, onSuccess }: {
             </div>
 
             {healthNum < 1.3 && healthNum > 0 && healthNum <= 100 && (
-                <StateNotice tone="warning" message="Health ratio is low — consider borrowing less to reduce liquidation risk." />
+                <StateNotice tone="warning" message="Health ratio is low - consider borrowing less to reduce liquidation risk." />
             )}
 
             {errorMsg ? (
@@ -390,7 +390,7 @@ function HubTab() {
                                 className="rounded-2xl border border-emerald-500/20 bg-emerald-900/10 p-4 flex items-center gap-3">
                                 <Check />
                                 <div className="text-sm">
-                                    <span className="text-slate-400">Step 1 — </span>
+                                    <span className="text-slate-400">Step 1 - </span>
                                     <span className="text-emerald-300">{formatDisplayBalance(depositedWei, 18, 4)} PAS deposited as collateral</span>
                                 </div>
                             </motion.div>
@@ -479,7 +479,7 @@ function PeopleTab() {
             setSelectedAcc(valid[0]);
             setTalismanConnected(true);
             setBridgeStatus('');
-            fetchPeopleBalance(valid[0].address).then(free => setPeopleBalance(formatPASFromPeople(free))).catch(() => setPeopleBalance('—'));
+            fetchPeopleBalance(valid[0].address).then(free => setPeopleBalance(formatPASFromPeople(free))).catch(() => setPeopleBalance('-'));
         } catch { setBridgeStatus('Failed to connect Talisman.'); }
     }
 
@@ -570,9 +570,9 @@ function PeopleTab() {
                                         </div>
                                         <div className={cn('rounded-xl border px-4 py-3 space-y-0 transition-opacity',
                                             bridgeAmount && Number(bridgeAmount) > 0 ? 'border-white/10 bg-black/30' : 'border-white/5 bg-black/10 opacity-35 pointer-events-none')}>
-                                            <InfoRow label="Projected collateral value" value={bridgePreview ? `~$${bridgePreview.collateralUsd.toFixed(2)}` : '—'} />
-                                            <InfoRow label="Max borrowable" value={bridgePreview ? `~${formatTokenAmount(bridgePreview.maxBorrowAtoms, 6, 2, false)} mUSDC` : '—'} tone="green" />
-                                            <InfoRow label="PAS price" value={bridgePreview ? `$${bridgePreview.oraclePriceNum.toFixed(4)}` : '—'} />
+                                            <InfoRow label="Projected collateral value" value={bridgePreview ? `~$${bridgePreview.collateralUsd.toFixed(2)}` : '-'} />
+                                            <InfoRow label="Max borrowable" value={bridgePreview ? `~${formatTokenAmount(bridgePreview.maxBorrowAtoms, 6, 2, false)} mUSDC` : '-'} tone="green" />
+                                            <InfoRow label="PAS price" value={bridgePreview ? `$${bridgePreview.oraclePriceNum.toFixed(4)}` : '-'} />
                                         </div>
                                         {bridgeStatus && bridging && (
                                             <div className="rounded-xl border border-white/10 bg-black/30 px-3 py-2.5 flex items-center gap-2">
@@ -604,7 +604,7 @@ function PeopleTab() {
                                 className="rounded-2xl border border-emerald-500/20 bg-emerald-900/10 p-4 flex items-center gap-3">
                                 <Check />
                                 <div className="text-sm">
-                                    <span className="text-slate-400">Step 1 — </span>
+                                    <span className="text-slate-400">Step 1 - </span>
                                     <span className="text-emerald-300">+{arrivedWei ? formatPASFromEVM(arrivedWei) : bridgeAmount} PAS arrived on Hub</span>
                                 </div>
                             </motion.div>
@@ -627,7 +627,7 @@ function PeopleTab() {
                                     <div className="rounded-2xl border border-emerald-500/20 bg-emerald-900/10 p-4 flex items-center gap-3">
                                         <Check />
                                         <div className="text-sm">
-                                            <span className="text-slate-400">Step 2 — </span>
+                                            <span className="text-slate-400">Step 2 - </span>
                                             <span className="text-emerald-300">{formatDisplayBalance(depositedWei, 18, 4)} PAS deposited as collateral</span>
                                         </div>
                                     </div>

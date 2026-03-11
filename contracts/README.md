@@ -48,7 +48,7 @@ Solidity smart contracts and ink! credit scoring engine for the Kredio DeFi cred
 
 The Kredio contract suite is a hybrid Solidity + ink! system running on Polkadot Asset Hub EVM. The EVM contracts handle capital flows, position management, and protocol actions. The ink! contract (`KreditAgent`) implements the deterministic credit scoring algorithm. The two layers communicate via Asset Hub's unique cross-VM capability: Solidity contracts make low-level `staticcall` invocations to the Wasm contract using SCALE-encoded selectors.
 
-This hybrid architecture is unique to Polkadot — no other ecosystem supports cross-calling between an EVM contract and a Wasm contract within the same block and execution context.
+This hybrid architecture is unique to Polkadot - no other ecosystem supports cross-calling between an EVM contract and a Wasm contract within the same block and execution context.
 
 ---
 
@@ -175,31 +175,31 @@ contracts/
 
 ### KredioLending
 
-**`evm/KredioLending.sol`** — deployed on Asset Hub
+**`evm/KredioLending.sol`** - deployed on Asset Hub
 
 The primary lending pool for mUSDC-collateralised borrowing.
 
 **Lender functions:**
-- `deposit(uint256 amount)` — supply mUSDC liquidity; earns proportional yield
-- `withdraw(uint256 amount)` — retrieve deposited mUSDC plus pending yield
-- `pendingYieldAndHarvest(address user)` — harvest accumulated yield without withdrawing principal
+- `deposit(uint256 amount)` - supply mUSDC liquidity; earns proportional yield
+- `withdraw(uint256 amount)` - retrieve deposited mUSDC plus pending yield
+- `pendingYieldAndHarvest(address user)` - harvest accumulated yield without withdrawing principal
 
 **Borrower functions:**
-- `depositCollateral(uint256 amount)` — post mUSDC collateral
-- `withdrawCollateral()` — withdraw collateral (must have no open debt)
-- `borrow(uint256 amount)` — open a loan; collateral ratio and interest rate set by KreditAgent score
-- `repay()` — repay full debt (principal + accrued interest); increments on-chain repayment counter
-- `healthRatio(address borrower)` — returns current health: `collateral / (debt × collateralRatioBps / 10000)`
+- `depositCollateral(uint256 amount)` - post mUSDC collateral
+- `withdrawCollateral()` - withdraw collateral (must have no open debt)
+- `borrow(uint256 amount)` - open a loan; collateral ratio and interest rate set by KreditAgent score
+- `repay()` - repay full debt (principal + accrued interest); increments on-chain repayment counter
+- `healthRatio(address borrower)` - returns current health: `collateral / (debt × collateralRatioBps / 10000)`
 
 **Liquidation:**
-- `liquidate(address borrower)` — callable by anyone when `healthRatio < 1.0`; caller seizes collateral
-- `adminLiquidate(address borrower)` — admin-only; same mechanic
+- `liquidate(address borrower)` - callable by anyone when `healthRatio < 1.0`; caller seizes collateral
+- `adminLiquidate(address borrower)` - admin-only; same mechanic
 
 **Yield strategy (admin-only):**
-- `adminSetYieldPool(address pool)` — wire an external yield pool for idle capital routing
-- `adminInvest(uint256 amount)` — move idle capital into yield pool
-- `adminPullback(uint256 amount)` — retrieve capital from yield pool
-- `adminClaimYield()` — claim accrued yield and distribute to lenders
+- `adminSetYieldPool(address pool)` - wire an external yield pool for idle capital routing
+- `adminInvest(uint256 amount)` - move idle capital into yield pool
+- `adminPullback(uint256 amount)` - retrieve capital from yield pool
+- `adminClaimYield()` - claim accrued yield and distribute to lenders
 
 **Yield distribution:** Interest paid on repayment and claimed yield both flow through `_distributeInterest()`, which updates `accYieldPerShare`. Lenders' shares are settled lazily on the next deposit/withdraw/harvest, making the pool gas-efficient regardless of lender count.
 
@@ -207,25 +207,25 @@ The primary lending pool for mUSDC-collateralised borrowing.
 
 ### KredioPASMarket
 
-**`evm/KredioPASMarket.sol`** — deployed on Asset Hub
+**`evm/KredioPASMarket.sol`** - deployed on Asset Hub
 
 Borrowing market backed by **native PAS token** collateral.
 
 **Collateral & borrowing:**
-- `depositCollateral()` — `payable`; deposits `msg.value` PAS as collateral
-- `withdrawCollateral()` — withdraws PAS collateral (position must be fully repaid)
-- `borrow(uint256 amount)` — draw mUSDC against collateral at oracle LTV; rate set by KreditAgent
-- `repay()` — repay full position; transfers debt + accrued interest from borrower
+- `depositCollateral()` - `payable`; deposits `msg.value` PAS as collateral
+- `withdrawCollateral()` - withdraws PAS collateral (position must be fully repaid)
+- `borrow(uint256 amount)` - draw mUSDC against collateral at oracle LTV; rate set by KreditAgent
+- `repay()` - repay full position; transfers debt + accrued interest from borrower
 
 **Oracle integration:** Uses `IPASOracle.latestRoundData()` (Chainlink-compatible) for live PAS/USD pricing. A configurable `stalenessLimit` (default 3600 seconds) reverts borrows and liquidations if the oracle data is too old.
 
 **Lender side:** mUSDC deposited by lenders earns yield in the same accumulator pattern as KredioLending.
 
 **Risk parameters (admin-settable):**
-- `ltvBps` — max loan-to-value ratio (default 65%)
-- `liqBonusBps` — liquidation bonus paid to liquidator (default 8%)
-- `stalenessLimit` — maximum oracle age in seconds
-- `protocolFeeBps` — fraction of interest retained by protocol (max 20%)
+- `ltvBps` - max loan-to-value ratio (default 65%)
+- `liqBonusBps` - liquidation bonus paid to liquidator (default 8%)
+- `stalenessLimit` - maximum oracle age in seconds
+- `protocolFeeBps` - fraction of interest retained by protocol (max 20%)
 
 **Governance score inputs:** Lifetime cumulative deposits (`totalDepositedEver`) and first-seen block (`firstSeenBlock`) are stored per user and passed to KreditAgent on every borrow call, ensuring the score reflects the full history of the borrower.
 
@@ -233,12 +233,12 @@ Borrowing market backed by **native PAS token** collateral.
 
 ### KredioSwap
 
-**`evm/KredioSwap.sol`** — deployed on Asset Hub
+**`evm/KredioSwap.sol`** - deployed on Asset Hub
 
 A single-direction swap contract: send native PAS, receive mUSDC at oracle price.
 
-- `quoteSwap(uint256 pasWei)` — returns mUSDC out for a given PAS input (read-only, no gas)
-- `swap(uint256 minMUSDCOut)` — `payable`; executes swap with slippage protection
+- `quoteSwap(uint256 pasWei)` - returns mUSDC out for a given PAS input (read-only, no gas)
+- `swap(uint256 minMUSDCOut)` - `payable`; executes swap with slippage protection
 - Fee: `feeBps` (default 0.3%, maximum 1%)
 
 The oracle integrates a crash circuit-breaker: if `oracle.isCrashed()` returns true, all quotes and swaps revert until the oracle recovers.
@@ -247,13 +247,13 @@ The oracle integrates a crash circuit-breaker: if `oracle.isCrashed()` returns t
 
 ### KredioBridgeMinter
 
-**`evm/KredioBridgeMinter.sol`** — deployed on Asset Hub
+**`evm/KredioBridgeMinter.sol`** - deployed on Asset Hub
 
 Hub-side contract for the cross-chain ETH→mUSDC bridge.
 
-- `processDeposit(sourceTxHash, sourceChainId, sourceUser, hubRecipient, ethAmount)` — called by the authorised backend relayer; mints mUSDC to `hubRecipient`
-- `initiateRedeem(sourceTxHash, amount)` — called by `hubRecipient` to burn mUSDC before the backend sends ETH back to the source chain
-- `getUserDeposits(user)` — returns all deposit records for a hub recipient
+- `processDeposit(sourceTxHash, sourceChainId, sourceUser, hubRecipient, ethAmount)` - called by the authorised backend relayer; mints mUSDC to `hubRecipient`
+- `initiateRedeem(sourceTxHash, amount)` - called by `hubRecipient` to burn mUSDC before the backend sends ETH back to the source chain
+- `getUserDeposits(user)` - returns all deposit records for a hub recipient
 
 Replay protection: each `sourceTxHash` can only be processed once (`AlreadyProcessed` error prevents double-minting).
 
@@ -261,11 +261,11 @@ Replay protection: each `sourceTxHash` can only be processed once (`AlreadyProce
 
 ### EthBridgeInbox
 
-**`evm/EthBridgeInbox.sol`** — deployed on Ethereum Sepolia
+**`evm/EthBridgeInbox.sol`** - deployed on Ethereum Sepolia
 
 Source-chain deposit contract. Users send ETH here; the emitted `EthDeposited` event is picked up by the backend relayer.
 
-- `deposit(address hubRecipient)` — `payable`; enforces per-deposit min/max limits
+- `deposit(address hubRecipient)` - `payable`; enforces per-deposit min/max limits
 - Emits: `EthDeposited(depositor, ethAmount, hubRecipient)`
 - Owner can update min/max deposit bounds
 
@@ -273,7 +273,7 @@ Source-chain deposit contract. Users send ETH here; the emitted `EthDeposited` e
 
 ### KredioXCMSettler
 
-**`evm/KredioXCMSettler.sol`** — deployed on Asset Hub
+**`evm/KredioXCMSettler.sol`** - deployed on Asset Hub
 
 Cross-chain intent settlement engine. Receives encoded intent payloads via XCM `Transact` calls from authorised parachains and executes the corresponding action in the Kredio protocol suite.
 
@@ -296,13 +296,13 @@ Settlement history is tracked per originating account via `settlementHistory` an
 
 ### KredioAccountRegistry
 
-**`evm/KredioAccountRegistry.sol`** — deployed on Asset Hub
+**`evm/KredioAccountRegistry.sol`** - deployed on Asset Hub
 
 Links a Substrate (SR25519) identity to an EVM address with cryptographic proof or admin attestation.
 
-- `linkAccount(substrateKey, signature)` — verifies the SR25519 signature over the structured link message and creates a bidirectional mapping
-- `attestedLink(evmAddress, substrateKey)` — admin/attester fallback when the on-chain SR25519 precompile is unavailable
-- `unlinkAccount()` — removes the link; invalidates all prior signatures via nonce increment
+- `linkAccount(substrateKey, signature)` - verifies the SR25519 signature over the structured link message and creates a bidirectional mapping
+- `attestedLink(evmAddress, substrateKey)` - admin/attester fallback when the on-chain SR25519 precompile is unavailable
+- `unlinkAccount()` - removes the link; invalidates all prior signatures via nonce increment
 
 Replay protection: `linkNonce` increments on both link and unlink operations, ensuring a captured signature cannot be replayed after any state change.
 
@@ -312,7 +312,7 @@ One-to-one enforcement: attempting to link an already-linked address or key reve
 
 ### KreditAgent (ink!)
 
-**`kredit_agent/lib.rs`** — deployed on Asset Hub as a Wasm contract
+**`kredit_agent/lib.rs`** - deployed on Asset Hub as a Wasm contract
 
 The deterministic on-chain credit scoring engine. Called by both EVM market contracts via low-level SCALE-encoded staticcalls.
 
@@ -347,12 +347,12 @@ bytes4 internal constant SEL_TIER            = 0x2b2bb477;
 
 ### GovernanceCache
 
-**`evm/GovernanceCache.sol`** — deployed on Asset Hub
+**`evm/GovernanceCache.sol`** - deployed on Asset Hub
 
 Stores a summary of each user's Polkadot OpenGov participation on-chain, written by an authorised admin/oracle.
 
-- `setGovernanceData(user, voteCount, maxConviction)` — admin writes
-- `getGovernanceData(user)` — returns `(voteCount, maxConviction, cachedAt)`
+- `setGovernanceData(user, voteCount, maxConviction)` - admin writes
+- `getGovernanceData(user)` - returns `(voteCount, maxConviction, cachedAt)`
 
 In a full production integration, this cache would be populated by an automated indexer monitoring on-chain governance events via Substrate RPC or Subquery, enabling governance participation to directly influence credit scoring.
 
@@ -360,14 +360,14 @@ In a full production integration, this cache would be populated by an automated 
 
 ### PASOracle
 
-**`evm/MockPASOracle.sol`** — deployed on Asset Hub
+**`evm/MockPASOracle.sol`** - deployed on Asset Hub
 
 A Chainlink `AggregatorV3`-compatible price feed for PAS/USD, updatable by the authorised owner (the backend oracle service in the current deployment).
 
-- `setPrice(int256 price)` — updates the on-chain price; reverts if in crash mode
-- `latestRoundData()` — standard Chainlink interface; returns `(roundId, answer, startedAt, updatedAt, answeredInRound)`
-- `crash(int256 crashPrice)` — sets a crash price, halting normal price updates
-- `recover()` — restores the last normal price
+- `setPrice(int256 price)` - updates the on-chain price; reverts if in crash mode
+- `latestRoundData()` - standard Chainlink interface; returns `(roundId, answer, startedAt, updatedAt, answeredInRound)`
+- `crash(int256 crashPrice)` - sets a crash price, halting normal price updates
+- `recover()` - restores the last normal price
 
 In a production deployment on mainnet Polkadot, this would be replaced by a decentralised oracle such as a Chainlink feed deployed on Asset Hub or an Acurast-powered off-chain oracle computation.
 
@@ -375,9 +375,9 @@ In a production deployment on mainnet Polkadot, this would be replaced by a dece
 
 ### USD Coin (mUSDC)
 
-**`evm/MockUSDC.sol`** — deployed on Asset Hub
+**`evm/MockUSDC.sol`** - deployed on Asset Hub
 
-The protocol stablecoin — a standard ERC-20 with a public `mint()` function for testnet use. On mainnet, this would be replaced by the canonical bridged USDC (Circle's CCTP on Polkadot, or a Polkadot-native stablecoin).
+The protocol stablecoin - a standard ERC-20 with a public `mint()` function for testnet use. On mainnet, this would be replaced by the canonical bridged USDC (Circle's CCTP on Polkadot, or a Polkadot-native stablecoin).
 
 - 6 decimal places (matching USDC standard)
 - Public faucet: anyone can call `mint(address to, uint256 amount)` on testnet
@@ -386,16 +386,16 @@ The protocol stablecoin — a standard ERC-20 with a public `mint()` function fo
 
 ### YieldPool
 
-**`evm/MockYieldPool.sol`** — deployed on Asset Hub
+**`evm/MockYieldPool.sol`** - deployed on Asset Hub
 
 External yield source integrated with `KredioLending` for idle capital management.
 
-- `deposit(uint256 amount)` — KredioLending deposits idle mUSDC
-- `withdraw(address to, uint256 amount)` — KredioLending withdraws capital
-- `claimYield(address to)` — distributes accrued yield to the lending contract
-- `pendingYield(address who)` — view current accrued yield
+- `deposit(uint256 amount)` - KredioLending deposits idle mUSDC
+- `withdraw(address to, uint256 amount)` - KredioLending withdraws capital
+- `claimYield(address to)` - distributes accrued yield to the lending contract
+- `pendingYield(address who)` - view current accrued yield
 
-Yield accrues at a configurable APY rate (`yieldRateBps`). In a production deployment, this would be an integration with a live yield source — for example a Polkadot-native liquidity pool, a parachain lending market, or a cross-chain yield aggregator — routing idle Kredio liquidity to the highest available return.
+Yield accrues at a configurable APY rate (`yieldRateBps`). In a production deployment, this would be an integration with a live yield source - for example a Polkadot-native liquidity pool, a parachain lending market, or a cross-chain yield aggregator - routing idle Kredio liquidity to the highest available return.
 
 ---
 
@@ -572,7 +572,7 @@ After deployment:
 
 ### Bridge Contracts
 
-#### Step 1 — Deploy EthBridgeInbox on Ethereum Sepolia
+#### Step 1 - Deploy EthBridgeInbox on Ethereum Sepolia
 
 ```bash
 forge script script/DeployBridge.s.sol:DeployInbox \
@@ -586,7 +586,7 @@ forge script script/DeployBridge.s.sol:DeployInbox \
 
 Note the deployed `EthBridgeInbox` address.
 
-#### Step 2 — Deploy KredioBridgeMinter on Asset Hub
+#### Step 2 - Deploy KredioBridgeMinter on Asset Hub
 
 ```bash
 forge script script/DeployBridge.s.sol:DeployMinter \
@@ -596,7 +596,7 @@ forge script script/DeployBridge.s.sol:DeployMinter \
   --broadcast
 ```
 
-#### Step 3 — Configure
+#### Step 3 - Configure
 
 Set in `backend/.env`:
 ```env

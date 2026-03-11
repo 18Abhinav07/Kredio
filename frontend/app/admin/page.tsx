@@ -31,7 +31,7 @@ function parseAddresses(raw: string): `0x${string}`[] {
 }
 
 function fmt6(v: bigint | undefined) {
-    if (v === undefined) return '—';
+    if (v === undefined) return '-';
     return (Number(v) / 1e6).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 });
 }
 
@@ -124,7 +124,7 @@ export default function AdminPage() {
     }
 
     return (
-        <PageShell title="Admin" subtitle="Owner-only controls — interest acceleration, bulk resets, oracle, risk parameters and governance.">
+        <PageShell title="Admin" subtitle="Owner-only controls - interest acceleration, bulk resets, oracle, risk parameters and governance.">
 
             {/* Access panel */}
             <Panel title="Access Control">
@@ -137,13 +137,13 @@ export default function AdminPage() {
             <SectionTitle>Pool State</SectionTitle>
             <Grid>
                 <Panel title="KredioLending (USDC Market)">
-                    <StatRow label="Global Tick" value={lendingTick !== undefined ? `${lendingTick === 0n ? '1' : String(lendingTick)}×` : '—'} tone={lendingTick && lendingTick > 0n ? 'green' : undefined} />
+                    <StatRow label="Global Tick" value={lendingTick !== undefined ? `${lendingTick === 0n ? '1' : String(lendingTick)}×` : '-'} tone={lendingTick && lendingTick > 0n ? 'green' : undefined} />
                     <StatRow label="Total Deposited" value={`${fmt6(lendingTotalDeposited as bigint | undefined)} mUSDC`} />
                     <StatRow label="Total Borrowed" value={`${fmt6(lendingTotalBorrowed as bigint | undefined)} mUSDC`} />
                     <StatRow label="Protocol Fees" value={`${fmt6(lendingFees as bigint | undefined)} mUSDC`} />
                 </Panel>
                 <Panel title="KredioPASMarket (PAS Market)">
-                    <StatRow label="Global Tick" value={pasTick !== undefined ? `${pasTick === 0n ? '1' : String(pasTick)}×` : '—'} tone={pasTick && pasTick > 0n ? 'green' : undefined} />
+                    <StatRow label="Global Tick" value={pasTick !== undefined ? `${pasTick === 0n ? '1' : String(pasTick)}×` : '-'} tone={pasTick && pasTick > 0n ? 'green' : undefined} />
                     <StatRow label="Total Deposited" value={`${fmt6(pasTotalDeposited as bigint | undefined)} mUSDC`} />
                     <StatRow label="Total Borrowed" value={`${fmt6(pasTotalBorrowed as bigint | undefined)} mUSDC`} />
                     <StatRow label="Protocol Fees" value={`${fmt6(pasFees as bigint | undefined)} mUSDC`} />
@@ -159,7 +159,7 @@ export default function AdminPage() {
                 <InfoBox>
                     <strong className="text-white">How it works:</strong> interest formula is{' '}
                     <code className="text-amber-300">debt × rate × elapsed × multiplier / (10000 × 365 days)</code>.
-                    Setting this to <em>60</em> makes every second count as 60 seconds — ideal for live demos.
+                    Setting this to <em>60</em> makes every second count as 60 seconds - ideal for live demos.
                     The effective multiplier is <code className="text-amber-300">max(globalTick, perUserMultiplier)</code>.
                 </InfoBox>
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -197,12 +197,12 @@ export default function AdminPage() {
             </Panel>
 
             {/* Tick pool / force-accrue */}
-            <SectionTitle>Yield Tick — Force-Distribute Interest to Lenders</SectionTitle>
+            <SectionTitle>Yield Tick - Force-Distribute Interest to Lenders</SectionTitle>
             <Panel title="Tick Pool"
                 subtitle="Capitalises accrued interest for the listed borrowers into their debt and immediately distributes it as yield to lenders. Resets each borrower's interest clock. Shows lending yield growth in real-time.">
                 <InfoBox>
                     Enter comma-separated borrower addresses. Their current accrued interest is calculated,
-                    added to their principal and distributed to the lender pool as yield — all in one tx.
+                    added to their principal and distributed to the lender pool as yield - all in one tx.
                     Lenders&apos; <strong className="text-white">pendingYield</strong> increases immediately.
                 </InfoBox>
                 <ActionInput label="Borrower Addresses (comma-separated)" value={bulkUsers} onChange={setBulkUsers} placeholder="0xAbc..., 0xDef..." />
@@ -261,7 +261,7 @@ export default function AdminPage() {
             <SectionTitle>Credit Score History</SectionTitle>
             <Panel title="Reset User Credit Scores"
                 subtitle="Clears repayment count, liquidation count, first-seen block, lifetime deposits, and per-user rate multiplier. Wallets return to new-user baseline tier.">
-                <InfoBox>After reset, each wallet computes its score as a brand-new user — perfect for re-running demos from a fair starting point.</InfoBox>
+                <InfoBox>After reset, each wallet computes its score as a brand-new user - perfect for re-running demos from a fair starting point.</InfoBox>
                 <ActionInput label="User Addresses (comma-separated)" value={bulkUsers} onChange={setBulkUsers} placeholder="0xAbc..., 0xDef..." />
                 <div className="text-xs text-slate-500 mt-1">{bulkAddrs.length} address{bulkAddrs.length !== 1 ? 'es' : ''} parsed</div>
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -274,7 +274,7 @@ export default function AdminPage() {
 
             {/* Nuclear reset */}
             <SectionTitle>Nuclear Reset</SectionTitle>
-            <Panel title="Hard Reset — Sweep All USDC & Zero Pool Accounting"
+            <Panel title="Hard Reset - Sweep All USDC & Zero Pool Accounting"
                 subtitle="Zeros totalBorrowed, totalDeposited, accYieldPerShare, protocolFees and globalTick, then transfers all USDC inside the contract to the receiver address. Recommended sequence below.">
                 <InfoBox>
                     <strong className="text-red-400">Recommended clean-start sequence:</strong>
@@ -283,7 +283,7 @@ export default function AdminPage() {
                         <li>Force-Close All Positions for all active borrowers.</li>
                         <li>Bulk Withdraw for all depositors.</li>
                         <li>Reset User Scores for all participants.</li>
-                        <li>Hard Reset — sweeps remaining USDC dust and zeros accounting.</li>
+                        <li>Hard Reset - sweeps remaining USDC dust and zeros accounting.</li>
                         <li>Re-seed pool: deposit mUSDC as admin via the Lend page.</li>
                     </ol>
                 </InfoBox>
@@ -310,9 +310,9 @@ export default function AdminPage() {
 
             {/* Oracle */}
             <SectionTitle>Oracle Controls</SectionTitle>
-            <Panel title="MockPASOracle — Price Manipulation"
-                subtitle="Set or crash the PAS/USD oracle. Crash drops price so open positions become liquidatable — useful for demonstrating liquidation flows. Recover restores the normal price.">
-                <ActionInput label="Price (8 decimal places — e.g. 100000000 = $1.00)" value={oraclePrice8} onChange={setOraclePrice8} placeholder="100000000" />
+            <Panel title="MockPASOracle - Price Manipulation"
+                subtitle="Set or crash the PAS/USD oracle. Crash drops price so open positions become liquidatable - useful for demonstrating liquidation flows. Recover restores the normal price.">
+                <ActionInput label="Price (8 decimal places - e.g. 100000000 = $1.00)" value={oraclePrice8} onChange={setOraclePrice8} placeholder="100000000" />
                 <div className="flex flex-wrap gap-2 mt-2">
                     <ActionButton label="Set Price" loading={isBusy('oracleSet')} disabled={isBusy('oracleSet')}
                         onClick={() => { const v = numeric(oraclePrice8); if (!v) return; run('oracleSet', () => actions.oracleSetPrice(v)); }} />
@@ -348,24 +348,24 @@ export default function AdminPage() {
             {/* Strategy status */}
             <Grid>
                 <Panel title="Strategy Status (KredioLending)">
-                    <StatRow label="Yield Pool" value={ss ? `${String(ss[0]).slice(0, 8)}…${String(ss[0]).slice(-6)}` : '—'} tone={ss && ss[0] !== '0x0000000000000000000000000000000000000000' ? 'green' : 'red'} />
+                    <StatRow label="Yield Pool" value={ss ? `${String(ss[0]).slice(0, 8)}…${String(ss[0]).slice(-6)}` : '-'} tone={ss && ss[0] !== '0x0000000000000000000000000000000000000000' ? 'green' : 'red'} />
                     <StatRow label="Invested" value={`${fmt6(ss?.[1])} mUSDC`} tone={ss && ss[1] > 0n ? 'green' : undefined} />
                     <StatRow label="Total Earned by Strategy" value={`${fmt6(ss?.[2])} mUSDC`} />
                     <StatRow label="Pending Yield (claimable)" value={`${fmt6(pendingYield as bigint | undefined)} mUSDC`} tone={pendingYield && (pendingYield as bigint) > 0n ? 'green' : undefined} />
-                    <StatRow label="Invest Ratio" value={ss ? `${Number(ss[4]) / 100}%` : '—'} />
-                    <StatRow label="Min Buffer" value={ss ? `${Number(ss[5]) / 100}%` : '—'} />
+                    <StatRow label="Invest Ratio" value={ss ? `${Number(ss[4]) / 100}%` : '-'} />
+                    <StatRow label="Min Buffer" value={ss ? `${Number(ss[5]) / 100}%` : '-'} />
                 </Panel>
                 <Panel title="MockYieldPool Status">
-                    <StatRow label="Pool Address" value={config.yieldPool ? `${config.yieldPool.slice(0, 8)}…${config.yieldPool.slice(-6)}` : '—'} tone="green" />
+                    <StatRow label="Pool Address" value={config.yieldPool ? `${config.yieldPool.slice(0, 8)}…${config.yieldPool.slice(-6)}` : '-'} tone="green" />
                     <StatRow label="Total Principal" value={`${fmt6(poolPrincipal as bigint | undefined)} mUSDC`} />
-                    <StatRow label="APY Rate" value={poolYieldRate !== undefined ? `${Number(poolYieldRate as bigint) / 100}% APY` : '—'} tone={poolYieldRate && (poolYieldRate as bigint) > 1000n ? 'green' : undefined} />
+                    <StatRow label="APY Rate" value={poolYieldRate !== undefined ? `${Number(poolYieldRate as bigint) / 100}% APY` : '-'} tone={poolYieldRate && (poolYieldRate as bigint) > 1000n ? 'green' : undefined} />
                     <StatRow label="Mode" value={(poolYieldRate as bigint | undefined) && (poolYieldRate as bigint) > 10000n ? 'DEMO (fast)' : 'Normal'} tone={(poolYieldRate as bigint | undefined) && (poolYieldRate as bigint) > 10000n ? 'green' : undefined} />
                 </Panel>
             </Grid>
 
             {/* Crank yield rate */}
             <Panel
-                title="Crank Yield Rate — MockYieldPool"
+                title="Crank Yield Rate - MockYieldPool"
                 subtitle="Sets the annual yield rate on the mock pool. Use high values (e.g. 60000 = 600% APY) for demos where yield should be visible within minutes. Use 600 for realistic 6% APY.">
                 <InfoBox>
                     <strong className="text-white">APY → Rate BPS:</strong>{' '}
@@ -409,7 +409,7 @@ export default function AdminPage() {
                     <ActionButton label="Claim Yield & Inject into Lender Pool" loading={isBusy('yieldClaim')} disabled={isBusy('yieldClaim') || !pendingYield || (pendingYield as bigint) === 0n}
                         onClick={() => run('yieldClaim', () => actions.yieldClaimAndInject().then(r => { refetchStrategy(); return r; }))} />
                     <p className="text-xs text-slate-500 mt-1">
-                        Pending: <span className="text-amber-300">{fmt6(pendingYield as bigint | undefined)} mUSDC</span> — distributes to all lenders via accYieldPerShare immediately.
+                        Pending: <span className="text-amber-300">{fmt6(pendingYield as bigint | undefined)} mUSDC</span> - distributes to all lenders via accYieldPerShare immediately.
                     </p>
                 </div>
             </Panel>

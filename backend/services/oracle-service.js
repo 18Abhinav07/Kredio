@@ -1,5 +1,5 @@
 'use strict';
-// Oracle service — adapted from oracle-feeder/oracle-feeder.js.
+// Oracle service - adapted from oracle-feeder/oracle-feeder.js.
 // Exported as a module so server.js owns the HTTP layer via Express.
 // All logic is identical to the standalone script; only the HTTP layer is removed.
 
@@ -14,7 +14,7 @@ let feed = [];
 if (fs.existsSync(feedPath)) {
     feed = JSON.parse(fs.readFileSync(feedPath, 'utf8'));
 } else {
-    console.warn('[oracle] Feed file not found at', feedPath, '— oracle service disabled');
+    console.warn('[oracle] Feed file not found at', feedPath, '- oracle service disabled');
 }
 
 // ─── Load ABIs ────────────────────────────────────────────────────────────
@@ -151,15 +151,15 @@ function getState() {
 // ─── Startup ──────────────────────────────────────────────────────────────
 async function start() {
     if (!KEY) {
-        console.warn('[oracle] KEY not set — oracle service disabled');
+        console.warn('[oracle] KEY not set - oracle service disabled');
         return;
     }
     if (!HUB.oracle) {
-        console.warn('[oracle] ORACLE env not set — oracle service disabled');
+        console.warn('[oracle] ORACLE env not set - oracle service disabled');
         return;
     }
     if (feed.length === 0) {
-        console.warn('[oracle] Feed empty — oracle service disabled');
+        console.warn('[oracle] Feed empty - oracle service disabled');
         return;
     }
     if (Number.isNaN(effectiveTickMs) || effectiveTickMs < 10_000) {
@@ -170,7 +170,7 @@ async function start() {
     const oracleAbi = loadABI('MockPASOracle');
     const marketAbi = loadABI('KredioPASMarket');
     if (!oracleAbi) {
-        console.warn('[oracle] MockPASOracle ABI missing — run forge build');
+        console.warn('[oracle] MockPASOracle ABI missing - run forge build');
         return;
     }
 

@@ -79,13 +79,13 @@ mod yield_mind {
                 };
             }
 
-            // Utilisation in basis points — u128 intermediate
+            // Utilisation in basis points - u128 intermediate
             let util_bps = ((total_borrowed as u128 * 10_000)
                 / total_deposited as u128) as u32;
 
             // ── Reasoning code (priority order) ──────────────────────────
             let reasoning_code: u8 = if util_bps > 7_000 {
-                1 // HighUtil — keep everything liquid
+                1 // HighUtil - keep everything liquid
             } else if volatility_bps > 3_000 {
                 3 // Volatile
             } else if util_bps < 2_000 {

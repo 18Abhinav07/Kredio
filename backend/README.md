@@ -34,9 +34,9 @@ Unified Node.js backend service for the Kredio protocol. Runs three concurrent s
 
 The backend is a lightweight Node.js/Express server that handles off-chain automation the smart contracts cannot perform themselves:
 
-- **Oracle Feeder** — reads from a pre-loaded PAS/USD price feed and writes each price tick on-chain to the `PASOracle` contract. In production this would be replaced by a decentralised oracle network (Chainlink or Acurast) deployed on Asset Hub.
-- **Bridge Relayer** — monitors source-chain `EthBridgeInbox` contracts for deposit events, cross-checks the ETH/USD price against both CoinGecko and Chainlink for manipulation resistance, then calls `KredioBridgeMinter.processDeposit()` on Asset Hub to mint the equivalent mUSDC. On mainnet this role would be performed by a trustless light-client bridging system such as Snowbridge or XCM reserve transfers.
-- **Yield Strategy Automator** — polls the `KredioLending` pool's utilisation rate and automatically routes idle capital into the external yield source and claims accrued yield back to the pool, maximising lender returns without any manual intervention.
+- **Oracle Feeder** - reads from a pre-loaded PAS/USD price feed and writes each price tick on-chain to the `PASOracle` contract. In production this would be replaced by a decentralised oracle network (Chainlink or Acurast) deployed on Asset Hub.
+- **Bridge Relayer** - monitors source-chain `EthBridgeInbox` contracts for deposit events, cross-checks the ETH/USD price against both CoinGecko and Chainlink for manipulation resistance, then calls `KredioBridgeMinter.processDeposit()` on Asset Hub to mint the equivalent mUSDC. On mainnet this role would be performed by a trustless light-client bridging system such as Snowbridge or XCM reserve transfers.
+- **Yield Strategy Automator** - polls the `KredioLending` pool's utilisation rate and automatically routes idle capital into the external yield source and claims accrued yield back to the pool, maximising lender returns without any manual intervention.
 
 ---
 
@@ -120,13 +120,13 @@ backend/
 
 `services/oracle-service.js`
 
-Reads from `data/pas_oracle_feed.json` — a sequence of dated PAS/USD price entries — and writes each price to the on-chain `PASOracle` contract at a configurable tick interval.
+Reads from `data/pas_oracle_feed.json` - a sequence of dated PAS/USD price entries - and writes each price to the on-chain `PASOracle` contract at a configurable tick interval.
 
 **Modes:**
-- `DEMO` (default) — ticks every 60 seconds using the pre-loaded historical feed, cycling through entries. Designed for demonstrations and integration testing.
-- `REAL` — ticks every 15 minutes, suitable for connecting to a live price source. In a production deployment, real prices would be fetched from a decentralised oracle aggregator rather than the feed file.
+- `DEMO` (default) - ticks every 60 seconds using the pre-loaded historical feed, cycling through entries. Designed for demonstrations and integration testing.
+- `REAL` - ticks every 15 minutes, suitable for connecting to a live price source. In a production deployment, real prices would be fetched from a decentralised oracle aggregator rather than the feed file.
 
-**Self-alignment:** On startup the service reads the `PASOracle` contract's `stalenessLimit` and automatically caps its tick interval to 80% of that value — ensuring the oracle never goes stale from the market contract's perspective.
+**Self-alignment:** On startup the service reads the `PASOracle` contract's `stalenessLimit` and automatically caps its tick interval to 80% of that value - ensuring the oracle never goes stale from the market contract's perspective.
 
 **Crash simulation:** The oracle supports an explicit crash mode where the price is set to a configured low value, simulating a collateral price crash for liquidation testing. The backend exposes endpoints to trigger and recover from crash mode.
 
@@ -175,7 +175,7 @@ sequenceDiagram
 
 **Rate limiting:** The bridge route applies a 1-request-per-minute per-IP rate limit to the deposit endpoint.
 
-**Quote endpoint:** `GET /bridge/quote?chainId=11155111&ethAmount=0.01` — returns a non-binding price quote without writing anything on-chain.
+**Quote endpoint:** `GET /bridge/quote?chainId=11155111&ethAmount=0.01` - returns a non-binding price quote without writing anything on-chain.
 
 ---
 
@@ -289,10 +289,10 @@ STRATEGY_POLL_MS=30000                       # Poll every 30 seconds
 ```
 
 **Minimum required to run:**
-- `KEY` — the relayer private key (needs to hold PAS for gas on Asset Hub)
-- `ORACLE` — the PASOracle address
-- `MINTER_ADDR` + `INBOX_ADDR_11155111` — for the bridge relayer
-- `LENDING_ADDR` + `YIELD_POOL_ADDR` — for the yield strategy (only if `YIELD_STRATEGY_ENABLED=true`)
+- `KEY` - the relayer private key (needs to hold PAS for gas on Asset Hub)
+- `ORACLE` - the PASOracle address
+- `MINTER_ADDR` + `INBOX_ADDR_11155111` - for the bridge relayer
+- `LENDING_ADDR` + `YIELD_POOL_ADDR` - for the yield strategy (only if `YIELD_STRATEGY_ENABLED=true`)
 
 ---
 

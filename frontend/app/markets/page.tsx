@@ -13,10 +13,10 @@ export default function MarketsIndexPage() {
     const { lending, pasMarket, oracle, refresh } = useGlobalProtocolData();
 
     return (
-        <PageShell title="Markets" subtitle="All protocol markets — USDC lending, PAS-collateral lending, and PAS borrowing.">
+        <PageShell title="Markets" subtitle="All protocol markets - USDC lending, PAS-collateral lending, and PAS borrowing.">
 
             {/* ── Row 1: USDC Lending ── */}
-            <Panel title="USDC Lending Market" subtitle="KredioLending — mUSDC collateral borrowing pool.">
+            <Panel title="USDC Lending Market" subtitle="KredioLending - mUSDC collateral borrowing pool.">
                 <StatRow label="Total Deposited" value={`${fmtToken(lending.totalDeposited, 6, 2)} mUSDC`} />
                 <StatRow label="Total Borrowed" value={`${fmtToken(lending.totalBorrowed, 6, 2)} mUSDC`} />
                 <StatRow label="Utilization" value={bpsToPercent(lending.utilizationBps)} />
@@ -25,7 +25,7 @@ export default function MarketsIndexPage() {
             </Panel>
 
             {/* ── Row 2: PAS Market ── */}
-            <Panel title="PAS Collateral Market" subtitle="KredioPASMarket — native PAS collateral borrowing pool with oracle pricing.">
+            <Panel title="PAS Collateral Market" subtitle="KredioPASMarket - native PAS collateral borrowing pool with oracle pricing.">
                 <Grid>
                     <div>
                         <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Pool Metrics</p>

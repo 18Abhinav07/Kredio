@@ -21,12 +21,12 @@ const ROOT = join(__dirname, '..', '..');
 // Load contracts/.env
 dotenv.config({ path: join(ROOT, 'contracts', '.env') });
 
-const RPC    = process.env.PASSET_RPC || 'https://eth-rpc-testnet.polkadot.io/';
-const KEY    = process.env.ADMIN;
+const RPC = process.env.PASSET_RPC || 'https://eth-rpc-testnet.polkadot.io/';
+const KEY = process.env.ADMIN;
 if (!KEY) { console.error('ADMIN key not set in contracts/.env'); process.exit(1); }
 
 const provider = new ethers.JsonRpcProvider(RPC);
-const wallet   = new ethers.Wallet(KEY, provider);
+const wallet = new ethers.Wallet(KEY, provider);
 
 console.log('Deployer:', wallet.address);
 const balance = await provider.getBalance(wallet.address);
@@ -44,19 +44,19 @@ const ARTIFACTS = [
         name: 'NeuralScorer',
         envKey: 'NEURAL_SCORER_ADDRESS',
         path: join(ROOT, 'contracts', 'pvm', 'neural_scorer',
-                   'target', 'ink', 'neural_scorer.polkavm'),
+            'target', 'ink', 'neural_scorer.polkavm'),
     },
     {
         name: 'RiskAssessor',
         envKey: 'RISK_ASSESSOR_ADDRESS',
         path: join(ROOT, 'contracts', 'pvm', 'risk_assessor',
-                   'target', 'ink', 'risk_assessor.polkavm'),
+            'target', 'ink', 'risk_assessor.polkavm'),
     },
     {
         name: 'YieldMind',
         envKey: 'YIELD_MIND_ADDRESS',
         path: join(ROOT, 'contracts', 'pvm', 'yield_mind',
-                   'target', 'ink', 'yield_mind.polkavm'),
+            'target', 'ink', 'yield_mind.polkavm'),
     },
 ];
 

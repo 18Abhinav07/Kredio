@@ -161,48 +161,48 @@ flowchart TD
     end
 ```
 
-### `/` — Landing Page
+### `/` - Landing Page
 Protocol overview with animated sections: hero, topology diagram, features, credit tier breakdown, and CTA. Uses smooth scroll-snap for full-page section navigation.
 
-### `/dashboard` — Dashboard
+### `/dashboard` - Dashboard
 Live read-only protocol metrics: total deposited, total borrowed, utilisation rates for both markets, PAS/USD oracle price and status, and recent protocol activity.
 
-### `/score` — Credit Score
+### `/score` - Credit Score
 Displays the connected wallet's live Kredit score (0–100), current tier (ANON → DIAMOND), collateral ratio, and interest rate. Shows the inputs driving the score: repayment count, liquidation count, deposit tier, and account age.
 
-### `/lend` — Lend
+### `/lend` - Lend
 - Deposit mUSDC into the lending pool
 - Withdraw deposited mUSDC
 - Harvest accumulated yield in one click
 - Live display of deposit balance and pending yield
 
-### `/borrow` — Borrow
+### `/borrow` - Borrow
 Two-market borrowing UI:
 - **Lending Market**: deposit mUSDC collateral, borrow mUSDC
 - **PAS Market**: deposit native PAS collateral, borrow mUSDC at oracle price
 
 Both panels show live position state including collateral, debt, accrued interest, health ratio, and credit tier.
 
-### `/positions` — Positions
+### `/positions` - Positions
 Full management view of open positions in both markets. Shows real-time health, total owed including accrued interest, and repay/withdraw buttons.
 
-### `/liquidate` — Liquidate
+### `/liquidate` - Liquidate
 Scans both markets for undercollateralised positions. Any connected wallet can trigger liquidation and receive the collateral bonus.
 
-### `/swap` — Swap
+### `/swap` - Swap
 Swap native PAS for mUSDC using the on-chain oracle price. Shows live quote, 0.3% fee breakdown, and reserve balance.
 
-### `/bridge` — Bridge
+### `/bridge` - Bridge
 Cross-chain ETH → mUSDC bridge flow:
 1. User selects a source chain (Ethereum Sepolia)
 2. Fetches a live quote from the backend (ETH/USD price, bridge fee)
 3. User approves and deposits ETH to the `EthBridgeInbox` on the source chain
 4. Frontend polls the backend to confirm relay and minting on Asset Hub
 
-### `/markets` — Markets
+### `/markets` - Markets
 Aggregate market data: total protocol TVL, utilisation per market, oracle price history, and tier distribution of active borrowers.
 
-### `/admin` — Admin Panel
+### `/admin` - Admin Panel
 Admin-only interface (gated by deployer address check) for:
 - Force-closing positions
 - Bulk withdrawing deposits
@@ -258,9 +258,9 @@ Returns wallet state and checks if the connected address is the protocol admin. 
 
 ### `useProtocolData`
 Provides reactive read-only views into protocol state:
-- `useGlobalProtocolData()` — both market snapshots and oracle state
-- `useUserPositionData()` — user's deposits, collateral, debt, pending yield, score
-- `useScoreSnapshot()` — live Kredit score, tier, rates
+- `useGlobalProtocolData()` - both market snapshots and oracle state
+- `useUserPositionData()` - user's deposits, collateral, debt, pending yield, score
+- `useScoreSnapshot()` - live Kredit score, tier, rates
 
 All hooks poll on a configurable interval and expose a `refresh()` callback.
 
@@ -288,16 +288,16 @@ Defines the custom `passetHub` chain (Polkadot Asset Hub EVM testnet, chain ID `
 
 ### `lib/xcm.ts`
 XCM utilities for Substrate-side interactions:
-- `sendXcm(params)` — builds and submits an XCM transfer from PeopleChain → Asset Hub using `@paraspell/sdk-pjs`
-- `pollHubArrival(params)` — polls the Hub EVM balance until the XCM-transferred PAS arrives
-- `h160ToSS58(evmAddress)` — converts a 20-byte EVM address to the corresponding SS58 address on Asset Hub (using the H160 padding scheme Asset Hub uses for EVM-Substrate account equivalence)
-- `fetchPeopleBalance(ss58)` — fetches native PAS balance from the PeopleChain via WebSocket
+- `sendXcm(params)` - builds and submits an XCM transfer from PeopleChain → Asset Hub using `@paraspell/sdk-pjs`
+- `pollHubArrival(params)` - polls the Hub EVM balance until the XCM-transferred PAS arrives
+- `h160ToSS58(evmAddress)` - converts a 20-byte EVM address to the corresponding SS58 address on Asset Hub (using the H160 padding scheme Asset Hub uses for EVM-Substrate account equivalence)
+- `fetchPeopleBalance(ss58)` - fetches native PAS balance from the PeopleChain via WebSocket
 
 ### `lib/constants.ts`
 All contract ABIs in `parseAbi` format for type-safe viem usage: `KREDIO_LENDING`, `KREDIO_PAS_MARKET`, `KREDIT_AGENT`, `PAS_ORACLE`, `ERC20`, `MOCK_ASSET`, `BRIDGE_MINTER`, `BRIDGE_INBOX`.
 
 ### `lib/tokens.ts`
-Token registry defining metadata for `PAS` (native) and `mUSDC` (6-decimal protocol stablecoin) — symbols, decimals, asset IDs, UI badge colours, and faucet amounts.
+Token registry defining metadata for `PAS` (native) and `mUSDC` (6-decimal protocol stablecoin) - symbols, decimals, asset IDs, UI badge colours, and faucet amounts.
 
 ### `lib/addresses.ts`
 Typed `NetworkConfig` object derived from `config/contracts.ts`, exposing all protocol addresses and chain config as a single typed import.

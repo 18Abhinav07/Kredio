@@ -52,7 +52,7 @@ mod neural_scorer {
 
             // Positive signals: repayment (4x), deposit (2x), age (1x)   range [0, 7M]
             let pos = rep_norm * 4 + dep_norm * 2 + age_norm;
-            // Negative signal: liquidation (4x) — subtract safely
+            // Negative signal: liquidation (4x) - subtract safely
             let neg = liq_norm * 4;
             // Combined: pos - neg + 0 to get a value in [0, 7M], bias by adding
             // 4M so the range becomes [0−4M fall, +7M rise]; clamp to [0, 11M]

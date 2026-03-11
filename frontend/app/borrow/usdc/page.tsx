@@ -121,9 +121,9 @@ function CollateralStep({ onSuccess }: {
     };
 
     const isProcessing = phase === 'approving' || phase === 'approved' || phase === 'depositing';
-    const btnLabel = phase === 'approving' ? 'Step 1/2 — Approving…'
+    const btnLabel = phase === 'approving' ? 'Step 1/2 - Approving…'
         : phase === 'approved' ? 'Approved ✓'
-            : phase === 'depositing' ? 'Step 2/2 — Depositing…'
+            : phase === 'depositing' ? 'Step 2/2 - Depositing…'
                 : amountAtoms ? `Deposit ${input} mUSDC as Collateral` : 'Deposit Collateral';
 
     return (
@@ -154,8 +154,8 @@ function CollateralStep({ onSuccess }: {
             {/* Borrow preview */}
             <div className={cn('rounded-xl border px-4 py-3 space-y-0 transition-opacity',
                 amountAtoms && !overBalance ? 'border-white/10 bg-black/30' : 'border-white/5 bg-black/10 opacity-35 pointer-events-none')}>
-                <InfoRow label="Collateral to deposit" value={`${input || '—'} mUSDC`} />
-                <InfoRow label="Max borrowable (based on score)" value={amountAtoms ? `~${formatTokenAmount(maxBorrowAtoms, 6, 2, false)} mUSDC` : '—'} tone="green" />
+                <InfoRow label="Collateral to deposit" value={`${input || '-'} mUSDC`} />
+                <InfoRow label="Max borrowable (based on score)" value={amountAtoms ? `~${formatTokenAmount(maxBorrowAtoms, 6, 2, false)} mUSDC` : '-'} tone="green" />
                 <InfoRow label="Borrow interest rate" value={`${(interestBps / 100).toFixed(2)}% APR`} />
             </div>
             {/* 2-step info */}
@@ -203,7 +203,7 @@ function BorrowStep({ collateralAtoms, maxBorrowAtoms, onSuccess }: {
     })();
     const borrowDisplay = formatTokenAmount(borrowAtoms, 6, 2, false);
 
-    // Estimated health in BPS: (collateral * 10000) / borrow — matches contract formula
+    // Estimated health in BPS: (collateral * 10000) / borrow - matches contract formula
     const estHealthBps: bigint = borrowAtoms > 0n
         ? (collateralAtoms * 10000n) / borrowAtoms
         : BigInt('999999999999999');
@@ -267,7 +267,7 @@ function BorrowStep({ collateralAtoms, maxBorrowAtoms, onSuccess }: {
                     tone={healthTone as 'green' | 'yellow' | 'red'} />
             </div>
             {Number(estHealthBps) < 15000 && borrowAtoms > 0n && Number(estHealthBps) < 999998 && (
-                <StateNotice tone="warning" message="Health ratio is low — consider borrowing less." />
+                <StateNotice tone="warning" message="Health ratio is low - consider borrowing less." />
             )}
             {errorMsg ? (
                 <div className="flex items-center gap-3 rounded-xl border border-rose-500/20 bg-rose-500/8 px-4 py-3">
@@ -361,7 +361,7 @@ export default function BorrowUsdcPage() {
                                     className="rounded-2xl border border-emerald-500/20 bg-emerald-900/10 p-4 flex items-center gap-3">
                                     <Check />
                                     <div className="text-sm">
-                                        <span className="text-slate-400">Step 1 — </span>
+                                        <span className="text-slate-400">Step 1 - </span>
                                         <span className="text-emerald-300">{formatTokenAmount(collateralAtoms, 6, 2, false)} mUSDC ready as collateral</span>
                                     </div>
                                 </motion.div>

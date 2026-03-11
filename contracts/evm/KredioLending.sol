@@ -226,7 +226,7 @@ contract KredioLending is ReentrancyGuard {
     }
 
     /// @notice Pull principal back from yield pool to this contract.
-    /// @dev Yield accumulated in the pool is NOT claimed here — call adminClaimAndInjectYield separately.
+    /// @dev Yield accumulated in the pool is NOT claimed here - call adminClaimAndInjectYield separately.
     function adminPullBack(
         uint256 amount
     ) external onlyAdmin nonReentrant {

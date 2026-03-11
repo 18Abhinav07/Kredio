@@ -1,5 +1,5 @@
 /**
- * seed.mjs — Protocol seeding script
+ * seed.mjs - Protocol seeding script
  *
  * Lenders  : PRIVATE_KEY  and  PRIVATE_KEY_2  → deposit mUSDC into both pools
  * Borrowers: KEY2  and  KEY3  → borrow mUSDC in lending market (mUSDC collateral)
@@ -178,7 +178,7 @@ const wB1 = wallet(acctB1);
 const wB2 = wallet(acctB2);
 
 console.log('\n═══════════════════════════════════════════════════');
-console.log('  Tesseract / Kredio — Protocol Seeding Script');
+console.log('  Tesseract / Kredio - Protocol Seeding Script');
 console.log('═══════════════════════════════════════════════════');
 log(`Admin   / Lender-1 : ${acctAdmin.address}`);
 log(`Lender-2           : ${acctLend2.address}`);
@@ -187,8 +187,8 @@ log(`Borrower-2         : ${acctB2.address}`);
 
 // ─── 1. Mint mUSDC to all participants ────────────────────────────────────────
 
-section('STEP 1 — Mint mUSDC to all participants');
-// MockUSDC has no access control on mint() — anyone can call it
+section('STEP 1 - Mint mUSDC to all participants');
+// MockUSDC has no access control on mint() - anyone can call it
 const LEND1_USDC_NEEDED = LENDER_DEPOSIT_LENDING + LENDER_DEPOSIT_PAS + parseUnits('1000', 6);
 const LEND2_USDC_NEEDED = LENDER_DEPOSIT_LENDING + LENDER_DEPOSIT_PAS + parseUnits('1000', 6);
 const BORR_USDC_NEEDED = BORROWER_COLLATERAL + parseUnits('1000', 6);
@@ -210,7 +210,7 @@ for (const [w, amt, label] of [
 
 // ─── 2. Fund borrower wallets with PAS for gas + collateral ───────────────────
 
-section('STEP 2 — Fund borrower wallets with PAS (gas + collateral)');
+section('STEP 2 - Fund borrower wallets with PAS (gas + collateral)');
 for (const [acct, label] of [[acctB1, 'Borrower-1'], [acctB2, 'Borrower-2']]) {
     const pasBal = await pub.getBalance({ address: acct.address });
     log(`${label} PAS balance: ${fmt18(pasBal)}`);
@@ -227,7 +227,7 @@ for (const [acct, label] of [[acctB1, 'Borrower-1'], [acctB2, 'Borrower-2']]) {
 
 // ─── 3. Lenders deposit mUSDC into KredioLending ─────────────────────────────
 
-section('STEP 3 — Lenders deposit mUSDC into KredioLending (lending pool)');
+section('STEP 3 - Lenders deposit mUSDC into KredioLending (lending pool)');
 for (const [w, amt, label] of [
     [wAdmin, LENDER_DEPOSIT_LENDING, 'Lender-1'],
     [wLend2, LENDER_DEPOSIT_LENDING, 'Lender-2'],
@@ -243,7 +243,7 @@ for (const [w, amt, label] of [
 
 // ─── 4. Lenders deposit mUSDC into KredioPASMarket ───────────────────────────
 
-section('STEP 4 — Lenders deposit mUSDC into KredioPASMarket (liquidity for PAS borrowers)');
+section('STEP 4 - Lenders deposit mUSDC into KredioPASMarket (liquidity for PAS borrowers)');
 for (const [w, amt, label] of [
     [wAdmin, LENDER_DEPOSIT_PAS, 'Lender-1'],
     [wLend2, LENDER_DEPOSIT_PAS, 'Lender-2'],
@@ -259,7 +259,7 @@ for (const [w, amt, label] of [
 
 // ─── 5. Borrowers → KredioLending (mUSDC collateral, mUSDC borrow) ───────────
 
-section('STEP 5 — Borrowers deposit mUSDC collateral + borrow from KredioLending');
+section('STEP 5 - Borrowers deposit mUSDC collateral + borrow from KredioLending');
 for (const [w, label] of [[wB1, 'Borrower-1'], [wB2, 'Borrower-2']]) {
     const pos = await pub.readContract({ address: CONTRACTS.LENDING, abi: LENDING_ABI, functionName: 'positions', args: [w.account.address] });
     const posActive = pos[6];
@@ -292,7 +292,7 @@ for (const [w, label] of [[wB1, 'Borrower-1'], [wB2, 'Borrower-2']]) {
 
 // ─── 6. Borrowers → KredioPASMarket (PAS collateral, mUSDC borrow) ────────────
 
-section('STEP 6 — Borrowers deposit PAS collateral + borrow from KredioPASMarket');
+section('STEP 6 - Borrowers deposit PAS collateral + borrow from KredioPASMarket');
 
 // Read oracle price to compute LTV
 let oraclePrice;

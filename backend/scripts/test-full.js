@@ -1,6 +1,6 @@
 'use strict';
 /**
- * test-full.js — Kredio Protocol Comprehensive Test Suite
+ * test-full.js - Kredio Protocol Comprehensive Test Suite
  *
  * Phases:
  *   0  Current-state snapshot
@@ -266,7 +266,7 @@ async function main() {
     const startTs = Date.now();
     const bar = '═'.repeat(110);
     console.log('\n' + bar);
-    console.log('  KREDIO PROTOCOL — COMPREHENSIVE TEST SUITE');
+    console.log('  KREDIO PROTOCOL - COMPREHENSIVE TEST SUITE');
     console.log('  Run started:', new Date().toISOString());
     console.log(bar + '\n');
 
@@ -281,13 +281,13 @@ async function main() {
     const userAddrs = Object.values(users).map(w => w.address);
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  PHASE 0 — CURRENT STATE SNAPSHOT
+    //  PHASE 0 - CURRENT STATE SNAPSHOT
     // ══════════════════════════════════════════════════════════════════════════
     console.log('\n' + '─'.repeat(110));
-    console.log('  PHASE 0 — CURRENT STATE SNAPSHOT');
+    console.log('  PHASE 0 - CURRENT STATE SNAPSHOT');
     console.log('─'.repeat(110));
 
-    // Oracle uses Chainlink latestRoundData() — staleness check happens on-chain
+    // Oracle uses Chainlink latestRoundData() - staleness check happens on-chain
     let oraclePrice = 502069300n; // fallback: $5.02 per PAS (8 decimals)
     try {
         const rd = await oracle.latestRoundData();
@@ -325,10 +325,10 @@ async function main() {
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  PHASE 1 — SWEEP ALL CONTRACTS CLEAN
+    //  PHASE 1 - SWEEP ALL CONTRACTS CLEAN
     // ══════════════════════════════════════════════════════════════════════════
     console.log('\n' + '─'.repeat(110));
-    console.log('  PHASE 1 — SWEEP ALL CONTRACTS CLEAN');
+    console.log('  PHASE 1 - SWEEP ALL CONTRACTS CLEAN');
     console.log('─'.repeat(110));
 
     //─────────────────────────────────────────────────────────────────────────
@@ -424,10 +424,10 @@ async function main() {
     console.log(`  YieldPool.totalPrincipal       = ${fmt6(cleanYP)} (expect 0 after pull-back)`);
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  PHASE 2 — FUND ACCOUNTS
+    //  PHASE 2 - FUND ACCOUNTS
     // ══════════════════════════════════════════════════════════════════════════
     console.log('\n' + '─'.repeat(110));
-    console.log('  PHASE 2 — FUND ACCOUNTS (200 000 mUSDC + 1 000 PAS each)');
+    console.log('  PHASE 2 - FUND ACCOUNTS (200 000 mUSDC + 1 000 PAS each)');
     console.log('─'.repeat(110));
 
     const TARGET_MUSDC = u6('200000');
@@ -465,10 +465,10 @@ async function main() {
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  PHASE 3 — CONFIGURE RATES + SEED POOLS
+    //  PHASE 3 - CONFIGURE RATES + SEED POOLS
     // ══════════════════════════════════════════════════════════════════════════
     console.log('\n' + '─'.repeat(110));
-    console.log('  PHASE 3 — CONFIGURE RATES & SEED POOLS');
+    console.log('  PHASE 3 - CONFIGURE RATES & SEED POOLS');
     console.log('─'.repeat(110));
 
     // 3.1  Yield pool rate → 100 000 bps (1 000% APY – fast demo accumulation)
@@ -564,10 +564,10 @@ async function main() {
     console.log(`  KredioPASMarket.totalDeposited = ${fmt6(seededPM)}`);
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  PHASE 4 — TEST SEQUENCE
+    //  PHASE 4 - TEST SEQUENCE
     // ══════════════════════════════════════════════════════════════════════════
     console.log('\n' + '─'.repeat(110));
-    console.log('  PHASE 4 — TEST SEQUENCE');
+    console.log('  PHASE 4 - TEST SEQUENCE');
     console.log('─'.repeat(110));
 
     // ── T1  USER1 lends 50 000 mUSDC to KredioLending ────────────────────────
@@ -663,7 +663,7 @@ async function main() {
     const T4_BORROW = (T4_maxBorrow * 7000n) / 10000n; // 70% of max
     console.log(`  300 PAS → collValueUSDC=${fmt6(T4_collValue)}  ltvBps=${ltvBps}  maxBorrow=${fmt6(T4_maxBorrow)}  borrowing70%=${fmt6(T4_BORROW)}`);
 
-    await step('USER4', 'depositCollateral — lock 300 PAS in KredioPASMarket', 'KredioPASMarket',
+    await step('USER4', 'depositCollateral - lock 300 PAS in KredioPASMarket', 'KredioPASMarket',
         () => pasMarket.connect(users.USER4).depositCollateral({ value: T4_PAS }),
         {
             expected: 'collateralBalance[USER4] += 300 PAS (wei)',
@@ -685,10 +685,10 @@ async function main() {
     const T5_PAS = u18('400');
     const T5_collValue = (T5_PAS * oraclePriceN) / (10n ** 20n);
     const T5_maxBorrow = (T5_collValue * ltvBps) / 10000n;
-    const T5_BORROW = (T5_maxBorrow * 9500n) / 10000n; // 95% — near-instant liquidation risk
+    const T5_BORROW = (T5_maxBorrow * 9500n) / 10000n; // 95% - near-instant liquidation risk
     console.log(`  400 PAS → collValueUSDC=${fmt6(T5_collValue)}  maxBorrow=${fmt6(T5_maxBorrow)}  borrowing95%=${fmt6(T5_BORROW)}`);
 
-    await step('USER5', 'depositCollateral — lock 400 PAS in KredioPASMarket', 'KredioPASMarket',
+    await step('USER5', 'depositCollateral - lock 400 PAS in KredioPASMarket', 'KredioPASMarket',
         () => pasMarket.connect(users.USER5).depositCollateral({ value: T5_PAS }),
         {
             expected: 'collateralBalance[USER5] += 400 PAS',
@@ -730,7 +730,7 @@ async function main() {
     }
 
     // ── T7  Verify strategy status ────────────────────────────────────────────
-    console.log('\n  ── T7: CHECK — Strategy status after investment ──');
+    console.log('\n  ── T7: CHECK - Strategy status after investment ──');
     try {
         const strat = await lending.strategyStatus();
         console.log(`  pool           : ${strat.pool}`);
@@ -755,7 +755,7 @@ async function main() {
     console.log(`  USER4 accrued interest (PASMarket): ${fmt6(u4Interest)} mUSDC`);
     console.log(`  USER5 accrued interest (PASMarket): ${fmt6(u5Interest)} mUSDC`);
 
-    // ── T9  adminTickPool — capitalise interest, distribute to lenders ────────
+    // ── T9  adminTickPool - capitalise interest, distribute to lenders ────────
     console.log('\n  ── T9: ADMIN → Tick both pools (capitalise interest → distribute to lenders) ──');
 
     await step('ADMIN', 'adminTickPool for USER2 in KredioLending', 'KredioLending',
@@ -822,7 +822,7 @@ async function main() {
     console.log(`  Pending strategy yield now: ${fmt6(pendingExtYield2)} mUSDC`);
 
     if (pendingExtYield2 > 0n) {
-        await step('ADMIN', `adminClaimAndInjectYield — mint ${fmt6(pendingExtYield2)} mUSDC yield → distribute to lenders`, 'KredioLending',
+        await step('ADMIN', `adminClaimAndInjectYield - mint ${fmt6(pendingExtYield2)} mUSDC yield → distribute to lenders`, 'KredioLending',
             () => lending.connect(admin).adminClaimAndInjectYield(),
             {
                 expected: 'MockYieldPool mints fresh mUSDC to KredioLending; accYieldPerShare增加; USER1+ADMIN earn pro-rata yield',
@@ -880,7 +880,7 @@ async function main() {
             () => musdc.connect(users.USER2).approve(ADDR.LENDING, repayAmt),
             { expected: 'Allowance ≥ totalOwed' }
         );
-        await step('USER2', `repay() — pay ${fmt6(u2PosFull.totalOwed)} mUSDC (principal + interest)`, 'KredioLending',
+        await step('USER2', `repay() - pay ${fmt6(u2PosFull.totalOwed)} mUSDC (principal + interest)`, 'KredioLending',
             () => lending.connect(users.USER2).repay(),
             {
                 expected: 'Position deleted; collateral 20 000 mUSDC returned to USER2; interest distributed to lenders; repaymentCount[USER2]++',
@@ -903,7 +903,7 @@ async function main() {
             () => musdc.connect(users.USER4).approve(ADDR.PAS_MARKET, u4RepayAmt),
             { expected: 'Allowance set' }
         );
-        await step('USER4', `repay() — pay ${fmt6(u4PosFull.totalOwed)} mUSDC (principal + interest)`, 'KredioPASMarket',
+        await step('USER4', `repay() - pay ${fmt6(u4PosFull.totalOwed)} mUSDC (principal + interest)`, 'KredioPASMarket',
             () => pasMarket.connect(users.USER4).repay(),
             {
                 expected: 'Position inactive; totalBorrowed decreases; interest to PM lenders; repaymentCount[USER4]++',
@@ -911,7 +911,7 @@ async function main() {
                 afterFn: async () => ({ totalBorrowed: (await pasMarket.totalBorrowed()).toString(), mUSDCBal: (await musdc.balanceOf(users.USER4.address)).toString() }),
             }
         );
-        await step('USER4', 'withdrawCollateral() — retrieve 300 PAS from KredioPASMarket', 'KredioPASMarket',
+        await step('USER4', 'withdrawCollateral() - retrieve 300 PAS from KredioPASMarket', 'KredioPASMarket',
             () => pasMarket.connect(users.USER4).withdrawCollateral(),
             {
                 expected: 'USER4 receives 300 PAS; collateralBalance[USER4] → 0',
@@ -929,7 +929,7 @@ async function main() {
     console.log(`  USER1 depositBalance: ${fmt6(u1DepBal)} mUSDC`);
 
     if (u1DepBal > 0n) {
-        await step('USER1', `withdraw(${fmt6(u1DepBal)}) — full withdrawal from KredioLending`, 'KredioLending',
+        await step('USER1', `withdraw(${fmt6(u1DepBal)}) - full withdrawal from KredioLending`, 'KredioLending',
             () => lending.connect(users.USER1).withdraw(u1DepBal),
             {
                 expected: 'USER1 gets deposit back (auto-pulls from yield pool if needed) + any remaining yield; totalDeposited decreases',
@@ -947,7 +947,7 @@ async function main() {
     console.log(`  USER3 PM depositBalance: ${fmt6(u3DepBal)} mUSDC`);
 
     if (u3DepBal > 0n) {
-        await step('USER3', `withdraw(${fmt6(u3DepBal)}) — full withdrawal from KredioPASMarket`, 'KredioPASMarket',
+        await step('USER3', `withdraw(${fmt6(u3DepBal)}) - full withdrawal from KredioPASMarket`, 'KredioPASMarket',
             () => pasMarket.connect(users.USER3).withdraw(u3DepBal),
             {
                 expected: 'USER3 gets deposit back; PM totalDeposited decreases',
@@ -971,10 +971,10 @@ async function main() {
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  PHASE 5 — FINAL STATE + REPORT
+    //  PHASE 5 - FINAL STATE + REPORT
     // ══════════════════════════════════════════════════════════════════════════
     console.log('\n' + '─'.repeat(110));
-    console.log('  PHASE 5 — FINAL STATE SNAPSHOT');
+    console.log('  PHASE 5 - FINAL STATE SNAPSHOT');
     console.log('─'.repeat(110));
 
     const finalL = {
@@ -1057,7 +1057,7 @@ async function main() {
         const status = `${icon} ${r.status}`.padEnd(8);
         const txRef = r.txHash
             ? r.txHash.slice(0, 16) + '...'
-            : (r.error || '—').slice(0, 30);
+            : (r.error || '-').slice(0, 30);
         console.log(
             String(r.step).padEnd(5),
             r.actor.padEnd(7),

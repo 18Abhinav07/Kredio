@@ -1,5 +1,5 @@
 'use strict';
-// Bridge service — verifies source chain deposits, quotes ETH→mUSDC,
+// Bridge service - verifies source chain deposits, quotes ETH→mUSDC,
 // and calls KredioBridgeMinter.processDeposit() on Hub as the relayer.
 
 const { ethers } = require('ethers');
@@ -40,7 +40,7 @@ async function getHubGasOverrides() {
 }
 
 /**
- * Retry helper — retries `fn` up to `attempts` times with `delayMs` ms between.
+ * Retry helper - retries `fn` up to `attempts` times with `delayMs` ms between.
  * Logs each failure so the operator can see retries in server output.
  */
 async function withRetry(fn, { attempts = 3, delayMs = 5000, label = 'operation' } = {}) {
@@ -51,7 +51,7 @@ async function withRetry(fn, { attempts = 3, delayMs = 5000, label = 'operation'
         } catch (err) {
             lastErr = err;
             if (i < attempts) {
-                console.warn(`[bridge] ${label}: attempt ${i}/${attempts} failed — ${err.message} — retrying in ${delayMs / 1000}s`);
+                console.warn(`[bridge] ${label}: attempt ${i}/${attempts} failed - ${err.message} - retrying in ${delayMs / 1000}s`);
                 await new Promise(r => setTimeout(r, delayMs));
             }
         }
@@ -88,7 +88,7 @@ async function fetchEthPriceCoinGecko() {
     if (cgCache.priceUSD > 0 && now - cgCache.fetchedAt < CG_CACHE_TTL_MS) {
         return cgCache.priceUSD;
     }
-    // Simple fetch without node-fetch dep — use built-in fetch (Node 18+)
+    // Simple fetch without node-fetch dep - use built-in fetch (Node 18+)
     const res = await fetch(
         'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd',
         { headers: { 'Accept': 'application/json' } }
@@ -133,7 +133,7 @@ async function verifySanity(chainId, cgPrice) {
         }
     } catch (err) {
         if (err.message.startsWith('Price divergence')) throw err;
-        // Network error reading Chainlink — log and continue (non-blocking)
+        // Network error reading Chainlink - log and continue (non-blocking)
         console.warn('[bridge] Chainlink sanity check failed (non-fatal):', err.message);
     }
 }
@@ -183,7 +183,7 @@ async function processDeposit(chainId, txHash, hubRecipient) {
     hubRecipient = ethers.getAddress(hubRecipient);
 
     // ═══════════════════════════════════════════════════════════════════════
-    // [SOURCE CHAIN: e.g. Ethereum Sepolia]  — verify the lock tx on-chain
+    // [SOURCE CHAIN: e.g. Ethereum Sepolia]  - verify the lock tx on-chain
     // ═══════════════════════════════════════════════════════════════════════
 
     const srcProvider = getSourceProvider(chainId);
@@ -217,7 +217,7 @@ async function processDeposit(chainId, txHash, hubRecipient) {
     }
 
     // ═══════════════════════════════════════════════════════════════════════
-    // [PRICE ORACLE]  — CoinGecko price + Chainlink sanity check
+    // [PRICE ORACLE]  - CoinGecko price + Chainlink sanity check
     // ═══════════════════════════════════════════════════════════════════════
 
     const ethPriceUSD = await fetchEthPriceCoinGecko();
@@ -227,7 +227,7 @@ async function processDeposit(chainId, txHash, hubRecipient) {
     if (mUSDCOut === 0n) throw new Error('[Price Oracle] Computed mUSDCOut is zero (deposit too small?)');
 
     // ═══════════════════════════════════════════════════════════════════════
-    // [HUB: Polkadot Hub]  — idempotency check then mint mUSDC, with retry
+    // [HUB: Polkadot Hub]  - idempotency check then mint mUSDC, with retry
     // ═══════════════════════════════════════════════════════════════════════
 
     const existing = await minterContract.deposits(txHash);
@@ -239,7 +239,7 @@ async function processDeposit(chainId, txHash, hubRecipient) {
 
     console.log(`[bridge][${chain.name}→Hub] Processing deposit: ethAmount=${ethers.formatEther(ethAmount)} price=$${ethPriceUSD} mUSDCOut=${Number(mUSDCOut) / 1e6}`);
 
-    // Retry up to 3× — safe because Hub minter is idempotent (rejects duplicate txHash)
+    // Retry up to 3× - safe because Hub minter is idempotent (rejects duplicate txHash)
     const { hubTx, hubReceipt } = await withRetry(async () => {
         const hubGas = await getHubGasOverrides();
         const hubTx = await minterContract.processDeposit(
@@ -273,7 +273,7 @@ async function processDeposit(chainId, txHash, hubRecipient) {
 /**
  * [Hub → Source Chain] Finalise a redeem: verify Hub state then release ETH.
  * Flow:
- *   [Hub]           read deposit record — verify redeemed=true
+ *   [Hub]           read deposit record - verify redeemed=true
  *   [Source Chain]  inbox.adminWithdraw() releases locked ETH to sourceUser, with retry
  *
  * @param {string} sourceTxHash  Original source-chain deposit tx hash
@@ -282,12 +282,12 @@ async function processRedeem(sourceTxHash) {
     if (!minterContract) throw new Error('Minter contract not initialised');
 
     // ═══════════════════════════════════════════════════════════════════════
-    // [HUB: Polkadot Hub]  — read-only, verify on-chain state
+    // [HUB: Polkadot Hub]  - read-only, verify on-chain state
     // ═══════════════════════════════════════════════════════════════════════
 
     const rec = await minterContract.deposits(sourceTxHash);
-    if (rec.timestamp === 0n) throw new Error('[Hub] Unknown deposit — sourceTxHash not found in minter');
-    if (!rec.redeemed) throw new Error('[Hub] initiateRedeem not yet confirmed — try again shortly');
+    if (rec.timestamp === 0n) throw new Error('[Hub] Unknown deposit - sourceTxHash not found in minter');
+    if (!rec.redeemed) throw new Error('[Hub] initiateRedeem not yet confirmed - try again shortly');
 
     const sourceChainId = Number(rec.sourceChainId);
     const sourceUser = rec.sourceUser;
@@ -298,17 +298,17 @@ async function processRedeem(sourceTxHash) {
     if (!chain.inboxAddress) throw new Error(`Inbox not deployed for chain ${sourceChainId}`);
 
     // ═══════════════════════════════════════════════════════════════════════
-    // [SOURCE CHAIN: e.g. Ethereum Sepolia]  — release locked ETH from inbox
+    // [SOURCE CHAIN: e.g. Ethereum Sepolia]  - release locked ETH from inbox
     // ═══════════════════════════════════════════════════════════════════════
 
     const srcProvider = getSourceProvider(sourceChainId);
     const srcWallet = new ethers.Wallet(KEY, srcProvider);
 
     const inboxAbi = loadABI('EthBridgeInbox');
-    if (!inboxAbi) throw new Error('EthBridgeInbox ABI missing — run forge build');
+    if (!inboxAbi) throw new Error('EthBridgeInbox ABI missing - run forge build');
     const inbox = new ethers.Contract(chain.inboxAddress, inboxAbi, srcWallet);
 
-    // Balance guard — inbox must hold enough ETH to cover this redeem
+    // Balance guard - inbox must hold enough ETH to cover this redeem
     const locked = await srcProvider.getBalance(chain.inboxAddress);
     if (locked < ethAmount) {
         throw new Error(
@@ -319,7 +319,7 @@ async function processRedeem(sourceTxHash) {
 
     console.log(`[bridge][Hub→${chain.name}] adminWithdraw ${ethers.formatEther(ethAmount)} ETH → ${sourceUser}`);
 
-    // Release ETH — retry up to 3× if source-chain RPC is flaky
+    // Release ETH - retry up to 3× if source-chain RPC is flaky
     // Safe to retry: adminWithdraw releases from inbox balance, not relayer wallet
     const { tx, receipt } = await withRetry(async () => {
         const tx = await inbox.adminWithdraw(sourceUser, ethAmount);
@@ -365,17 +365,17 @@ async function getDepositStatus(txHash) {
 // ─── Startup ──────────────────────────────────────────────────────────────
 function start() {
     if (!KEY) {
-        console.warn('[bridge] KEY not set — bridge relayer disabled');
+        console.warn('[bridge] KEY not set - bridge relayer disabled');
         return;
     }
     if (!HUB.minter) {
-        console.warn('[bridge] MINTER_ADDR not set — bridge relayer disabled (set after deploy)');
+        console.warn('[bridge] MINTER_ADDR not set - bridge relayer disabled (set after deploy)');
         return;
     }
 
     const minterAbi = loadABI('KredioBridgeMinter');
     if (!minterAbi) {
-        console.warn('[bridge] KredioBridgeMinter ABI missing — run forge build');
+        console.warn('[bridge] KredioBridgeMinter ABI missing - run forge build');
         return;
     }
 
@@ -386,7 +386,7 @@ function start() {
     // Validate each chain inbox is configured
     for (const [id, chain] of Object.entries(CHAINS)) {
         if (!chain.inboxAddress) {
-            console.warn(`[bridge] Chain ${id} (${chain.name}): INBOX_ADDR_${id} not set — deposits from this chain disabled`);
+            console.warn(`[bridge] Chain ${id} (${chain.name}): INBOX_ADDR_${id} not set - deposits from this chain disabled`);
         } else {
             console.log(`[bridge] Chain ${id} (${chain.name}): inbox=${chain.inboxAddress}`);
         }

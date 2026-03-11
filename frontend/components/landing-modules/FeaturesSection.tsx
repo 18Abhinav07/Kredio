@@ -9,10 +9,12 @@ const ALL = [
     { cls: 'fc-flash', icon: '◎', title: 'Flashloan Shield', desc: 'Manipulation-resistant v5 interest accrual. Protects the protocol from single-block price manipulation and flashloan attacks.', color: '#A78BFA' },
     { cls: 'fc-xcm', icon: '⇌', title: 'XCM Deposits', desc: 'Bridge PAS from People Chain via native XCM.', color: T.cyan },
     { cls: 'fc-eth', icon: '⬡', title: 'ETH Bridge', desc: 'Bring liquidity from different EVM chains into Polkadot Asset Hub. Minted 1:1 on-chain.', color: '#F59E0B' },
-    { cls: 'fc-gov', icon: '⬥', title: 'Governance Rewards', desc: 'Vote on Asset Hub governance and earn score multipliers. Consistency unlocks higher tiers permanently.', color: '#818CF8', stat: '6 →',  statLabel: 'Tiers' },
+    { cls: 'fc-gov', icon: '⬥', title: 'Governance Rewards', desc: 'Vote on Asset Hub governance and earn score multipliers. Consistency unlocks higher tiers permanently.', color: '#818CF8', stat: '6 →', statLabel: 'Tiers' },
     { cls: 'fc-musdc', icon: '◇', title: 'mUSDC Markets', desc: 'Bridged EVM USDC pools with real-time yield.', color: '#38BDF8' },
     { cls: 'fc-swap', icon: '↻', title: 'KredioSwap', desc: 'Swap PAS, mUSDC and lending positions atomically.', color: '#F472B6' },
-    { cls: 'fc-id', icon: '▲', title: 'Identity Boost', desc: 'On-chain proofs permanently raise starting score. Leverage KILT and identity providers to exit the Anon tier immediately.', color: '#FB923C' },
+    { cls: 'fc-id', icon: '▲', title: 'Identity Boost', desc: 'On-chain proofs permanently raise starting score.', color: '#FB923C' },
+    { cls: 'fc-ai', icon: '⬡', title: 'AI Credit Engine', desc: 'Six-tier dynamic credit scoring driven by on-chain behavior. Score improves in real time - no application, no waiting period.', color: '#D946EF' },
+    { cls: 'fc-neural', icon: '◉', title: 'Neural Risk Layer', desc: 'A dual-mode neural net runs alongside deterministic rules to catch manipulation and edge cases the rulebook misses.', color: '#14B8A6' },
 ] as const;
 
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.05, delayChildren: 0.06 } } };
@@ -74,6 +76,22 @@ function CustomBg({ id }: { id: string }) {
                 <path d="M 100 150 A 50 50 0 0 1 150 100" fill="none" stroke="rgba(244,114,182,0.04)" strokeWidth="2" strokeLinecap="round" />
             </svg>
         );
+        case 'fc-ai': return (
+            <svg className="fc-bg-element" viewBox="0 0 400 200" preserveAspectRatio="xRightYBottom meet">
+                <path d="M -50 100 Q 100 -50 200 100 T 450 100" fill="none" stroke="rgba(217,70,239,0.06)" strokeWidth="4" />
+                <path d="M -50 120 Q 100 -10 200 120 T 450 120" fill="none" stroke="rgba(217,70,239,0.04)" strokeWidth="2" strokeDasharray="8 8" />
+                <circle cx="200" cy="100" r="24" fill="none" stroke="rgba(217,70,239,0.08)" strokeWidth="2" />
+                <path d="M 185 100 L 215 100 M 200 85 L 200 115" stroke="rgba(217,70,239,0.08)" strokeWidth="2" />
+            </svg>
+        );
+        case 'fc-neural': return (
+            <svg className="fc-bg-element" viewBox="0 0 200 200" preserveAspectRatio="xRightYBottom meet">
+                <circle cx="100" cy="100" r="60" fill="none" stroke="rgba(20,184,166,0.04)" strokeWidth="1" />
+                <circle cx="100" cy="100" r="40" fill="none" stroke="rgba(20,184,166,0.06)" strokeWidth="2" />
+                <circle cx="100" cy="100" r="20" fill="none" stroke="rgba(20,184,166,0.08)" strokeWidth="4" />
+                <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(20,184,166,0.03)" strokeWidth="1" strokeDasharray="4 4" />
+            </svg>
+        );
         default: return null;
     }
 }
@@ -100,6 +118,8 @@ export function FeaturesSection() {
                 .fc-musdc { grid-column: 1 / 2; grid-row: 6 / 7; }  /* 1x1 Bottom Left-ish */
                 .fc-swap { grid-column: 2 / 3; grid-row: 6 / 7; }   /* 1x1 Bottom Mid */
                 .fc-id { grid-column: 3 / 4; grid-row: 5 / 7; }     /* 1x2 Bottom Right */
+                .fc-ai { grid-column: 1 / 3; grid-row: 7 / 8; }
+                .fc-neural { grid-column: 3 / 4; grid-row: 7 / 8; }
 
                 @media (max-width: 960px) {
                     .feat-grid { grid-template-columns: repeat(2, 1fr); }
@@ -110,11 +130,13 @@ export function FeaturesSection() {
                     .fc-gov { grid-column: 1 / 3; grid-row: span 2; }
                     .fc-id { grid-column: span 1; grid-row: span 2; }
                     .fc-musdc, .fc-swap { grid-column: span 1; grid-row: span 1; }
+                    .fc-ai { grid-column: 1 / 3; grid-row: span 1; }
+                    .fc-neural { grid-column: span 2; grid-row: span 1; }
                 }
                 @media (max-width: 600px) {
                     .feat-grid { grid-template-columns: 1fr; }
-                    .fc-pas, .fc-gov, .fc-xcm { grid-column: 1 / 2; grid-row: span 1; }
-                    .fc-flash, .fc-eth, .fc-musdc, .fc-swap, .fc-id { grid-column: 1 / 2; grid-row: span 1; }
+                    .fc-pas, .fc-gov, .fc-xcm, .fc-ai { grid-column: 1 / 2; grid-row: span 1; }
+                    .fc-flash, .fc-eth, .fc-musdc, .fc-swap, .fc-id, .fc-neural { grid-column: 1 / 2; grid-row: span 1; }
                 }
 
                 .feat-card {
@@ -183,7 +205,7 @@ export function FeaturesSection() {
                 <motion.div variants={card} style={{ marginBottom: '40px' }}>
                     <p style={LABEL_STYLE}>Core Architecture</p>
                     <h2 style={{ fontSize: 'clamp(40px, 5vw, 64px)', fontWeight: 700, color: T.white, letterSpacing: '-0.04em', lineHeight: 1.05 }}>
-                        Multi-Chain Supply.<br/>
+                        Multi-Chain Supply.<br />
                         <span style={{ color: '#E2E8F0', opacity: 0.35 }}>Unified Credit Engine.</span>
                     </h2>
                 </motion.div>
@@ -193,7 +215,7 @@ export function FeaturesSection() {
                         // Is this card spanning multiple columns/rows?
                         const isHuge = f.cls === 'fc-pas' || f.cls === 'fc-gov';
                         const isVertical = f.cls === 'fc-flash' || f.cls === 'fc-eth' || f.cls === 'fc-id';
-                        const isHorizontal = f.cls === 'fc-xcm';
+                        const isHorizontal = f.cls === 'fc-xcm' || f.cls === 'fc-ai';
 
                         return (
                             <motion.div
@@ -203,14 +225,14 @@ export function FeaturesSection() {
                             >
                                 {/* Custom Bespoke Background Graphic */}
                                 <CustomBg id={f.cls} />
-                                
+
                                 <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
                                     {/* Top: Icon */}
-                                    <div style={{ 
-                                        width: isHuge ? 64 : 48, 
-                                        height: isHuge ? 64 : 48, 
-                                        borderRadius: 16, 
-                                        background: `rgba(255,255,255,0.03)`, 
+                                    <div style={{
+                                        width: isHuge ? 64 : 48,
+                                        height: isHuge ? 64 : 48,
+                                        borderRadius: 16,
+                                        background: `rgba(255,255,255,0.03)`,
                                         border: `1px solid rgba(255,255,255,0.08)`,
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                         fontSize: isHuge ? '28px' : '20px', color: f.color,

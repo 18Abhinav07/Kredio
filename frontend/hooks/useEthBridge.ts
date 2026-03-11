@@ -71,7 +71,7 @@ export function useEthBridge() {
     const { address } = useAccount();
     const chainId = useChainId();
     const publicClient = usePublicClient();
-    // Pinned clients — independent of the currently active wallet chain
+    // Pinned clients - independent of the currently active wallet chain
     const sepoliaPublicClient = usePublicClient({ chainId: BRIDGE.SEPOLIA_CHAIN_ID });
     const hubPublicClient = usePublicClient({ chainId: CONTRACTS.CHAIN_ID });
     const { data: walletClient } = useWalletClient();
@@ -90,7 +90,7 @@ export function useEthBridge() {
     const [mintedResult, setMintedResult] = useState<{ hubTx: string; mUSDCHuman: string } | null>(null);
     const [history, setHistory] = useState<({ sourceTxHash: `0x${string}` } & DepositRecord)[]>([]);
 
-    // Isolated reclaim state — never touches deposit `status`
+    // Isolated reclaim state - never touches deposit `status`
     const [reclaimingTx, setReclaimingTx] = useState<`0x${string}` | null>(null);
     const [reclaimErrorTx, setReclaimErrorTx] = useState<`0x${string}` | null>(null);
     const [reclaimError, setReclaimError] = useState<string | null>(null);
@@ -242,7 +242,7 @@ export function useEthBridge() {
         setReclaimStep('switching-chain');
 
         try {
-            // Ensure on Hub — switch if needed; walletClientRef.current will
+            // Ensure on Hub - switch if needed; walletClientRef.current will
             // be updated by the useEffect above once the re-render fires.
             if (chainId !== CONTRACTS.CHAIN_ID) {
                 await switchChainAsync({ chainId: CONTRACTS.CHAIN_ID });
@@ -303,7 +303,7 @@ export function useEthBridge() {
     const fetchHistory = useCallback(async (user: string) => {
         if (!BRIDGE.MINTER) return;
         try {
-            // We read from Hub — create a direct viem publicClient to avoid chain mismatch
+            // We read from Hub - create a direct viem publicClient to avoid chain mismatch
             const { createPublicClient, http } = await import('viem');
             const hubClient = createPublicClient({
                 transport: http(CONTRACTS.RPC),

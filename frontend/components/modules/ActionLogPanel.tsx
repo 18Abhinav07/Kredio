@@ -85,7 +85,7 @@ export function ActionLogPanel() {
     return (
         <div className="fixed right-5 bottom-5 z-70 flex flex-col items-end gap-3">
 
-            {/* Log panel — slides up from button */}
+            {/* Log panel - slides up from button */}
             <AnimatePresence>
                 {open && (
                     <motion.div
@@ -133,7 +133,7 @@ export function ActionLogPanel() {
                 )}
             </AnimatePresence>
 
-            {/* Trigger — circle that expands to pill on hover */}
+            {/* Trigger - circle that expands to pill on hover */}
             <button
                 onClick={() => setOpen(v => !v)}
                 className="group relative flex items-center h-10 rounded-full border border-white/10 bg-black/70 backdrop-blur-xl cursor-pointer px-2.5 hover:px-4 transition-all duration-200 shadow-lg hover:border-white/20 hover:bg-black/80"

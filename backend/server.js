@@ -7,6 +7,9 @@ const { PORT } = require('./config');
 const oracle = require('./services/oracle-service');
 const bridge = require('./services/bridge-service');
 const yieldStrategy = require('./services/yield-strategy-service');
+const aiEngine = require('./src/aiEngine');
+const xcmAcknowledger = require('./src/xcmAcknowledger');
+const protocolPing = require('./src/protocolPing');
 const oracleRoutes = require('./routes/oracle');
 const bridgeRoutes = require('./routes/bridge');
 const yieldStrategyRoutes = require('./routes/yield-strategy');
@@ -40,8 +43,9 @@ app.use((_req, res) => {
 // ─── Start services ───────────────────────────────────────────────────────
 oracle.start().catch(err => console.error('[oracle] start error:', err.message));
 bridge.start();
-yieldStrategy.start().catch(err => console.error('[yield-strategy] start error:', err.message));
-
+yieldStrategy.start().catch(err => console.error('[yield-strategy] start error:', err.message));aiEngine.start().catch(err => console.error('[aiEngine] start error:', err.message));
+xcmAcknowledger.start().catch(err => console.error('[xcmAcknowledger] start error:', err.message));
+protocolPing.start().catch(err => console.error('[protocolPing] start error:', err.message));
 // ─── Listen ───────────────────────────────────────────────────────────────
 const server = app.listen(PORT, () => {
     console.log(`\n════════════════════════════════════════`);
@@ -56,6 +60,7 @@ const server = app.listen(PORT, () => {
     console.log(`  POST /bridge/deposit   { chainId, txHash, hubRecipient }`);
     console.log(`  GET  /bridge/status?txHash=0x...`);
     console.log(`  GET  /yield-strategy/status`);
+    console.log(`  [AI Engine + XCM Acknowledger running in background]`);
     console.log(`════════════════════════════════════════\n`);
 });
 

@@ -4,12 +4,12 @@ import { motion } from 'framer-motion';
 import { T, SECTION, LABEL_STYLE } from './tokens';
 
 const TIERS = [
-    { cls: 'tc-1', name: 'ANON',     pts: '0',      ltv: '50%', rate: '12%', color: '#475569', hero: false },
-    { cls: 'tc-2', name: 'BRONZE',   pts: '100',    ltv: '60%', rate: '10%', color: '#CD7F32', hero: false },
-    { cls: 'tc-3', name: 'SILVER',   pts: '500',    ltv: '70%', rate: '8%',  color: '#94A3B8', hero: false },
-    { cls: 'tc-4', name: 'GOLD',     pts: '2,000',  ltv: '78%', rate: '6.5%',color: '#F59E0B', hero: false },
-    { cls: 'tc-5', name: 'PLATINUM', pts: '10,000', ltv: '83%', rate: '5%',  color: '#00E2FF', hero: false },
-    { cls: 'tc-6', name: 'DIAMOND',  pts: '50,000', ltv: '85%', rate: '3%',  color: '#E81CFF', hero: true },
+    { cls: 'tc-1', name: 'ANON', pts: '0', ltv: '50%', rate: '12%', color: '#475569', hero: false },
+    { cls: 'tc-2', name: 'BRONZE', pts: '100', ltv: '60%', rate: '10%', color: '#CD7F32', hero: false },
+    { cls: 'tc-3', name: 'SILVER', pts: '500', ltv: '70%', rate: '8%', color: '#94A3B8', hero: false },
+    { cls: 'tc-4', name: 'GOLD', pts: '2,000', ltv: '78%', rate: '6.5%', color: '#F59E0B', hero: false },
+    { cls: 'tc-5', name: 'PLATINUM', pts: '10,000', ltv: '83%', rate: '5%', color: '#00E2FF', hero: false },
+    { cls: 'tc-6', name: 'DIAMOND', pts: '50,000', ltv: '85%', rate: '3%', color: '#E81CFF', hero: true },
 ] as const;
 
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.06, delayChildren: 0.06 } } };
@@ -118,8 +118,8 @@ export function TiersSection() {
             `}</style>
 
             <div className="tiers-wrap">
-                {/* Left side — Sticky Header */}
-                <motion.div 
+                {/* Left side - Sticky Header */}
+                <motion.div
                     className="sticky-left"
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
@@ -128,13 +128,13 @@ export function TiersSection() {
                 >
                     <p style={LABEL_STYLE}>The Path to Diamond</p>
                     <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 700, color: T.white, letterSpacing: '-0.04em', lineHeight: 1.05, marginBottom: '16px' }}>
-                        Climb the Ladder.<br/>
+                        Climb the Ladder.<br />
                         <span style={{ color: '#E81CFF' }}>Unlock Capital.</span>
                     </h2>
                     <p style={{ fontSize: '15px', color: '#E2E8F0', lineHeight: 1.7, maxWidth: '420px', marginBottom: '32px' }}>
                         Kredio replaces fragmented identity with a unified on-chain reputation. Start at Anon with basic terms. Prove your reliability through repayments and governance. Unlock institutional-grade liquidity at Diamond.
                     </p>
-                    
+
                     <div style={{ display: 'flex', gap: '24px' }}>
                         <div>
                             <p style={{ fontSize: '28px', fontWeight: 700, color: T.white, letterSpacing: '-0.04em' }}>6</p>
@@ -151,8 +151,8 @@ export function TiersSection() {
                     </div>
                 </motion.div>
 
-                {/* Right side — Overlapping Stacking Cards */}
-                <motion.div 
+                {/* Right side - Overlapping Stacking Cards */}
+                <motion.div
                     className="ladder-container"
                     initial="hidden"
                     whileInView="show"
@@ -164,7 +164,7 @@ export function TiersSection() {
                             key={t.name}
                             variants={card}
                             className={`tier-card ${t.hero ? 'hero-card' : ''}`}
-                            style={{ 
+                            style={{
                                 zIndex: index, // Ensure natural stacking order
                                 // Slight tilt based on index to make it feel like scattered cards
                                 transformOrigin: 'center center'
@@ -184,7 +184,7 @@ export function TiersSection() {
                                             <span style={{ marginLeft: '12px', fontSize: '9px', fontFamily: 'ui-monospace,monospace', color: T.pink, letterSpacing: '1.5px', background: 'rgba(232,28,255,0.15)', padding: '4px 10px', borderRadius: '6px' }}>ULTIMATE TIER</span>
                                         )}
                                     </div>
-                                    
+
                                     {/* Min points */}
                                     <p style={{ fontSize: '11px', fontFamily: 'ui-monospace,monospace', color: '#CBD5E1', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>

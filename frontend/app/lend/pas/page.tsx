@@ -87,7 +87,7 @@ function LendDepositCard({
     const utilBps = pasMarket.utilizationBps;
     // Estimated lender APY: avg borrow rate (~10%) × utilization × 90% (after 10% protocol fee)
     const aprNum = (Number(utilBps) / 10000) * 9;
-    const aprDisplay = utilBps === 0n ? '—' : `${aprNum.toFixed(2)}%`;
+    const aprDisplay = utilBps === 0n ? '-' : `${aprNum.toFixed(2)}%`;
     const yearlyYield = amountAtoms && utilBps > 0n ? (Number(amountAtoms) / 1e6) * (aprNum / 100) : 0;
 
     const { writeContract: writeApprove, data: approveHash, isPending: approveSigning, reset: resetApprove } = useWriteContract();
@@ -118,7 +118,7 @@ function LendDepositCard({
     };
     const reset = () => { setPhase('idle'); setAmountInput(''); resetApprove(); resetDeposit(); };
     const isProcessing = phase === 'approving' || phase === 'approved' || phase === 'depositing';
-    const btnLabel = phase === 'approving' ? 'Step 1/2 — Approving…' : phase === 'approved' ? 'Approved ✓' : phase === 'depositing' ? 'Step 2/2 — Depositing…' : amountInput ? `Lend ${amountInput} mUSDC` : 'Lend mUSDC';
+    const btnLabel = phase === 'approving' ? 'Step 1/2 - Approving…' : phase === 'approved' ? 'Approved ✓' : phase === 'depositing' ? 'Step 2/2 - Depositing…' : amountInput ? `Lend ${amountInput} mUSDC` : 'Lend mUSDC';
 
     return (
         <div className="space-y-4">
@@ -149,10 +149,10 @@ function LendDepositCard({
                         className="rounded-xl border border-white/10 bg-black/30 px-4 py-3 space-y-2">
                         <div className="flex items-center gap-3">
                             <div className={cn('flex items-center gap-2 text-xs flex-1', phase === 'approved' || phase === 'depositing' ? 'text-emerald-400' : 'text-indigo-300')}>
-                                {phase === 'approved' || phase === 'depositing' ? <Check /> : <Spinner small />} Step 1/2 — Approve
+                                {phase === 'approved' || phase === 'depositing' ? <Check /> : <Spinner small />} Step 1/2 - Approve
                             </div>
                             <div className={cn('flex items-center gap-2 text-xs flex-1', phase === 'depositing' ? 'text-indigo-300' : 'text-slate-600')}>
-                                {phase === 'depositing' ? <Spinner small /> : <span className="w-4 h-4" />} Step 2/2 — Deposit
+                                {phase === 'depositing' ? <Spinner small /> : <span className="w-4 h-4" />} Step 2/2 - Deposit
                             </div>
                         </div>
                         <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden">
@@ -246,13 +246,13 @@ function SwapStep({ onSuccess }: { onSuccess: (receivedMusdc: string) => void })
                 <div className="flex-1">
                     {quoteFetching && pasWeiD > 0n ? <span className="flex items-center gap-2 text-slate-500 text-sm"><Spinner small />Calculating...</span>
                         : quoteDisplay ? <span className="text-2xl font-light text-emerald-300">{quoteDisplay}</span>
-                            : <span className="text-2xl font-light text-slate-600">—</span>}
+                            : <span className="text-2xl font-light text-slate-600">-</span>}
                 </div>
                 <span className={cn('text-xs font-semibold rounded-lg px-2.5 py-1', hasQuote ? 'text-emerald-300 bg-emerald-500/10 border border-emerald-500/20' : 'text-slate-600 bg-white/5 border border-white/10')}>mUSDC</span>
             </div>
             <div className={cn('rounded-xl border px-4 py-3 transition-opacity', hasQuote ? 'border-white/10 bg-black/30' : 'border-white/5 bg-black/10 opacity-35 pointer-events-none')}>
-                <InfoRow label="Rate" value={oraclePrice ? `1 PAS ≈ $${oraclePrice.toFixed(4)}` : '—'} />
-                <InfoRow label={`Fee (${Number(feeBps) / 100}%)`} value={hasQuote ? `${formatTokenAmount(((quoteResult as bigint) * feeBps) / (10000n - feeBps), 6, 4, false)} mUSDC` : '—'} />
+                <InfoRow label="Rate" value={oraclePrice ? `1 PAS ≈ $${oraclePrice.toFixed(4)}` : '-'} />
+                <InfoRow label={`Fee (${Number(feeBps) / 100}%)`} value={hasQuote ? `${formatTokenAmount(((quoteResult as bigint) * feeBps) / (10000n - feeBps), 6, 4, false)} mUSDC` : '-'} />
             </div>
             <button onClick={() => {
                 if (!amount || !quoteResult) return;
@@ -265,7 +265,7 @@ function SwapStep({ onSuccess }: { onSuccess: (receivedMusdc: string) => void })
                             : 'bg-indigo-600 hover:bg-indigo-500 text-white')}>
                 {busy ? <><Spinner />{isSigning ? 'Waiting for MetaMask…' : 'Confirming…'}</> : `Swap ${amount || '0'} PAS → mUSDC`}
             </button>
-            {oracle.isCrashed && <StateNotice tone="error" message="Oracle is down — swaps paused." />}
+            {oracle.isCrashed && <StateNotice tone="error" message="Oracle is down - swaps paused." />}
         </div>
     );
 }
@@ -294,7 +294,7 @@ function SwapAndLendTab({ contractAddr, market }: { contractAddr: `0x${string}`;
                     <motion.div key="sd" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                         className="rounded-2xl border border-emerald-500/20 bg-emerald-900/10 p-4 flex items-center gap-3">
                         <Check />
-                        <div className="text-sm"><span className="text-slate-400">Step 1 — </span><span className="text-emerald-300">Swapped PAS → {swappedMusdc} mUSDC</span></div>
+                        <div className="text-sm"><span className="text-slate-400">Step 1 - </span><span className="text-emerald-300">Swapped PAS → {swappedMusdc} mUSDC</span></div>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -360,7 +360,7 @@ function BridgeAndLendTab({ contractAddr, market }: { contractAddr: `0x${string}
             const valid = accounts.filter(a => !a.type || a.type === 'sr25519' || a.type === 'ed25519');
             if (!valid.length) { setBridgeStatus('No Substrate accounts found.'); return; }
             setSubAccounts(valid); setSelectedAcc(valid[0]); setTalismanConnected(true); setBridgeStatus('');
-            fetchPeopleBalance(valid[0].address).then(f => setPeopleBalance(formatPASFromPeople(f))).catch(() => setPeopleBalance('—'));
+            fetchPeopleBalance(valid[0].address).then(f => setPeopleBalance(formatPASFromPeople(f))).catch(() => setPeopleBalance('-'));
         } catch { setBridgeStatus('Failed to connect Talisman.'); }
     }
 
@@ -442,8 +442,8 @@ function BridgeAndLendTab({ contractAddr, market }: { contractAddr: `0x${string}
                                             </div>
                                         </div>
                                         <div className={cn('rounded-xl border px-4 py-3 transition-opacity', bridgeAmount && Number(bridgeAmount) > 0 ? 'border-white/10 bg-black/30' : 'border-white/5 bg-black/10 opacity-35 pointer-events-none')}>
-                                            <InfoRow label="Expected mUSDC after swap" value={previewMusdc ? `~${previewMusdc} mUSDC` : '—'} tone="green" />
-                                            <InfoRow label="PAS price" value={oracle.price8 > 0n ? `$${(Number(oracle.price8) / 1e8).toFixed(4)}` : '—'} />
+                                            <InfoRow label="Expected mUSDC after swap" value={previewMusdc ? `~${previewMusdc} mUSDC` : '-'} tone="green" />
+                                            <InfoRow label="PAS price" value={oracle.price8 > 0n ? `$${(Number(oracle.price8) / 1e8).toFixed(4)}` : '-'} />
                                             <InfoRow label="Estimated time" value="~30 seconds" />
                                         </div>
                                         {bridgeStatus && bridging && (
@@ -474,7 +474,7 @@ function BridgeAndLendTab({ contractAddr, market }: { contractAddr: `0x${string}
                             <motion.div key="bd" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                                 className="rounded-2xl border border-emerald-500/20 bg-emerald-900/10 p-4 flex items-center gap-3">
                                 <Check />
-                                <div className="text-sm"><span className="text-slate-400">Step 1 — </span><span className="text-emerald-300">+{arrivedWei ? formatPASFromEVM(arrivedWei) : bridgeAmount} PAS arrived on Hub</span></div>
+                                <div className="text-sm"><span className="text-slate-400">Step 1 - </span><span className="text-emerald-300">+{arrivedWei ? formatPASFromEVM(arrivedWei) : bridgeAmount} PAS arrived on Hub</span></div>
                             </motion.div>
                         )}
                     </AnimatePresence>
@@ -489,7 +489,7 @@ function BridgeAndLendTab({ contractAddr, market }: { contractAddr: `0x${string}
                                 ) : (
                                     <div className="rounded-2xl border border-emerald-500/20 bg-emerald-900/10 p-4 flex items-center gap-3">
                                         <Check />
-                                        <div className="text-sm"><span className="text-slate-400">Step 2 — </span><span className="text-emerald-300">Swapped → {swappedMusdc} mUSDC</span></div>
+                                        <div className="text-sm"><span className="text-slate-400">Step 2 - </span><span className="text-emerald-300">Swapped → {swappedMusdc} mUSDC</span></div>
                                     </div>
                                 )}
                             </motion.div>

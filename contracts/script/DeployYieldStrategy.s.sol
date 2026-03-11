@@ -18,8 +18,8 @@ interface IMintableY {
 
 /**
  * @notice Deploy the Intelligent Yield Strategy components:
- *           1. MockYieldPool  — accrues yield at a configurable APY rate
- *           2. KredioLending v6 — upgraded with strategy invest/pullback logic
+ *           1. MockYieldPool  - accrues yield at a configurable APY rate
+ *           2. KredioLending v6 - upgraded with strategy invest/pullback logic
  *         Wires them together and seeds the lending pool with 20,000 mUSDC.
  *
  * Reuses:

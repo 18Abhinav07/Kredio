@@ -316,7 +316,7 @@ export function bpsToPercent(bps: bigint | number, digits = 2) {
 
 export function formatHealthFactor(bps: bigint | number, digits = 2) {
     const raw = typeof bps === 'number' ? bps : Number(bps);
-    // type(uint256).max signals no active position — both contracts use this as sentinel
+    // type(uint256).max signals no active position - both contracts use this as sentinel
     if (raw > 1_000_000_000) return '∞';
     // Both KredioLending and KredioPASMarket return (collateral * 10000) / owed (BPS)
     return (raw / 10000).toFixed(digits) + 'x';
@@ -407,7 +407,7 @@ export function useStrategyData() {
                 isActive: result[1] > 0n,
             });
         } catch {
-            // Strategy not yet deployed on this lending contract — keep defaults silently.
+            // Strategy not yet deployed on this lending contract - keep defaults silently.
         } finally {
             setLoading(false);
         }

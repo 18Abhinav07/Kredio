@@ -117,7 +117,7 @@ contract KredioBridgeMinter {
 
         _userDeposits[hubRecipient].push(sourceTxHash);
 
-        // MockUSDC.mint() is publicly callable — no permission needed
+        // MockUSDC.mint() is publicly callable - no permission needed
         IMockUSDC(mUSDC).mint(hubRecipient, mUSDCOut);
 
         emit DepositProcessed(sourceTxHash, hubRecipient, mUSDCOut, sourceChainId);

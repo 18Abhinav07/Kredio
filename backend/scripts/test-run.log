@@ -1,6 +1,6 @@
 
 ══════════════════════════════════════════════════════════════════════════════════════════════════════════════
-  KREDIO PROTOCOL — COMPREHENSIVE TEST SUITE
+  KREDIO PROTOCOL - COMPREHENSIVE TEST SUITE
   Run started: 2026-03-08T09:32:04.466Z
 ══════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
@@ -21,7 +21,7 @@ Contracts:
   ORACLE    : 0x1494432a8Af6fa8c03C0d7DD7720E298D85C55c7
 
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  PHASE 0 — CURRENT STATE SNAPSHOT
+  PHASE 0 - CURRENT STATE SNAPSHOT
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
   PAS oracle answer: 608220000 (8 decimals = $6.0822 per PAS)
@@ -54,7 +54,7 @@ Contracts:
     USER6  0x86393035... | mUSDC:       631,129.0082 | PAS:   1,999.9984
 
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  PHASE 1 — SWEEP ALL CONTRACTS CLEAN
+  PHASE 1 - SWEEP ALL CONTRACTS CLEAN
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
   KredioLending investedAmount: 0.00 mUSDC
@@ -91,7 +91,7 @@ Contracts:
   YieldPool.totalPrincipal       = 244,995.7808 (expect 0 after pull-back)
 
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  PHASE 2 — FUND ACCOUNTS (200 000 mUSDC + 1 000 PAS each)
+  PHASE 2 - FUND ACCOUNTS (200 000 mUSDC + 1 000 PAS each)
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
   USER1 (0x5EF0a87f...)  mUSDC=871,130.837  PAS=1,999.9472
@@ -140,7 +140,7 @@ Contracts:
   USER6  0x86393035... | mUSDC:       831,129.0082 | PAS:   1,999.9984
 
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  PHASE 3 — CONFIGURE RATES & SEED POOLS
+  PHASE 3 - CONFIGURE RATES & SEED POOLS
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
   [Step 15] ADMIN: Set yield pool rate to 100 000 bps (1 000% APY)
@@ -180,7 +180,7 @@ Contracts:
   KredioPASMarket.totalDeposited = 300,000.00
 
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  PHASE 4 — TEST SEQUENCE
+  PHASE 4 - TEST SEQUENCE
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
   ── T1: USER1 → Lend 50 000 mUSDC into KredioLending ──
@@ -216,7 +216,7 @@ Contracts:
   ── T4: USER4 → Deposit PAS collateral + Borrow from KredioPASMarket ──
   300 PAS → collValueUSDC=1,824.66  ltvBps=6500  maxBorrow=1,186.029  borrowing70%=830.2203
 
-  [Step 32] USER4: depositCollateral — lock 300 PAS in KredioPASMarket
+  [Step 32] USER4: depositCollateral - lock 300 PAS in KredioPASMarket
      ✓ tx: 0xa02001ba6c06f37b0f62242013dc646c180afda8f2b4b8b3529a5b3fdd6b0ca9   gas: 22057
 
   [Step 33] USER4: Borrow 830.2203 mUSDC from KredioPASMarket (PAS-collateral gated)
@@ -225,7 +225,7 @@ Contracts:
   ── T5: USER5 → Deposit 400 PAS + Borrow 95% of max (liquidation target) ──
   400 PAS → collValueUSDC=2,432.88  maxBorrow=1,581.372  borrowing95%=1,502.3034
 
-  [Step 34] USER5: depositCollateral — lock 400 PAS in KredioPASMarket
+  [Step 34] USER5: depositCollateral - lock 400 PAS in KredioPASMarket
      ✓ tx: 0x38e5a65a72b7a41d8b7891b5692c2dc4beed864466f10a97406262cee47c7b4d   gas: 22057
 
   [Step 35] USER5: Borrow 1,502.3034 mUSDC at 95% LTV (near liquidation)
@@ -237,7 +237,7 @@ Contracts:
   [Step 36] ADMIN: Invest 200,000.00 mUSDC from KredioLending into yield pool
      ✓ tx: 0x2a4f7c0a10fc312b108a198a5e46095d6043d90c544358c5a557a370b3414294   gas: 65737
 
-  ── T7: CHECK — Strategy status after investment ──
+  ── T7: CHECK - Strategy status after investment ──
   pool           : 0x1dB4Faad3081aAfe26eC0ef6886F04f28D944AAB
   invested       : 200,000.00 mUSDC
   totalEarned    : 0.00 mUSDC (lifetime)
@@ -276,7 +276,7 @@ Contracts:
   ── T12: ADMIN → Claim external yield from MockYieldPool and inject into KredioLending ──
   Pending strategy yield now: 11.4155 mUSDC
 
-  [Step 40] ADMIN: adminClaimAndInjectYield — mint 11.4155 mUSDC yield → distribute to lenders
+  [Step 40] ADMIN: adminClaimAndInjectYield - mint 11.4155 mUSDC yield → distribute to lenders
      ✓ tx: 0x1f4af041bf7fae4ce9b6297f1e6a6a4e2b16c5a7d77ceeae58e7c3f7743a285d   gas: 24152
 
   ── T13: USER1 → Harvest yield from KredioLending ──
@@ -297,7 +297,7 @@ Contracts:
   [Step 43] USER2: Approve 10,080.1567 mUSDC to KredioLending for repayment
      ✓ tx: 0xd472eec0e340a0515396cdc794a33d83466594a2b9481e1e54b6dc5ca97b5a16   gas: 21885
 
-  [Step 44] USER2: repay() — pay 10,030.1567 mUSDC (principal + interest)
+  [Step 44] USER2: repay() - pay 10,030.1567 mUSDC (principal + interest)
      ✓ tx: 0x10cd3b65e736845a7e8f66f99b39145846b43ccbd73568cb8d64eae58bdd03a6   gas: 0
 
   ── T16: USER4 → Repay PAS market loan + Withdraw PAS collateral ──
@@ -306,22 +306,22 @@ Contracts:
   [Step 45] USER4: Approve 882.7239 mUSDC to KredioPASMarket
      ✓ tx: 0x44c6688fd403b82d35b65eb4f10cf1bf0b40f28b7ba909a9dd4476999989eaf6   gas: 21885
 
-  [Step 46] USER4: repay() — pay 832.7239 mUSDC (principal + interest)
+  [Step 46] USER4: repay() - pay 832.7239 mUSDC (principal + interest)
      ✓ tx: 0xc5a23df7bb8b859bd222c95ebdbdd794c8b9a8ae43468a2890421e031ad43000   gas: 0
 
-  [Step 47] USER4: withdrawCollateral() — retrieve 300 PAS from KredioPASMarket
+  [Step 47] USER4: withdrawCollateral() - retrieve 300 PAS from KredioPASMarket
      ✓ tx: 0xef7d982615d66ed325ff61b13bac2fa1bb3f0dedf64903c3a2ef4ab3c3126f81   gas: 0
 
   ── T17: USER1 → Withdraw deposit from KredioLending ──
   USER1 depositBalance: 50,000.00 mUSDC
 
-  [Step 48] USER1: withdraw(50,000.00) — full withdrawal from KredioLending
+  [Step 48] USER1: withdraw(50,000.00) - full withdrawal from KredioLending
      ✓ tx: 0x4c38861d3cbf9b5f04727dc4c0973e04a162722523d101d7fb6705b0f7cf06a9   gas: 0
 
   ── T18: USER3 → Withdraw deposit from KredioPASMarket ──
   USER3 PM depositBalance: 80,000.00 mUSDC
 
-  [Step 49] USER3: withdraw(80,000.00) — full withdrawal from KredioPASMarket
+  [Step 49] USER3: withdraw(80,000.00) - full withdrawal from KredioPASMarket
      ✓ tx: 0x284c57be22235c5b5a89ee940f223529f2bbfc3e8cc4cf575bc9cef43165b4cc   gas: 0
 
   ── T19: USER6 → Read credit score (unused in test; should show ANON) ──
@@ -329,7 +329,7 @@ Contracts:
   USER6 PM position active: false
 
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  PHASE 5 — FINAL STATE SNAPSHOT
+  PHASE 5 - FINAL STATE SNAPSHOT
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
   Final KredioLending:
@@ -397,24 +397,24 @@ Step  Actor   Status   Contract          Action                                 
 29    USER2   ✓ PASS   MockUSDC          Approve 20 000 mUSDC to KredioLending (collateral) 0xb3140bef7060c1...
 30    USER2   ✓ PASS   KredioLending     Deposit 20 000 mUSDC as USDC collateral into Kredi 0xb820051887aac6...
 31    USER2   ✓ PASS   KredioLending     Borrow 10,000.00 mUSDC from KredioLending (credit- 0x81ff031b01582f...
-32    USER4   ✓ PASS   KredioPASMarket   depositCollateral — lock 300 PAS in KredioPASMarke 0xa02001ba6c06f3...
+32    USER4   ✓ PASS   KredioPASMarket   depositCollateral - lock 300 PAS in KredioPASMarke 0xa02001ba6c06f3...
 33    USER4   ✓ PASS   KredioPASMarket   Borrow 830.2203 mUSDC from KredioPASMarket (PAS-co 0x9d23841a167cdd...
-34    USER5   ✓ PASS   KredioPASMarket   depositCollateral — lock 400 PAS in KredioPASMarke 0x38e5a65a72b7a4...
+34    USER5   ✓ PASS   KredioPASMarket   depositCollateral - lock 400 PAS in KredioPASMarke 0x38e5a65a72b7a4...
 35    USER5   ✓ PASS   KredioPASMarket   Borrow 1,502.3034 mUSDC at 95% LTV (near liquidati 0x81a4ac2b27c7a4...
 36    ADMIN   ✓ PASS   KredioLending     Invest 200,000.00 mUSDC from KredioLending into yi 0x2a4f7c0a10fc31...
 37    ADMIN   ✓ PASS   KredioLending     adminTickPool for USER2 in KredioLending           0x67409bd19177bf...
 38    ADMIN   ✓ PASS   KredioPASMarket   adminTickPool for USER4 + USER5 in KredioPASMarket 0x3b8c1a9257e644...
 39    ADMIN   ✓ PASS   KredioPASMarket   adminLiquidate USER5 (totalOwed≈1,504.2961 mUSDC,  0xcff4edaa8ad413...
-40    ADMIN   ✓ PASS   KredioLending     adminClaimAndInjectYield — mint 11.4155 mUSDC yiel 0x1f4af041bf7fae...
+40    ADMIN   ✓ PASS   KredioLending     adminClaimAndInjectYield - mint 11.4155 mUSDC yiel 0x1f4af041bf7fae...
 41    USER1   ✓ PASS   KredioLending     Harvest 1.723 mUSDC yield from KredioLending       0x12370963fd3ea3...
 42    USER3   ✓ PASS   KredioPASMarket   Harvest 0.8193 mUSDC yield from KredioPASMarket    0xf026987c0912f2...
 43    USER2   ✓ PASS   MockUSDC          Approve 10,080.1567 mUSDC to KredioLending for rep 0xd472eec0e340a0...
-44    USER2   ✓ PASS   KredioLending     repay() — pay 10,030.1567 mUSDC (principal + inter 0x10cd3b65e73684...
+44    USER2   ✓ PASS   KredioLending     repay() - pay 10,030.1567 mUSDC (principal + inter 0x10cd3b65e73684...
 45    USER4   ✓ PASS   MockUSDC          Approve 882.7239 mUSDC to KredioPASMarket          0x44c6688fd403b8...
-46    USER4   ✓ PASS   KredioPASMarket   repay() — pay 832.7239 mUSDC (principal + interest 0xc5a23df7bb8b85...
-47    USER4   ✓ PASS   KredioPASMarket   withdrawCollateral() — retrieve 300 PAS from Kredi 0xef7d982615d66e...
-48    USER1   ✓ PASS   KredioLending     withdraw(50,000.00) — full withdrawal from KredioL 0x4c38861d3cbf9b...
-49    USER3   ✓ PASS   KredioPASMarket   withdraw(80,000.00) — full withdrawal from KredioP 0x284c57be22235c...
+46    USER4   ✓ PASS   KredioPASMarket   repay() - pay 832.7239 mUSDC (principal + interest 0xc5a23df7bb8b85...
+47    USER4   ✓ PASS   KredioPASMarket   withdrawCollateral() - retrieve 300 PAS from Kredi 0xef7d982615d66e...
+48    USER1   ✓ PASS   KredioLending     withdraw(50,000.00) - full withdrawal from KredioL 0x4c38861d3cbf9b...
+49    USER3   ✓ PASS   KredioPASMarket   withdraw(80,000.00) - full withdrawal from KredioP 0x284c57be22235c...
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
   TOTAL: 49  |  PASS: 49  |  FAIL: 0  |  Elapsed: 637.4s
 ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════

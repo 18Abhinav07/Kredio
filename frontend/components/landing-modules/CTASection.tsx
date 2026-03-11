@@ -29,7 +29,7 @@ export function CTASection() {
 
                 {/* Subhead */}
                 <p style={{ fontSize: '15px', lineHeight: 1.9, color: '#E2E8F0', marginBottom: '48px', maxWidth: '400px', margin: '0 auto 48px' }}>
-                    Join anon, leave Diamond. Stop paying equal rates for unequal reliability. Build your unkillable on-chain credit history right now.
+                    Join anon, become Diamond. Stop paying equal rates for unequal reliability. Build your unkillable on-chain credit history right now.
                 </p>
 
                 {/* CTA button */}

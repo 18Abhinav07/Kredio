@@ -34,7 +34,7 @@ interface ISR25519Verifier {
 ///           - Attested fallback when the SR25519 precompile is unavailable.
 ///
 ///         One-to-one mapping enforced in both directions.
-///         Nonce increments on link AND unlink — old signatures are permanently
+///         Nonce increments on link AND unlink - old signatures are permanently
 ///         invalid after any state change.
 ///
 /// @dev Deployed on Hub EVM (chainId 420420417).

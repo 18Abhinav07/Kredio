@@ -1,4 +1,4 @@
-// ─── Token Registry — Phase 1 ───────────────────────────────────────
+// ─── Token Registry - Phase 1 ───────────────────────────────────────
 // Single source of truth for all token metadata used in the frontend.
 // PAS is native (no ERC-20 address). Everything else has a contract.
 

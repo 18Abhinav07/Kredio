@@ -153,33 +153,28 @@ contract KredioXCMSettler is ReentrancyGuard {
 
     // ── Phase 5 AI Engine events ──────────────────────────────────────────────
 
-    /// @notice Fired at the start of every settleIntent() call — unique intentId for audit trail.
+    /// @notice Fired at the start of every settleIntent() call - unique intentId for audit trail.
     event IntentAuditLog(
         bytes32 indexed intentId,
-        uint32  indexed sourceParaId,
+        uint32 indexed sourceParaId,
         address indexed sender,
-        uint8   intentType,
+        uint8 intentType,
         uint256 amount,
-        uint64  receivedBlock
+        uint64 receivedBlock
     );
 
     /// @notice Recorded by xcmAcknowledger.js after intent processing dispatches a message.
     event MessageDispatched(
         bytes32 indexed intentId,
-        uint8   bridgeType,
-        uint32  destinationId,
+        uint8 bridgeType,
+        uint32 destinationId,
         bytes32 messageHash,
-        uint64  dispatchedBlock,
-        uint64  estimatedDeliveryBlocks
+        uint64 dispatchedBlock,
+        uint64 estimatedDeliveryBlocks
     );
 
     /// @notice Recorded by xcmAcknowledger.js after the delivery window elapses.
-    event ExecutionAcknowledged(
-        bytes32 indexed intentId,
-        bool    success,
-        bytes4  resultCode,
-        uint64  acknowledgedBlock
-    );
+    event ExecutionAcknowledged(bytes32 indexed intentId, bool success, bytes4 resultCode, uint64 acknowledgedBlock);
 
     /// @notice Recorded by xcmAcknowledger.js when an ETH bridge operation is detected.
     event EthBridgeInitiated(
@@ -187,7 +182,7 @@ contract KredioXCMSettler is ReentrancyGuard {
         address indexed ethRecipient,
         uint256 amount,
         bytes32 bridgeTransactionHash,
-        uint64  initiatedBlock
+        uint64 initiatedBlock
     );
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -227,7 +222,7 @@ contract KredioXCMSettler is ReentrancyGuard {
 
     /// @notice Entry point for XCM Transact payloads.
     ///         Called by the Hub EVM XCM executor after tokens have already
-    ///         landed in `originAddress`. Does NOT revert on protocol failure —
+    ///         landed in `originAddress`. Does NOT revert on protocol failure -
     ///         failure is recorded on-chain so the XCM message is fully consumed.
     ///
     /// @param originAddress  The user's Hub EVM sovereign account.
@@ -252,9 +247,7 @@ contract KredioXCMSettler is ReentrancyGuard {
         intentNonce[originAddress] = nonce;
 
         // Phase 5: compute intentId and emit audit log before existing logic
-        bytes32 intentId = keccak256(abi.encode(
-            sourceParachain, originAddress, block.number, intentType
-        ));
+        bytes32 intentId = keccak256(abi.encode(sourceParachain, originAddress, block.number, intentType));
         emit IntentAuditLog(
             intentId,
             sourceParachain,
@@ -446,10 +439,10 @@ contract KredioXCMSettler is ReentrancyGuard {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Internal handlers — one per intent type
+    // Internal handlers - one per intent type
     // ─────────────────────────────────────────────────────────────────────────
 
-    /// @dev 0x01 — Deposits msg.value PAS as collateral in KredioPASMarket.
+    /// @dev 0x01 - Deposits msg.value PAS as collateral in KredioPASMarket.
     function _handleDepositCollateral(
         address,
         uint256 amount
@@ -462,7 +455,7 @@ contract KredioXCMSettler is ReentrancyGuard {
         }
     }
 
-    /// @dev 0x02 — Borrows mUSDC from KredioPASMarket (requires collateral posted).
+    /// @dev 0x02 - Borrows mUSDC from KredioPASMarket (requires collateral posted).
     ///      On success, forwards borrowed mUSDC to `user`.
     function _handleBorrow(
         address user,
@@ -482,7 +475,7 @@ contract KredioXCMSettler is ReentrancyGuard {
         }
     }
 
-    /// @dev 0x03 — Repays outstanding debt in KredioPASMarket.
+    /// @dev 0x03 - Repays outstanding debt in KredioPASMarket.
     ///      mUSDC must already be present in this contract (sent via XCM token transfer
     ///      prior to the Transact intent).
     function _handleRepay(
@@ -505,7 +498,7 @@ contract KredioXCMSettler is ReentrancyGuard {
         return (ok, 0, reason);
     }
 
-    /// @dev 0x04 — Deposits mUSDC into KredioLending pool.
+    /// @dev 0x04 - Deposits mUSDC into KredioLending pool.
     ///      mUSDC must already be present in this contract.
     function _handleDepositLend(
         address,
@@ -524,7 +517,7 @@ contract KredioXCMSettler is ReentrancyGuard {
         }
     }
 
-    /// @dev 0x05 — Swaps msg.value PAS → mUSDC via KredioSwap, then deposits into
+    /// @dev 0x05 - Swaps msg.value PAS → mUSDC via KredioSwap, then deposits into
     ///      KredioLending pool. Atomic: if either step fails, neither is committed.
     function _handleSwapAndLend(
         address,
@@ -560,7 +553,7 @@ contract KredioXCMSettler is ReentrancyGuard {
         }
     }
 
-    /// @dev 0x06 — Swaps msg.value PAS → mUSDC, deposits as KredioLending collateral,
+    /// @dev 0x06 - Swaps msg.value PAS → mUSDC, deposits as KredioLending collateral,
     ///      then borrows `borrowAmount` mUSDC. Three-step atomic: all succeed or stop.
     function _handleSwapAndBorrowCollateral(
         address user,
@@ -607,7 +600,7 @@ contract KredioXCMSettler is ReentrancyGuard {
         }
     }
 
-    /// @dev 0x07 — Withdraws all PAS collateral from KredioPASMarket.
+    /// @dev 0x07 - Withdraws all PAS collateral from KredioPASMarket.
     ///      Reverts if user has an active debt position (spec requirement).
     ///      On success, forwards returned PAS to `user`.
     function _handleWithdrawCollateral(
@@ -631,7 +624,7 @@ contract KredioXCMSettler is ReentrancyGuard {
         }
     }
 
-    /// @dev 0x08 — Atomic two-step exit: repay all PAS-market debt then withdraw
+    /// @dev 0x08 - Atomic two-step exit: repay all PAS-market debt then withdraw
     ///      all PAS collateral. If repay fails, withdrawal does NOT proceed.
     function _handleFullExit(
         address user
@@ -721,29 +714,19 @@ contract KredioXCMSettler is ReentrancyGuard {
         bool success,
         bytes4 resultCode
     ) external onlyOwner {
-        emit ExecutionAcknowledged(
-            intentId,
-            success,
-            resultCode,
-            uint64(block.number)
-        );
+        emit ExecutionAcknowledged(intentId, success, resultCode, uint64(block.number));
     }
 
     /// @notice Record that a cross-chain message was dispatched. Called by xcmAcknowledger.js.
     function recordMessageDispatched(
         bytes32 intentId,
-        uint8   bridgeType,
-        uint32  destinationId,
+        uint8 bridgeType,
+        uint32 destinationId,
         bytes32 messageHash,
-        uint64  estimatedDeliveryBlocks
+        uint64 estimatedDeliveryBlocks
     ) external onlyOwner {
         emit MessageDispatched(
-            intentId,
-            bridgeType,
-            destinationId,
-            messageHash,
-            uint64(block.number),
-            estimatedDeliveryBlocks
+            intentId, bridgeType, destinationId, messageHash, uint64(block.number), estimatedDeliveryBlocks
         );
     }
 
@@ -754,20 +737,16 @@ contract KredioXCMSettler is ReentrancyGuard {
         uint256 amount,
         bytes32 bridgeTransactionHash
     ) external onlyOwner {
-        emit EthBridgeInitiated(
-            bridgeId,
-            ethRecipient,
-            amount,
-            bridgeTransactionHash,
-            uint64(block.number)
-        );
+        emit EthBridgeInitiated(bridgeId, ethRecipient, amount, bridgeTransactionHash, uint64(block.number));
     }
 
     /// @dev Extract amount from intent payload if well-formed (offset 20..52 = uint256).
-    ///      Returns 0 if payload is too short. Pure — no storage access.
-    function _extractAmount(uint8 /*intentType*/, bytes calldata payload)
-        internal pure returns (uint256)
-    {
+    ///      Returns 0 if payload is too short. Pure - no storage access.
+    function _extractAmount(
+        uint8,
+        /*intentType*/
+        bytes calldata payload
+    ) internal pure returns (uint256) {
         if (payload.length >= 52) {
             return abi.decode(payload[20:52], (uint256));
         }
@@ -791,7 +770,7 @@ contract KredioXCMSettler is ReentrancyGuard {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Receive — needed to accept PAS returned from withdrawCollateral
+    // Receive - needed to accept PAS returned from withdrawCollateral
     // ─────────────────────────────────────────────────────────────────────────
 
     receive() external payable {}

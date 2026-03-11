@@ -31,7 +31,7 @@ export const wagmiConfig = createConfig({
     ],
     transports: {
         [passetHub.id]: http(CONTRACTS.RPC),
-        // Explicit public RPC — viem's default (thirdweb) blocks CORS from localhost
+        // Explicit public RPC - viem's default (thirdweb) blocks CORS from localhost
         [sepolia.id]: http('https://ethereum-sepolia-rpc.publicnode.com'),
     },
 });

@@ -1,5 +1,5 @@
 'use strict';
-// Yield Strategy Service — monitors KredioLending pool utilization and
+// Yield Strategy Service - monitors KredioLending pool utilization and
 // automatically rebalances idle capital into MockYieldPool to generate
 // extra yield for lenders. Claimed yield flows back through
 // _distributeInterest so all lenders earn their pro-rata share automatically.
@@ -61,7 +61,7 @@ function fmt6(atoms) {
     return ethers.formatUnits(atoms, 6);
 }
 
-// ─── Decision logic (pure — no side effects) ──────────────────────────────
+// ─── Decision logic (pure - no side effects) ──────────────────────────────
 // Returns { action, actionAmount, zone, target }
 // action: 'NOOP' | 'INVEST' | 'PULL_BACK' | 'PULL_ALL' | 'CLAIM'
 function computeDecision({ totalDeposited, totalBorrowed, investedAmount, pendingYield, nowMs }) {
@@ -210,26 +210,26 @@ async function tick() {
 // ─── Start ────────────────────────────────────────────────────────────────
 async function start() {
     if (!YIELD_STRATEGY.enabled) {
-        console.log('[yield-strategy] disabled — set YIELD_STRATEGY_ENABLED=true to enable');
+        console.log('[yield-strategy] disabled - set YIELD_STRATEGY_ENABLED=true to enable');
         return;
     }
     if (!YIELD_STRATEGY.lendingAddr) {
-        console.warn('[yield-strategy] LENDING_ADDR not set — skipping');
+        console.warn('[yield-strategy] LENDING_ADDR not set - skipping');
         return;
     }
     if (!YIELD_STRATEGY.yieldPoolAddr) {
-        console.warn('[yield-strategy] YIELD_POOL_ADDR not set — skipping');
+        console.warn('[yield-strategy] YIELD_POOL_ADDR not set - skipping');
         return;
     }
     if (!KEY) {
-        console.warn('[yield-strategy] KEY not set — cannot sign transactions');
+        console.warn('[yield-strategy] KEY not set - cannot sign transactions');
         return;
     }
 
     const lendingABI = loadABI('KredioLending');
     const yieldPoolABI = loadABI('MockYieldPool');
     if (!lendingABI || !yieldPoolABI) {
-        console.warn('[yield-strategy] Cannot load ABIs — run `forge build` first');
+        console.warn('[yield-strategy] Cannot load ABIs - run `forge build` first');
         return;
     }
 

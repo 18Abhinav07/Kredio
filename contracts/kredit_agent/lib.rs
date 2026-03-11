@@ -15,9 +15,9 @@ mod kredit_agent {
         /// compute_score(repayments, liquidations, deposit_tier, blocks_since_first) → u64
         ///
         /// Component weights:
-        ///   Repayment history  — max 55 pts (with liquidation penalty)
-        ///   Lending volume     — max 35 pts (via deposit_tier 0–7)
-        ///   Account age        — max 10 pts (via blocks_since_first)
+        ///   Repayment history  - max 55 pts (with liquidation penalty)
+        ///   Lending volume     - max 35 pts (via deposit_tier 0–7)
+        ///   Account age        - max 10 pts (via blocks_since_first)
         ///   TOTAL max          = 100 pts
         #[ink(message)]
         pub fn compute_score(
@@ -173,17 +173,17 @@ mod kredit_agent {
 
         fn interest_rate_internal(score: u64) -> u64 {
             if score >= 80 {
-                300  // 3% APY — DIAMOND
+                300  // 3% APY - DIAMOND
             } else if score >= 65 {
-                600  // 6% APY — PLATINUM
+                600  // 6% APY - PLATINUM
             } else if score >= 50 {
-                1000 // 10% APY — GOLD
+                1000 // 10% APY - GOLD
             } else if score >= 30 {
-                1500 // 15% APY — SILVER
+                1500 // 15% APY - SILVER
             } else if score >= 15 {
-                1800 // 18% APY — BRONZE
+                1800 // 18% APY - BRONZE
             } else {
-                2200 // 22% APY — ANON
+                2200 // 22% APY - ANON
             }
         }
 

@@ -6,7 +6,7 @@ import "../evm/EthBridgeInbox.sol";
 import "../evm/KredioBridgeMinter.sol";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// DeployInbox — deploy EthBridgeInbox on Ethereum Sepolia (chainId 11155111)
+// DeployInbox - deploy EthBridgeInbox on Ethereum Sepolia (chainId 11155111)
 //
 // Usage:
 //   forge script script/DeployBridge.s.sol:DeployInbox \
@@ -40,7 +40,7 @@ contract DeployInbox is Script {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// DeployMinter — deploy KredioBridgeMinter on Hub Testnet (chainId 420420417)
+// DeployMinter - deploy KredioBridgeMinter on Hub Testnet (chainId 420420417)
 //
 // Usage:
 //   forge script script/DeployBridge.s.sol:DeployMinter \
@@ -50,7 +50,7 @@ contract DeployInbox is Script {
 //     --broadcast
 // ─────────────────────────────────────────────────────────────────────────────
 contract DeployMinter is Script {
-    // Existing deployed MockUSDC on Hub — unchanged
+    // Existing deployed MockUSDC on Hub - unchanged
     address constant MUSDC = 0x5998cE005b4f3923c988Ae31940fAa1DEAC0c646;
 
     function run() external {

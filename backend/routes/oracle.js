@@ -3,12 +3,12 @@ const express = require('express');
 const router = express.Router();
 const oracle = require('../services/oracle-service');
 
-// GET /oracle/status — cached state, no RPC calls
+// GET /oracle/status - cached state, no RPC calls
 router.get('/status', (_req, res) => {
     res.json(oracle.getState());
 });
 
-// GET /oracle/crash — inject price crash
+// GET /oracle/crash - inject price crash
 router.get('/crash', async (_req, res) => {
     try {
         const result = await oracle.crash();
@@ -18,7 +18,7 @@ router.get('/crash', async (_req, res) => {
     }
 });
 
-// GET /oracle/recover — restore price
+// GET /oracle/recover - restore price
 router.get('/recover', async (_req, res) => {
     try {
         const result = await oracle.recover();
@@ -28,7 +28,7 @@ router.get('/recover', async (_req, res) => {
     }
 });
 
-// GET /oracle/next — advance one tick manually
+// GET /oracle/next - advance one tick manually
 router.get('/next', async (_req, res) => {
     try {
         const result = await oracle.tick(true);

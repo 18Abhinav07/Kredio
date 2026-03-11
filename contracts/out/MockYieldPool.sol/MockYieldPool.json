@@ -1,1 +1,698 @@
-{"abi":[{"type":"constructor","inputs":[{"name":"_usdc","type":"address","internalType":"address"},{"name":"_yieldRateBps","type":"uint256","internalType":"uint256"}],"stateMutability":"nonpayable"},{"type":"function","name":"admin","inputs":[],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"view"},{"type":"function","name":"claimYield","inputs":[{"name":"to","type":"address","internalType":"address"}],"outputs":[{"name":"amount","type":"uint256","internalType":"uint256"}],"stateMutability":"nonpayable"},{"type":"function","name":"deposit","inputs":[{"name":"amount","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"getStake","inputs":[{"name":"who","type":"address","internalType":"address"}],"outputs":[{"name":"principal","type":"uint256","internalType":"uint256"},{"name":"accrued","type":"uint256","internalType":"uint256"},{"name":"pending","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"pendingYield","inputs":[{"name":"who","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"setYieldRate","inputs":[{"name":"rateBps","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"stakes","inputs":[{"name":"","type":"address","internalType":"address"}],"outputs":[{"name":"principal","type":"uint256","internalType":"uint256"},{"name":"accrued","type":"uint256","internalType":"uint256"},{"name":"lastSettledAt","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"totalPrincipal","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"usdc","inputs":[],"outputs":[{"name":"","type":"address","internalType":"contract IYieldPoolUSDC"}],"stateMutability":"view"},{"type":"function","name":"withdraw","inputs":[{"name":"to","type":"address","internalType":"address"},{"name":"amount","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"yieldRateBps","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"event","name":"Deposited","inputs":[{"name":"depositor","type":"address","indexed":true,"internalType":"address"},{"name":"amount","type":"uint256","indexed":false,"internalType":"uint256"}],"anonymous":false},{"type":"event","name":"Withdrawn","inputs":[{"name":"depositor","type":"address","indexed":true,"internalType":"address"},{"name":"to","type":"address","indexed":true,"internalType":"address"},{"name":"amount","type":"uint256","indexed":false,"internalType":"uint256"}],"anonymous":false},{"type":"event","name":"YieldClaimed","inputs":[{"name":"depositor","type":"address","indexed":true,"internalType":"address"},{"name":"to","type":"address","indexed":true,"internalType":"address"},{"name":"amount","type":"uint256","indexed":false,"internalType":"uint256"}],"anonymous":false},{"type":"event","name":"YieldRateSet","inputs":[{"name":"rateBps","type":"uint256","indexed":false,"internalType":"uint256"}],"anonymous":false}],"bytecode":{"object":"0x6080346100f757601f6109d638819003918201601f19168301916001600160401b038311848410176100fb5780849260409485528339810103126100f75780516001600160a01b03811691908290036100f757602001519080156100c657620186a082116100915760018060a01b031933815f5416175f5560015416176001556002556040516108c690816101108239f35b60405162461bcd60e51b815260206004820152600d60248201526c0e4c2e8ca40e8dede40d0d2ced609b1b6044820152606490fd5b60405162461bcd60e51b81526020600482015260096024820152683d32b9379030b2323960b91b6044820152606490fd5b5f80fd5b634e487b7160e01b5f52604160045260245ffdfe6080604090808252600480361015610015575f80fd5b5f3560e01c9182631411dab0146105a15750816316934fc4146105475781633e413bee1461051f5781634b1533b2146105035781637a766460146104a1578163999927df14610367578163b6b55f2514610279578163c7bf19801461024d578163f3a6a4a31461022f578163f3fef3a3146100c3575063f851a44014610099575f80fd5b346100bf575f3660031901126100bf575f5490516001600160a01b039091168152602090f35b5f80fd5b9050346100bf57816003193601126100bf576100dd610663565b90602435906100ed8215156106af565b335f5260209260038452845f20838154106101f35761010b3361080e565b61011684825461075e565b9055815483116101eb5761012b83835461075e565b82555b600154855163a9059cbb60e01b81526001600160a01b03838116948201948552602085018690529390918691839186169082905f90829060400103925af19081156101e1577fd1c19fbcd4551a5edfb66d43d2e337c04837afda3482b42bdf569a8fccdae5fb949596916101a9915f916101b4575b50610722565b5193845216923392a3005b6101d49150883d8a116101da575b6101cc8183610679565b81019061070a565b5f6101a3565b503d6101c2565b86513d5f823e3d90fd5b5f825561012e565b855162461bcd60e51b815280840186905260166024820152751a5b9cdd59999a58da595b9d081c1c9a5b98da5c185b60521b6044820152606490fd5b82346100bf575f3660031901126100bf576020906002549051908152f35b82346100bf5760203660031901126100bf5760209061027261026d610663565b61077e565b9051908152f35b9050346100bf576020806003193601126100bf575f8183359361029d8515156106af565b6102a63361080e565b338352600382528583206102bb8682546106e9565b90556102c88582546106e9565b815560015486516323b872dd60e01b81523392810192909252306024830152604482018690529092839160649183916001600160a01b03165af190811561035d577f2da466a7b24304f47e87fa2e1e5a81b9831ce54fec19055ce277ca2f39ba42c493949161033d915f916103465750610722565b519283523392a2005b6101d49150843d86116101da576101cc8183610679565b84513d5f823e3d90fd5b9050346100bf57602091826003193601126100bf57610384610663565b61038d3361080e565b335f52600384526001825f20015492831561047357335f52600385525f6001848220015560018060a01b0390816001541690813b156100bf5784516340c10f1960e01b81526001600160a01b0385168282019081526020810188905290925f9184919082908490829060400103925af180156104695761043d575b505082519184835216907ff3055bc8d92d9c8d2f12b45d112dd345cd2cfd17292b8d65c5642ac6f912dfd7853392a351908152f35b67ffffffffffffffff8211610456575083525f80610408565b604190634e487b7160e01b5f525260245ffd5b85513d5f823e3d90fd5b825162461bcd60e51b815290810185905260086024820152671b9bc81e5a595b1960c21b6044820152606490fd5b82346100bf5760203660031901126100bf576104bb610663565b9060018060a01b0382165f5260036020526104ff815f20916104e3600184549401549461077e565b9051938493846040919493926060820195825260208201520152565b0390f35b82346100bf575f3660031901126100bf57602091549051908152f35b82346100bf575f3660031901126100bf5760015490516001600160a01b039091168152602090f35b82346100bf5760203660031901126100bf576001600160a01b03610569610663565b165f526003602052805f20906104ff825491600260018501549401549051938493846040919493926060820195825260208201520152565b9150346100bf5760203660031901126100bf575f54813592906001600160a01b031633036106375750620186a08211610604577f1928b8dd8d8a55881af81c5c67d8893146426443695f40a47c0c95411e2348fc602083858160025551908152a1005b606490602084519162461bcd60e51b8352820152600d60248201526c0e4c2e8ca40e8dede40d0d2ced609b1b6044820152fd5b602060649262461bcd60e51b835282015260096024820152683737ba1030b236b4b760b91b6044820152fd5b600435906001600160a01b03821682036100bf57565b90601f8019910116810190811067ffffffffffffffff82111761069b57604052565b634e487b7160e01b5f52604160045260245ffd5b156106b657565b60405162461bcd60e51b815260206004820152600b60248201526a1e995c9bc8185b5bdd5b9d60aa1b6044820152606490fd5b919082018092116106f657565b634e487b7160e01b5f52601160045260245ffd5b908160209103126100bf575180151581036100bf5790565b1561072957565b60405162461bcd60e51b815260206004820152600d60248201526c1d1c985b9cd9995c8819985a5b609a1b6044820152606490fd5b919082039182116106f657565b818102929181159184041417156106f657565b6001600160a01b03165f90815260036020526040812080546107ba92919080151580610801575b806107f4575b6107bd575b50600101546106e9565b90565b8192506107ec64496cebb800916107e76107dd600260019601544261075e565b916002549061076b565b61076b565b0491906107b0565b50600282015442116107ab565b50600282015415156107a5565b6001600160a01b03165f908152600360205260409020805480151580610883575b80610876575b610843575b50600242910155565b61085e64496cebb800916107e76107dd60028601544261075e565b0461086e600183019182546106e9565b90555f61083a565b5060028201544211610835565b506002820154151561082f56fea26469706673582212207e255bbe46f78a7308f3807cb8d97ab70160c7c11367102b140c418f6ea2f7e564736f6c63430008180033","sourceMap":"859:5667:10:-:0;;;;;;;;;;;;;-1:-1:-1;;859:5667:10;;;;-1:-1:-1;;;;;859:5667:10;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;859:5667:10;;;;;;;;;;;;1761:19;;;859:5667;;1829:7;1812:24;;859:5667;;;;;;;;1889:10;859:5667;-1:-1:-1;859:5667:10;;;-1:-1:-1;859:5667:10;;;;;;;1947:28;859:5667;;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;-1:-1:-1;859:5667:10;;;;;;-1:-1:-1;859:5667:10;;;;;-1:-1:-1;859:5667:10","linkReferences":{}},"deployedBytecode":{"object":"0x6080604090808252600480361015610015575f80fd5b5f3560e01c9182631411dab0146105a15750816316934fc4146105475781633e413bee1461051f5781634b1533b2146105035781637a766460146104a1578163999927df14610367578163b6b55f2514610279578163c7bf19801461024d578163f3a6a4a31461022f578163f3fef3a3146100c3575063f851a44014610099575f80fd5b346100bf575f3660031901126100bf575f5490516001600160a01b039091168152602090f35b5f80fd5b9050346100bf57816003193601126100bf576100dd610663565b90602435906100ed8215156106af565b335f5260209260038452845f20838154106101f35761010b3361080e565b61011684825461075e565b9055815483116101eb5761012b83835461075e565b82555b600154855163a9059cbb60e01b81526001600160a01b03838116948201948552602085018690529390918691839186169082905f90829060400103925af19081156101e1577fd1c19fbcd4551a5edfb66d43d2e337c04837afda3482b42bdf569a8fccdae5fb949596916101a9915f916101b4575b50610722565b5193845216923392a3005b6101d49150883d8a116101da575b6101cc8183610679565b81019061070a565b5f6101a3565b503d6101c2565b86513d5f823e3d90fd5b5f825561012e565b855162461bcd60e51b815280840186905260166024820152751a5b9cdd59999a58da595b9d081c1c9a5b98da5c185b60521b6044820152606490fd5b82346100bf575f3660031901126100bf576020906002549051908152f35b82346100bf5760203660031901126100bf5760209061027261026d610663565b61077e565b9051908152f35b9050346100bf576020806003193601126100bf575f8183359361029d8515156106af565b6102a63361080e565b338352600382528583206102bb8682546106e9565b90556102c88582546106e9565b815560015486516323b872dd60e01b81523392810192909252306024830152604482018690529092839160649183916001600160a01b03165af190811561035d577f2da466a7b24304f47e87fa2e1e5a81b9831ce54fec19055ce277ca2f39ba42c493949161033d915f916103465750610722565b519283523392a2005b6101d49150843d86116101da576101cc8183610679565b84513d5f823e3d90fd5b9050346100bf57602091826003193601126100bf57610384610663565b61038d3361080e565b335f52600384526001825f20015492831561047357335f52600385525f6001848220015560018060a01b0390816001541690813b156100bf5784516340c10f1960e01b81526001600160a01b0385168282019081526020810188905290925f9184919082908490829060400103925af180156104695761043d575b505082519184835216907ff3055bc8d92d9c8d2f12b45d112dd345cd2cfd17292b8d65c5642ac6f912dfd7853392a351908152f35b67ffffffffffffffff8211610456575083525f80610408565b604190634e487b7160e01b5f525260245ffd5b85513d5f823e3d90fd5b825162461bcd60e51b815290810185905260086024820152671b9bc81e5a595b1960c21b6044820152606490fd5b82346100bf5760203660031901126100bf576104bb610663565b9060018060a01b0382165f5260036020526104ff815f20916104e3600184549401549461077e565b9051938493846040919493926060820195825260208201520152565b0390f35b82346100bf575f3660031901126100bf57602091549051908152f35b82346100bf575f3660031901126100bf5760015490516001600160a01b039091168152602090f35b82346100bf5760203660031901126100bf576001600160a01b03610569610663565b165f526003602052805f20906104ff825491600260018501549401549051938493846040919493926060820195825260208201520152565b9150346100bf5760203660031901126100bf575f54813592906001600160a01b031633036106375750620186a08211610604577f1928b8dd8d8a55881af81c5c67d8893146426443695f40a47c0c95411e2348fc602083858160025551908152a1005b606490602084519162461bcd60e51b8352820152600d60248201526c0e4c2e8ca40e8dede40d0d2ced609b1b6044820152fd5b602060649262461bcd60e51b835282015260096024820152683737ba1030b236b4b760b91b6044820152fd5b600435906001600160a01b03821682036100bf57565b90601f8019910116810190811067ffffffffffffffff82111761069b57604052565b634e487b7160e01b5f52604160045260245ffd5b156106b657565b60405162461bcd60e51b815260206004820152600b60248201526a1e995c9bc8185b5bdd5b9d60aa1b6044820152606490fd5b919082018092116106f657565b634e487b7160e01b5f52601160045260245ffd5b908160209103126100bf575180151581036100bf5790565b1561072957565b60405162461bcd60e51b815260206004820152600d60248201526c1d1c985b9cd9995c8819985a5b609a1b6044820152606490fd5b919082039182116106f657565b818102929181159184041417156106f657565b6001600160a01b03165f90815260036020526040812080546107ba92919080151580610801575b806107f4575b6107bd575b50600101546106e9565b90565b8192506107ec64496cebb800916107e76107dd600260019601544261075e565b916002549061076b565b61076b565b0491906107b0565b50600282015442116107ab565b50600282015415156107a5565b6001600160a01b03165f908152600360205260409020805480151580610883575b80610876575b610843575b50600242910155565b61085e64496cebb800916107e76107dd60028601544261075e565b0461086e600183019182546106e9565b90555f61083a565b5060028201544211610835565b506002820154151561082f56fea26469706673582212207e255bbe46f78a7308f3807cb8d97ab70160c7c11367102b140c418f6ea2f7e564736f6c63430008180033","sourceMap":"859:5667:10:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;859:5667:10;;;;;;;;-1:-1:-1;;;;;859:5667:10;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;3138:10;3130:34;3138:10;;;3130:34;:::i;:::-;3199:10;859:5667;;;;3192:6;859:5667;;;;;;;;3228:21;859:5667;;3294:10;3199;3294;:::i;:::-;3357:21;859:5667;;;3357:21;:::i;:::-;859:5667;;;;3392:24;-1:-1:-1;3392:24:10;;3418;859:5667;;;3418:24;:::i;:::-;859:5667;;3388:87;859:5667;;;;-1:-1:-1;;;3493:25:10;;-1:-1:-1;;;;;859:5667:10;;;3493:25;;;859:5667;;;;;;;;;;;;;;;;;;;;;;;;;;;3493:25;;;;;;;;;3551:33;3493:25;;;;3485:51;3493:25;859:5667;3493:25;;;3388:87;3485:51;;:::i;:::-;859:5667;;;;;3199:10;;3551:33;;859:5667;3493:25;;;;;;;;;;;;;;;:::i;:::-;;;;;:::i;:::-;;;;;;;;;;859:5667;;;;;;;;;3388:87;859:5667;;;3388:87;;859:5667;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;;;-1:-1:-1;;859:5667:10;;;;;;946:27;859:5667;;;;;;;;;;;;;;-1:-1:-1;;859:5667:10;;;;;;;;;:::i;:::-;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;2412:10;2404:34;2412:10;;;2404:34;:::i;:::-;2456:10;;;:::i;:::-;;859:5667;;2477:6;859:5667;;;;;2477:38;859:5667;;;2477:38;:::i;:::-;859:5667;;2525:24;859:5667;;;2525:24;:::i;:::-;859:5667;;;;;;-1:-1:-1;;;2567:52:10;;2456:10;2567:52;;;859:5667;;;;2605:4;859:5667;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;859:5667:10;2567:52;;;;;;;2652:29;2567:52;;;2559:78;2567:52;859:5667;2567:52;;;2559:78;;:::i;:::-;859:5667;;;;2456:10;2652:29;;859:5667;2567:52;;;;;;;;;;;;;;:::i;:::-;859:5667;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;4018:10;;;:::i;:::-;;859:5667;;4048:6;859:5667;;4048:26;859:5667;;;4048:26;859:5667;4092:10;;;859:5667;;4018:10;859:5667;;4048:6;859:5667;;;4048:26;859:5667;;;4125:26;859:5667;;;;;;;;4048:26;859:5667;;4165:21;;;;;;859:5667;;-1:-1:-1;;;4165:21:10;;-1:-1:-1;;;;;859:5667:10;;4165:21;;;859:5667;;;;;;;;;;;;;;;;;;;;;;;;4165:21;;;;;;;;;;859:5667;;;;;;;;;;4018:10;4201:36;4018:10;;4201:36;;859:5667;;;;;4165:21;859:5667;;;;;;;;4165:21;;;;859:5667;;;;;;;;;;;;4165:21;859:5667;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;;;-1:-1:-1;;859:5667:10;;;;;;:::i;:::-;;;;;;;;;;;5177:6;859:5667;;;;;;;5230:17;5219:9;859:5667;;5219:9;;859:5667;5230:17;;:::i;:::-;859:5667;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;859:5667:10;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;859:5667:10;;;;;;;;-1:-1:-1;;;;;859:5667:10;;;;;;;;;;;;;;;-1:-1:-1;;859:5667:10;;;;-1:-1:-1;;;;;859:5667:10;;:::i;:::-;;;;1217:39;859:5667;;;;;;;;;1217:39;;;;;859:5667;1217:39;;859:5667;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;859:5667:10;;;;;;;;;;-1:-1:-1;;;;;859:5667:10;1614:10;:19;859:5667;;5641:18;5652:7;5641:18;;859:5667;;5724:21;859:5667;;;;5687:22;859:5667;;;;;5724:21;859:5667;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;-1:-1:-1;;;;;859:5667:10;;;;;;:::o;:::-;;;;;;;;;;;;;;;;;;;;;:::o;:::-;;;;;;;;;;;;;;;;:::o;:::-;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;;;;;;:::o;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o;:::-;;;;:::o;:::-;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;;;;;;:::o;:::-;;;;;;;;;;;;;;;;:::o;4538:436::-;-1:-1:-1;;;;;859:5667:10;-1:-1:-1;859:5667:10;;;4645:6;859:5667;;;;;;;4951:16;;-1:-1:-1;859:5667:10;4696:15;;;;:38;;4538:436;4696:75;;;4538:436;4692:243;;4538:436;4951:9;;;859:5667;4951:16;:::i;:::-;4538:436;:::o;4692:243::-;4823:15;;;4860:36;859:5667;4823:15;4860:26;4805:33;4823:15;4951:9;4823:15;;859:5667;4805:15;:33;:::i;:::-;859:5667;4823:15;859:5667;4860:26;;:::i;:::-;:36;:::i;:::-;1019:6;4692:243;;;;4696:75;4756:15;;;;859:5667;4738:15;:33;4696:75;;:38;4715:15;;;;859:5667;4715:19;;4696:38;;6124:400;-1:-1:-1;;;;;859:5667:10;-1:-1:-1;859:5667:10;;;6205:6;859:5667;;;;;;;6230:15;;;;:38;;6124:400;6230:75;;;6124:400;6226:249;;6124:400;6502:15;6484;6502;6484;;859:5667;6124:400::o;6226:249::-;6400:36;859:5667;6357:15;6400:26;6339:33;6357:15;;;859:5667;6339:15;:33;:::i;6400:36::-;1019:6;6386:78;859:5667;6386:9;;859:5667;;;6386:78;:::i;:::-;859:5667;;6226:249;;;6230:75;6290:15;;;;859:5667;6272:15;:33;6230:75;;:38;6249:15;;;;859:5667;6249:19;;6230:38;","linkReferences":{}},"methodIdentifiers":{"admin()":"f851a440","claimYield(address)":"999927df","deposit(uint256)":"b6b55f25","getStake(address)":"7a766460","pendingYield(address)":"c7bf1980","setYieldRate(uint256)":"1411dab0","stakes(address)":"16934fc4","totalPrincipal()":"4b1533b2","usdc()":"3e413bee","withdraw(address,uint256)":"f3fef3a3","yieldRateBps()":"f3a6a4a3"},"rawMetadata":"{\"compiler\":{\"version\":\"0.8.24+commit.e11b9ed9\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_usdc\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_yieldRateBps\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"depositor\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Deposited\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"depositor\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Withdrawn\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"depositor\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"YieldClaimed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rateBps\",\"type\":\"uint256\"}],\"name\":\"YieldRateSet\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"admin\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"}],\"name\":\"claimYield\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"deposit\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"who\",\"type\":\"address\"}],\"name\":\"getStake\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"principal\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"accrued\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"pending\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"who\",\"type\":\"address\"}],\"name\":\"pendingYield\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"rateBps\",\"type\":\"uint256\"}],\"name\":\"setYieldRate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"stakes\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"principal\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"accrued\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"lastSettledAt\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalPrincipal\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"usdc\",\"outputs\":[{\"internalType\":\"contract IYieldPoolUSDC\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"withdraw\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"yieldRateBps\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Yield is generated by calling MockUSDC.mint() \\u2014 valid on testnet only.      Yield accrues continuously by timestamp on the deposited principal.      Settlement happens on every principal change so the accrued amount is      always exact regardless of how many partial withdrawals have occurred.\",\"kind\":\"dev\",\"methods\":{\"claimYield(address)\":{\"params\":{\"to\":\"Recipient of yield (usually the lending contract).\"},\"returns\":{\"amount\":\"The yield minted.\"}},\"deposit(uint256)\":{\"params\":{\"amount\":\"Amount of mUSDC to deposit (6 decimals).\"}},\"withdraw(address,uint256)\":{\"params\":{\"amount\":\"Amount to withdraw (6 decimals).\",\"to\":\"Recipient of the withdrawn principal.\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"claimYield(address)\":{\"notice\":\"Claim all pending yield (accrued store + live since last settle).         Mints fresh mUSDC directly to `to` \\u2014 works on testnet because         MockUSDC.mint() is permissionless.\"},\"deposit(uint256)\":{\"notice\":\"Deposit mUSDC principal. Caller must have approved this contract first.\"},\"getStake(address)\":{\"notice\":\"Full stake view for dashboards.\"},\"pendingYield(address)\":{\"notice\":\"Returns pending yield = stored accrued + live (since last settle).\"},\"setYieldRate(uint256)\":{\"notice\":\"Update APY rate. Use 600 for 6% APY, 60000 for fast demo visibility.\"},\"withdraw(address,uint256)\":{\"notice\":\"Withdraw principal back to `to`. Does NOT auto-claim yield.         Any yield accumulated so far is locked into `accrued` and remains         claimable via claimYield() so no yield is ever silently lost.\"}},\"notice\":\"Mock yield pool for the Kredio intelligent yield strategy.\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"evm/MockYieldPool.sol\":\"MockYieldPool\"},\"evmVersion\":\"cancun\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\",\":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\":forge-std/=lib/forge-std/src/\",\":halmos-cheatcodes/=lib/openzeppelin-contracts/lib/halmos-cheatcodes/src/\",\":openzeppelin-contracts/=lib/openzeppelin-contracts/\"],\"viaIR\":true},\"sources\":{\"evm/MockYieldPool.sol\":{\"keccak256\":\"0x344f1ca392fce178906c7e49be73f25754482cc1da9cde4e4b18935fc870dc7d\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://fc16ab45df49b8cdea70978272d8cfb16c02abbdf81a694f85fd6fe975497066\",\"dweb:/ipfs/QmXW7L6G75BaVL3U6mcGp1kSoDCsNfEcBcWsMxMsJwPZAZ\"]}},\"version\":1}","metadata":{"compiler":{"version":"0.8.24+commit.e11b9ed9"},"language":"Solidity","output":{"abi":[{"inputs":[{"internalType":"address","name":"_usdc","type":"address"},{"internalType":"uint256","name":"_yieldRateBps","type":"uint256"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"address","name":"depositor","type":"address","indexed":true},{"internalType":"uint256","name":"amount","type":"uint256","indexed":false}],"type":"event","name":"Deposited","anonymous":false},{"inputs":[{"internalType":"address","name":"depositor","type":"address","indexed":true},{"internalType":"address","name":"to","type":"address","indexed":true},{"internalType":"uint256","name":"amount","type":"uint256","indexed":false}],"type":"event","name":"Withdrawn","anonymous":false},{"inputs":[{"internalType":"address","name":"depositor","type":"address","indexed":true},{"internalType":"address","name":"to","type":"address","indexed":true},{"internalType":"uint256","name":"amount","type":"uint256","indexed":false}],"type":"event","name":"YieldClaimed","anonymous":false},{"inputs":[{"internalType":"uint256","name":"rateBps","type":"uint256","indexed":false}],"type":"event","name":"YieldRateSet","anonymous":false},{"inputs":[],"stateMutability":"view","type":"function","name":"admin","outputs":[{"internalType":"address","name":"","type":"address"}]},{"inputs":[{"internalType":"address","name":"to","type":"address"}],"stateMutability":"nonpayable","type":"function","name":"claimYield","outputs":[{"internalType":"uint256","name":"amount","type":"uint256"}]},{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"stateMutability":"nonpayable","type":"function","name":"deposit"},{"inputs":[{"internalType":"address","name":"who","type":"address"}],"stateMutability":"view","type":"function","name":"getStake","outputs":[{"internalType":"uint256","name":"principal","type":"uint256"},{"internalType":"uint256","name":"accrued","type":"uint256"},{"internalType":"uint256","name":"pending","type":"uint256"}]},{"inputs":[{"internalType":"address","name":"who","type":"address"}],"stateMutability":"view","type":"function","name":"pendingYield","outputs":[{"internalType":"uint256","name":"","type":"uint256"}]},{"inputs":[{"internalType":"uint256","name":"rateBps","type":"uint256"}],"stateMutability":"nonpayable","type":"function","name":"setYieldRate"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function","name":"stakes","outputs":[{"internalType":"uint256","name":"principal","type":"uint256"},{"internalType":"uint256","name":"accrued","type":"uint256"},{"internalType":"uint256","name":"lastSettledAt","type":"uint256"}]},{"inputs":[],"stateMutability":"view","type":"function","name":"totalPrincipal","outputs":[{"internalType":"uint256","name":"","type":"uint256"}]},{"inputs":[],"stateMutability":"view","type":"function","name":"usdc","outputs":[{"internalType":"contract IYieldPoolUSDC","name":"","type":"address"}]},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"stateMutability":"nonpayable","type":"function","name":"withdraw"},{"inputs":[],"stateMutability":"view","type":"function","name":"yieldRateBps","outputs":[{"internalType":"uint256","name":"","type":"uint256"}]}],"devdoc":{"kind":"dev","methods":{"claimYield(address)":{"params":{"to":"Recipient of yield (usually the lending contract)."},"returns":{"amount":"The yield minted."}},"deposit(uint256)":{"params":{"amount":"Amount of mUSDC to deposit (6 decimals)."}},"withdraw(address,uint256)":{"params":{"amount":"Amount to withdraw (6 decimals).","to":"Recipient of the withdrawn principal."}}},"version":1},"userdoc":{"kind":"user","methods":{"claimYield(address)":{"notice":"Claim all pending yield (accrued store + live since last settle).         Mints fresh mUSDC directly to `to` — works on testnet because         MockUSDC.mint() is permissionless."},"deposit(uint256)":{"notice":"Deposit mUSDC principal. Caller must have approved this contract first."},"getStake(address)":{"notice":"Full stake view for dashboards."},"pendingYield(address)":{"notice":"Returns pending yield = stored accrued + live (since last settle)."},"setYieldRate(uint256)":{"notice":"Update APY rate. Use 600 for 6% APY, 60000 for fast demo visibility."},"withdraw(address,uint256)":{"notice":"Withdraw principal back to `to`. Does NOT auto-claim yield.         Any yield accumulated so far is locked into `accrued` and remains         claimable via claimYield() so no yield is ever silently lost."}},"version":1}},"settings":{"remappings":["@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/","erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/","forge-std/=lib/forge-std/src/","halmos-cheatcodes/=lib/openzeppelin-contracts/lib/halmos-cheatcodes/src/","openzeppelin-contracts/=lib/openzeppelin-contracts/"],"optimizer":{"enabled":true,"runs":200},"metadata":{"bytecodeHash":"ipfs"},"compilationTarget":{"evm/MockYieldPool.sol":"MockYieldPool"},"evmVersion":"cancun","libraries":{},"viaIR":true},"sources":{"evm/MockYieldPool.sol":{"keccak256":"0x344f1ca392fce178906c7e49be73f25754482cc1da9cde4e4b18935fc870dc7d","urls":["bzz-raw://fc16ab45df49b8cdea70978272d8cfb16c02abbdf81a694f85fd6fe975497066","dweb:/ipfs/QmXW7L6G75BaVL3U6mcGp1kSoDCsNfEcBcWsMxMsJwPZAZ"],"license":"MIT"}},"version":1},"id":10}
+{
+    "abi": [
+        {
+            "type": "constructor",
+            "inputs": [
+                {
+                    "name": "_usdc",
+                    "type": "address",
+                    "internalType": "address"
+                },
+                {
+                    "name": "_yieldRateBps",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "stateMutability": "nonpayable"
+        },
+        {
+            "type": "function",
+            "name": "admin",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "claimYield",
+            "inputs": [
+                {
+                    "name": "to",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "amount",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "stateMutability": "nonpayable"
+        },
+        {
+            "type": "function",
+            "name": "deposit",
+            "inputs": [
+                {
+                    "name": "amount",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "outputs": [],
+            "stateMutability": "nonpayable"
+        },
+        {
+            "type": "function",
+            "name": "getStake",
+            "inputs": [
+                {
+                    "name": "who",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "principal",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "accrued",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "pending",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "pendingYield",
+            "inputs": [
+                {
+                    "name": "who",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "setYieldRate",
+            "inputs": [
+                {
+                    "name": "rateBps",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "outputs": [],
+            "stateMutability": "nonpayable"
+        },
+        {
+            "type": "function",
+            "name": "stakes",
+            "inputs": [
+                {
+                    "name": "",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "principal",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "accrued",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                },
+                {
+                    "name": "lastSettledAt",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "totalPrincipal",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "usdc",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "address",
+                    "internalType": "contract IYieldPoolUSDC"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
+            "name": "withdraw",
+            "inputs": [
+                {
+                    "name": "to",
+                    "type": "address",
+                    "internalType": "address"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "outputs": [],
+            "stateMutability": "nonpayable"
+        },
+        {
+            "type": "function",
+            "name": "yieldRateBps",
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "event",
+            "name": "Deposited",
+            "inputs": [
+                {
+                    "name": "depositor",
+                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint256",
+                    "indexed": false,
+                    "internalType": "uint256"
+                }
+            ],
+            "anonymous": false
+        },
+        {
+            "type": "event",
+            "name": "Withdrawn",
+            "inputs": [
+                {
+                    "name": "depositor",
+                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address"
+                },
+                {
+                    "name": "to",
+                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint256",
+                    "indexed": false,
+                    "internalType": "uint256"
+                }
+            ],
+            "anonymous": false
+        },
+        {
+            "type": "event",
+            "name": "YieldClaimed",
+            "inputs": [
+                {
+                    "name": "depositor",
+                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address"
+                },
+                {
+                    "name": "to",
+                    "type": "address",
+                    "indexed": true,
+                    "internalType": "address"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint256",
+                    "indexed": false,
+                    "internalType": "uint256"
+                }
+            ],
+            "anonymous": false
+        },
+        {
+            "type": "event",
+            "name": "YieldRateSet",
+            "inputs": [
+                {
+                    "name": "rateBps",
+                    "type": "uint256",
+                    "indexed": false,
+                    "internalType": "uint256"
+                }
+            ],
+            "anonymous": false
+        }
+    ],
+    "bytecode": {
+        "object": "0x6080346100f757601f6109d638819003918201601f19168301916001600160401b038311848410176100fb5780849260409485528339810103126100f75780516001600160a01b03811691908290036100f757602001519080156100c657620186a082116100915760018060a01b031933815f5416175f5560015416176001556002556040516108c690816101108239f35b60405162461bcd60e51b815260206004820152600d60248201526c0e4c2e8ca40e8dede40d0d2ced609b1b6044820152606490fd5b60405162461bcd60e51b81526020600482015260096024820152683d32b9379030b2323960b91b6044820152606490fd5b5f80fd5b634e487b7160e01b5f52604160045260245ffdfe6080604090808252600480361015610015575f80fd5b5f3560e01c9182631411dab0146105a15750816316934fc4146105475781633e413bee1461051f5781634b1533b2146105035781637a766460146104a1578163999927df14610367578163b6b55f2514610279578163c7bf19801461024d578163f3a6a4a31461022f578163f3fef3a3146100c3575063f851a44014610099575f80fd5b346100bf575f3660031901126100bf575f5490516001600160a01b039091168152602090f35b5f80fd5b9050346100bf57816003193601126100bf576100dd610663565b90602435906100ed8215156106af565b335f5260209260038452845f20838154106101f35761010b3361080e565b61011684825461075e565b9055815483116101eb5761012b83835461075e565b82555b600154855163a9059cbb60e01b81526001600160a01b03838116948201948552602085018690529390918691839186169082905f90829060400103925af19081156101e1577fd1c19fbcd4551a5edfb66d43d2e337c04837afda3482b42bdf569a8fccdae5fb949596916101a9915f916101b4575b50610722565b5193845216923392a3005b6101d49150883d8a116101da575b6101cc8183610679565b81019061070a565b5f6101a3565b503d6101c2565b86513d5f823e3d90fd5b5f825561012e565b855162461bcd60e51b815280840186905260166024820152751a5b9cdd59999a58da595b9d081c1c9a5b98da5c185b60521b6044820152606490fd5b82346100bf575f3660031901126100bf576020906002549051908152f35b82346100bf5760203660031901126100bf5760209061027261026d610663565b61077e565b9051908152f35b9050346100bf576020806003193601126100bf575f8183359361029d8515156106af565b6102a63361080e565b338352600382528583206102bb8682546106e9565b90556102c88582546106e9565b815560015486516323b872dd60e01b81523392810192909252306024830152604482018690529092839160649183916001600160a01b03165af190811561035d577f2da466a7b24304f47e87fa2e1e5a81b9831ce54fec19055ce277ca2f39ba42c493949161033d915f916103465750610722565b519283523392a2005b6101d49150843d86116101da576101cc8183610679565b84513d5f823e3d90fd5b9050346100bf57602091826003193601126100bf57610384610663565b61038d3361080e565b335f52600384526001825f20015492831561047357335f52600385525f6001848220015560018060a01b0390816001541690813b156100bf5784516340c10f1960e01b81526001600160a01b0385168282019081526020810188905290925f9184919082908490829060400103925af180156104695761043d575b505082519184835216907ff3055bc8d92d9c8d2f12b45d112dd345cd2cfd17292b8d65c5642ac6f912dfd7853392a351908152f35b67ffffffffffffffff8211610456575083525f80610408565b604190634e487b7160e01b5f525260245ffd5b85513d5f823e3d90fd5b825162461bcd60e51b815290810185905260086024820152671b9bc81e5a595b1960c21b6044820152606490fd5b82346100bf5760203660031901126100bf576104bb610663565b9060018060a01b0382165f5260036020526104ff815f20916104e3600184549401549461077e565b9051938493846040919493926060820195825260208201520152565b0390f35b82346100bf575f3660031901126100bf57602091549051908152f35b82346100bf575f3660031901126100bf5760015490516001600160a01b039091168152602090f35b82346100bf5760203660031901126100bf576001600160a01b03610569610663565b165f526003602052805f20906104ff825491600260018501549401549051938493846040919493926060820195825260208201520152565b9150346100bf5760203660031901126100bf575f54813592906001600160a01b031633036106375750620186a08211610604577f1928b8dd8d8a55881af81c5c67d8893146426443695f40a47c0c95411e2348fc602083858160025551908152a1005b606490602084519162461bcd60e51b8352820152600d60248201526c0e4c2e8ca40e8dede40d0d2ced609b1b6044820152fd5b602060649262461bcd60e51b835282015260096024820152683737ba1030b236b4b760b91b6044820152fd5b600435906001600160a01b03821682036100bf57565b90601f8019910116810190811067ffffffffffffffff82111761069b57604052565b634e487b7160e01b5f52604160045260245ffd5b156106b657565b60405162461bcd60e51b815260206004820152600b60248201526a1e995c9bc8185b5bdd5b9d60aa1b6044820152606490fd5b919082018092116106f657565b634e487b7160e01b5f52601160045260245ffd5b908160209103126100bf575180151581036100bf5790565b1561072957565b60405162461bcd60e51b815260206004820152600d60248201526c1d1c985b9cd9995c8819985a5b609a1b6044820152606490fd5b919082039182116106f657565b818102929181159184041417156106f657565b6001600160a01b03165f90815260036020526040812080546107ba92919080151580610801575b806107f4575b6107bd575b50600101546106e9565b90565b8192506107ec64496cebb800916107e76107dd600260019601544261075e565b916002549061076b565b61076b565b0491906107b0565b50600282015442116107ab565b50600282015415156107a5565b6001600160a01b03165f908152600360205260409020805480151580610883575b80610876575b610843575b50600242910155565b61085e64496cebb800916107e76107dd60028601544261075e565b0461086e600183019182546106e9565b90555f61083a565b5060028201544211610835565b506002820154151561082f56fea26469706673582212207e255bbe46f78a7308f3807cb8d97ab70160c7c11367102b140c418f6ea2f7e564736f6c63430008180033",
+        "sourceMap": "859:5667:10:-:0;;;;;;;;;;;;;-1:-1:-1;;859:5667:10;;;;-1:-1:-1;;;;;859:5667:10;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;859:5667:10;;;;;;;;;;;;1761:19;;;859:5667;;1829:7;1812:24;;859:5667;;;;;;;;1889:10;859:5667;-1:-1:-1;859:5667:10;;;-1:-1:-1;859:5667:10;;;;;;;1947:28;859:5667;;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;-1:-1:-1;859:5667:10;;;;;;-1:-1:-1;859:5667:10;;;;;-1:-1:-1;859:5667:10",
+        "linkReferences": {}
+    },
+    "deployedBytecode": {
+        "object": "0x6080604090808252600480361015610015575f80fd5b5f3560e01c9182631411dab0146105a15750816316934fc4146105475781633e413bee1461051f5781634b1533b2146105035781637a766460146104a1578163999927df14610367578163b6b55f2514610279578163c7bf19801461024d578163f3a6a4a31461022f578163f3fef3a3146100c3575063f851a44014610099575f80fd5b346100bf575f3660031901126100bf575f5490516001600160a01b039091168152602090f35b5f80fd5b9050346100bf57816003193601126100bf576100dd610663565b90602435906100ed8215156106af565b335f5260209260038452845f20838154106101f35761010b3361080e565b61011684825461075e565b9055815483116101eb5761012b83835461075e565b82555b600154855163a9059cbb60e01b81526001600160a01b03838116948201948552602085018690529390918691839186169082905f90829060400103925af19081156101e1577fd1c19fbcd4551a5edfb66d43d2e337c04837afda3482b42bdf569a8fccdae5fb949596916101a9915f916101b4575b50610722565b5193845216923392a3005b6101d49150883d8a116101da575b6101cc8183610679565b81019061070a565b5f6101a3565b503d6101c2565b86513d5f823e3d90fd5b5f825561012e565b855162461bcd60e51b815280840186905260166024820152751a5b9cdd59999a58da595b9d081c1c9a5b98da5c185b60521b6044820152606490fd5b82346100bf575f3660031901126100bf576020906002549051908152f35b82346100bf5760203660031901126100bf5760209061027261026d610663565b61077e565b9051908152f35b9050346100bf576020806003193601126100bf575f8183359361029d8515156106af565b6102a63361080e565b338352600382528583206102bb8682546106e9565b90556102c88582546106e9565b815560015486516323b872dd60e01b81523392810192909252306024830152604482018690529092839160649183916001600160a01b03165af190811561035d577f2da466a7b24304f47e87fa2e1e5a81b9831ce54fec19055ce277ca2f39ba42c493949161033d915f916103465750610722565b519283523392a2005b6101d49150843d86116101da576101cc8183610679565b84513d5f823e3d90fd5b9050346100bf57602091826003193601126100bf57610384610663565b61038d3361080e565b335f52600384526001825f20015492831561047357335f52600385525f6001848220015560018060a01b0390816001541690813b156100bf5784516340c10f1960e01b81526001600160a01b0385168282019081526020810188905290925f9184919082908490829060400103925af180156104695761043d575b505082519184835216907ff3055bc8d92d9c8d2f12b45d112dd345cd2cfd17292b8d65c5642ac6f912dfd7853392a351908152f35b67ffffffffffffffff8211610456575083525f80610408565b604190634e487b7160e01b5f525260245ffd5b85513d5f823e3d90fd5b825162461bcd60e51b815290810185905260086024820152671b9bc81e5a595b1960c21b6044820152606490fd5b82346100bf5760203660031901126100bf576104bb610663565b9060018060a01b0382165f5260036020526104ff815f20916104e3600184549401549461077e565b9051938493846040919493926060820195825260208201520152565b0390f35b82346100bf575f3660031901126100bf57602091549051908152f35b82346100bf575f3660031901126100bf5760015490516001600160a01b039091168152602090f35b82346100bf5760203660031901126100bf576001600160a01b03610569610663565b165f526003602052805f20906104ff825491600260018501549401549051938493846040919493926060820195825260208201520152565b9150346100bf5760203660031901126100bf575f54813592906001600160a01b031633036106375750620186a08211610604577f1928b8dd8d8a55881af81c5c67d8893146426443695f40a47c0c95411e2348fc602083858160025551908152a1005b606490602084519162461bcd60e51b8352820152600d60248201526c0e4c2e8ca40e8dede40d0d2ced609b1b6044820152fd5b602060649262461bcd60e51b835282015260096024820152683737ba1030b236b4b760b91b6044820152fd5b600435906001600160a01b03821682036100bf57565b90601f8019910116810190811067ffffffffffffffff82111761069b57604052565b634e487b7160e01b5f52604160045260245ffd5b156106b657565b60405162461bcd60e51b815260206004820152600b60248201526a1e995c9bc8185b5bdd5b9d60aa1b6044820152606490fd5b919082018092116106f657565b634e487b7160e01b5f52601160045260245ffd5b908160209103126100bf575180151581036100bf5790565b1561072957565b60405162461bcd60e51b815260206004820152600d60248201526c1d1c985b9cd9995c8819985a5b609a1b6044820152606490fd5b919082039182116106f657565b818102929181159184041417156106f657565b6001600160a01b03165f90815260036020526040812080546107ba92919080151580610801575b806107f4575b6107bd575b50600101546106e9565b90565b8192506107ec64496cebb800916107e76107dd600260019601544261075e565b916002549061076b565b61076b565b0491906107b0565b50600282015442116107ab565b50600282015415156107a5565b6001600160a01b03165f908152600360205260409020805480151580610883575b80610876575b610843575b50600242910155565b61085e64496cebb800916107e76107dd60028601544261075e565b0461086e600183019182546106e9565b90555f61083a565b5060028201544211610835565b506002820154151561082f56fea26469706673582212207e255bbe46f78a7308f3807cb8d97ab70160c7c11367102b140c418f6ea2f7e564736f6c63430008180033",
+        "sourceMap": "859:5667:10:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;859:5667:10;;;;;;;;-1:-1:-1;;;;;859:5667:10;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;3138:10;3130:34;3138:10;;;3130:34;:::i;:::-;3199:10;859:5667;;;;3192:6;859:5667;;;;;;;;3228:21;859:5667;;3294:10;3199;3294;:::i;:::-;3357:21;859:5667;;;3357:21;:::i;:::-;859:5667;;;;3392:24;-1:-1:-1;3392:24:10;;3418;859:5667;;;3418:24;:::i;:::-;859:5667;;3388:87;859:5667;;;;-1:-1:-1;;;3493:25:10;;-1:-1:-1;;;;;859:5667:10;;;3493:25;;;859:5667;;;;;;;;;;;;;;;;;;;;;;;;;;;3493:25;;;;;;;;;3551:33;3493:25;;;;3485:51;3493:25;859:5667;3493:25;;;3388:87;3485:51;;:::i;:::-;859:5667;;;;;3199:10;;3551:33;;859:5667;3493:25;;;;;;;;;;;;;;;:::i;:::-;;;;;:::i;:::-;;;;;;;;;;859:5667;;;;;;;;;3388:87;859:5667;;;3388:87;;859:5667;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;;;-1:-1:-1;;859:5667:10;;;;;;946:27;859:5667;;;;;;;;;;;;;;-1:-1:-1;;859:5667:10;;;;;;;;;:::i;:::-;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;2412:10;2404:34;2412:10;;;2404:34;:::i;:::-;2456:10;;;:::i;:::-;;859:5667;;2477:6;859:5667;;;;;2477:38;859:5667;;;2477:38;:::i;:::-;859:5667;;2525:24;859:5667;;;2525:24;:::i;:::-;859:5667;;;;;;-1:-1:-1;;;2567:52:10;;2456:10;2567:52;;;859:5667;;;;2605:4;859:5667;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;;859:5667:10;2567:52;;;;;;;2652:29;2567:52;;;2559:78;2567:52;859:5667;2567:52;;;2559:78;;:::i;:::-;859:5667;;;;2456:10;2652:29;;859:5667;2567:52;;;;;;;;;;;;;;:::i;:::-;859:5667;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;4018:10;;;:::i;:::-;;859:5667;;4048:6;859:5667;;4048:26;859:5667;;;4048:26;859:5667;4092:10;;;859:5667;;4018:10;859:5667;;4048:6;859:5667;;;4048:26;859:5667;;;4125:26;859:5667;;;;;;;;4048:26;859:5667;;4165:21;;;;;;859:5667;;-1:-1:-1;;;4165:21:10;;-1:-1:-1;;;;;859:5667:10;;4165:21;;;859:5667;;;;;;;;;;;;;;;;;;;;;;;;4165:21;;;;;;;;;;859:5667;;;;;;;;;;4018:10;4201:36;4018:10;;4201:36;;859:5667;;;;;4165:21;859:5667;;;;;;;;4165:21;;;;859:5667;;;;;;;;;;;;4165:21;859:5667;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;;;-1:-1:-1;;859:5667:10;;;;;;:::i;:::-;;;;;;;;;;;5177:6;859:5667;;;;;;;5230:17;5219:9;859:5667;;5219:9;;859:5667;5230:17;;:::i;:::-;859:5667;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;859:5667:10;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;859:5667:10;;;;;;;;-1:-1:-1;;;;;859:5667:10;;;;;;;;;;;;;;;-1:-1:-1;;859:5667:10;;;;-1:-1:-1;;;;;859:5667:10;;:::i;:::-;;;;1217:39;859:5667;;;;;;;;;1217:39;;;;;859:5667;1217:39;;859:5667;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;859:5667:10;;;;;;;;;;-1:-1:-1;;;;;859:5667:10;1614:10;:19;859:5667;;5641:18;5652:7;5641:18;;859:5667;;5724:21;859:5667;;;;5687:22;859:5667;;;;;5724:21;859:5667;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;-1:-1:-1;;;;;859:5667:10;;;;;;:::o;:::-;;;;;;;;;;;;;;;;;;;;;:::o;:::-;;;;;;;;;;;;;;;;:::o;:::-;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;;;;;;:::o;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o;:::-;;;;:::o;:::-;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;-1:-1:-1;;;859:5667:10;;;;;;;;;;;;;;;;;:::o;:::-;;;;;;;;;;;;;;;;:::o;4538:436::-;-1:-1:-1;;;;;859:5667:10;-1:-1:-1;859:5667:10;;;4645:6;859:5667;;;;;;;4951:16;;-1:-1:-1;859:5667:10;4696:15;;;;:38;;4538:436;4696:75;;;4538:436;4692:243;;4538:436;4951:9;;;859:5667;4951:16;:::i;:::-;4538:436;:::o;4692:243::-;4823:15;;;4860:36;859:5667;4823:15;4860:26;4805:33;4823:15;4951:9;4823:15;;859:5667;4805:15;:33;:::i;:::-;859:5667;4823:15;859:5667;4860:26;;:::i;:::-;:36;:::i;:::-;1019:6;4692:243;;;;4696:75;4756:15;;;;859:5667;4738:15;:33;4696:75;;:38;4715:15;;;;859:5667;4715:19;;4696:38;;6124:400;-1:-1:-1;;;;;859:5667:10;-1:-1:-1;859:5667:10;;;6205:6;859:5667;;;;;;;6230:15;;;;:38;;6124:400;6230:75;;;6124:400;6226:249;;6124:400;6502:15;6484;6502;6484;;859:5667;6124:400::o;6226:249::-;6400:36;859:5667;6357:15;6400:26;6339:33;6357:15;;;859:5667;6339:15;:33;:::i;6400:36::-;1019:6;6386:78;859:5667;6386:9;;859:5667;;;6386:78;:::i;:::-;859:5667;;6226:249;;;6230:75;6290:15;;;;859:5667;6272:15;:33;6230:75;;:38;6249:15;;;;859:5667;6249:19;;6230:38;",
+        "linkReferences": {}
+    },
+    "methodIdentifiers": {
+        "admin()": "f851a440",
+        "claimYield(address)": "999927df",
+        "deposit(uint256)": "b6b55f25",
+        "getStake(address)": "7a766460",
+        "pendingYield(address)": "c7bf1980",
+        "setYieldRate(uint256)": "1411dab0",
+        "stakes(address)": "16934fc4",
+        "totalPrincipal()": "4b1533b2",
+        "usdc()": "3e413bee",
+        "withdraw(address,uint256)": "f3fef3a3",
+        "yieldRateBps()": "f3a6a4a3"
+    },
+    "rawMetadata": "{\"compiler\":{\"version\":\"0.8.24+commit.e11b9ed9\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_usdc\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_yieldRateBps\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"depositor\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Deposited\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"depositor\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Withdrawn\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"depositor\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"YieldClaimed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"rateBps\",\"type\":\"uint256\"}],\"name\":\"YieldRateSet\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"admin\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"}],\"name\":\"claimYield\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"deposit\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"who\",\"type\":\"address\"}],\"name\":\"getStake\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"principal\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"accrued\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"pending\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"who\",\"type\":\"address\"}],\"name\":\"pendingYield\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"rateBps\",\"type\":\"uint256\"}],\"name\":\"setYieldRate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"stakes\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"principal\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"accrued\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"lastSettledAt\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalPrincipal\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"usdc\",\"outputs\":[{\"internalType\":\"contract IYieldPoolUSDC\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"withdraw\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"yieldRateBps\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"Yield is generated by calling MockUSDC.mint() \\u2014 valid on testnet only.      Yield accrues continuously by timestamp on the deposited principal.      Settlement happens on every principal change so the accrued amount is      always exact regardless of how many partial withdrawals have occurred.\",\"kind\":\"dev\",\"methods\":{\"claimYield(address)\":{\"params\":{\"to\":\"Recipient of yield (usually the lending contract).\"},\"returns\":{\"amount\":\"The yield minted.\"}},\"deposit(uint256)\":{\"params\":{\"amount\":\"Amount of mUSDC to deposit (6 decimals).\"}},\"withdraw(address,uint256)\":{\"params\":{\"amount\":\"Amount to withdraw (6 decimals).\",\"to\":\"Recipient of the withdrawn principal.\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"claimYield(address)\":{\"notice\":\"Claim all pending yield (accrued store + live since last settle).         Mints fresh mUSDC directly to `to` \\u2014 works on testnet because         MockUSDC.mint() is permissionless.\"},\"deposit(uint256)\":{\"notice\":\"Deposit mUSDC principal. Caller must have approved this contract first.\"},\"getStake(address)\":{\"notice\":\"Full stake view for dashboards.\"},\"pendingYield(address)\":{\"notice\":\"Returns pending yield = stored accrued + live (since last settle).\"},\"setYieldRate(uint256)\":{\"notice\":\"Update APY rate. Use 600 for 6% APY, 60000 for fast demo visibility.\"},\"withdraw(address,uint256)\":{\"notice\":\"Withdraw principal back to `to`. Does NOT auto-claim yield.         Any yield accumulated so far is locked into `accrued` and remains         claimable via claimYield() so no yield is ever silently lost.\"}},\"notice\":\"Mock yield pool for the Kredio intelligent yield strategy.\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"evm/MockYieldPool.sol\":\"MockYieldPool\"},\"evmVersion\":\"cancun\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\",\":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\":forge-std/=lib/forge-std/src/\",\":halmos-cheatcodes/=lib/openzeppelin-contracts/lib/halmos-cheatcodes/src/\",\":openzeppelin-contracts/=lib/openzeppelin-contracts/\"],\"viaIR\":true},\"sources\":{\"evm/MockYieldPool.sol\":{\"keccak256\":\"0x344f1ca392fce178906c7e49be73f25754482cc1da9cde4e4b18935fc870dc7d\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://fc16ab45df49b8cdea70978272d8cfb16c02abbdf81a694f85fd6fe975497066\",\"dweb:/ipfs/QmXW7L6G75BaVL3U6mcGp1kSoDCsNfEcBcWsMxMsJwPZAZ\"]}},\"version\":1}",
+    "metadata": {
+        "compiler": {
+            "version": "0.8.24+commit.e11b9ed9"
+        },
+        "language": "Solidity",
+        "output": {
+            "abi": [
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "_usdc",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "_yieldRateBps",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "nonpayable",
+                    "type": "constructor"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "depositor",
+                            "type": "address",
+                            "indexed": true
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "amount",
+                            "type": "uint256",
+                            "indexed": false
+                        }
+                    ],
+                    "type": "event",
+                    "name": "Deposited",
+                    "anonymous": false
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "depositor",
+                            "type": "address",
+                            "indexed": true
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "to",
+                            "type": "address",
+                            "indexed": true
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "amount",
+                            "type": "uint256",
+                            "indexed": false
+                        }
+                    ],
+                    "type": "event",
+                    "name": "Withdrawn",
+                    "anonymous": false
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "depositor",
+                            "type": "address",
+                            "indexed": true
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "to",
+                            "type": "address",
+                            "indexed": true
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "amount",
+                            "type": "uint256",
+                            "indexed": false
+                        }
+                    ],
+                    "type": "event",
+                    "name": "YieldClaimed",
+                    "anonymous": false
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "rateBps",
+                            "type": "uint256",
+                            "indexed": false
+                        }
+                    ],
+                    "type": "event",
+                    "name": "YieldRateSet",
+                    "anonymous": false
+                },
+                {
+                    "inputs": [],
+                    "stateMutability": "view",
+                    "type": "function",
+                    "name": "admin",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ]
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "to",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "nonpayable",
+                    "type": "function",
+                    "name": "claimYield",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "amount",
+                            "type": "uint256"
+                        }
+                    ]
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "amount",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "nonpayable",
+                    "type": "function",
+                    "name": "deposit"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "who",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function",
+                    "name": "getStake",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "principal",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "accrued",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "pending",
+                            "type": "uint256"
+                        }
+                    ]
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "who",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function",
+                    "name": "pendingYield",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ]
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "rateBps",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "nonpayable",
+                    "type": "function",
+                    "name": "setYieldRate"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function",
+                    "name": "stakes",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "principal",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "accrued",
+                            "type": "uint256"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "lastSettledAt",
+                            "type": "uint256"
+                        }
+                    ]
+                },
+                {
+                    "inputs": [],
+                    "stateMutability": "view",
+                    "type": "function",
+                    "name": "totalPrincipal",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ]
+                },
+                {
+                    "inputs": [],
+                    "stateMutability": "view",
+                    "type": "function",
+                    "name": "usdc",
+                    "outputs": [
+                        {
+                            "internalType": "contract IYieldPoolUSDC",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ]
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "to",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "uint256",
+                            "name": "amount",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "nonpayable",
+                    "type": "function",
+                    "name": "withdraw"
+                },
+                {
+                    "inputs": [],
+                    "stateMutability": "view",
+                    "type": "function",
+                    "name": "yieldRateBps",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ]
+                }
+            ],
+            "devdoc": {
+                "kind": "dev",
+                "methods": {
+                    "claimYield(address)": {
+                        "params": {
+                            "to": "Recipient of yield (usually the lending contract)."
+                        },
+                        "returns": {
+                            "amount": "The yield minted."
+                        }
+                    },
+                    "deposit(uint256)": {
+                        "params": {
+                            "amount": "Amount of mUSDC to deposit (6 decimals)."
+                        }
+                    },
+                    "withdraw(address,uint256)": {
+                        "params": {
+                            "amount": "Amount to withdraw (6 decimals).",
+                            "to": "Recipient of the withdrawn principal."
+                        }
+                    }
+                },
+                "version": 1
+            },
+            "userdoc": {
+                "kind": "user",
+                "methods": {
+                    "claimYield(address)": {
+                        "notice": "Claim all pending yield (accrued store + live since last settle).         Mints fresh mUSDC directly to `to` - works on testnet because         MockUSDC.mint() is permissionless."
+                    },
+                    "deposit(uint256)": {
+                        "notice": "Deposit mUSDC principal. Caller must have approved this contract first."
+                    },
+                    "getStake(address)": {
+                        "notice": "Full stake view for dashboards."
+                    },
+                    "pendingYield(address)": {
+                        "notice": "Returns pending yield = stored accrued + live (since last settle)."
+                    },
+                    "setYieldRate(uint256)": {
+                        "notice": "Update APY rate. Use 600 for 6% APY, 60000 for fast demo visibility."
+                    },
+                    "withdraw(address,uint256)": {
+                        "notice": "Withdraw principal back to `to`. Does NOT auto-claim yield.         Any yield accumulated so far is locked into `accrued` and remains         claimable via claimYield() so no yield is ever silently lost."
+                    }
+                },
+                "version": 1
+            }
+        },
+        "settings": {
+            "remappings": [
+                "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+                "erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/",
+                "forge-std/=lib/forge-std/src/",
+                "halmos-cheatcodes/=lib/openzeppelin-contracts/lib/halmos-cheatcodes/src/",
+                "openzeppelin-contracts/=lib/openzeppelin-contracts/"
+            ],
+            "optimizer": {
+                "enabled": true,
+                "runs": 200
+            },
+            "metadata": {
+                "bytecodeHash": "ipfs"
+            },
+            "compilationTarget": {
+                "evm/MockYieldPool.sol": "MockYieldPool"
+            },
+            "evmVersion": "cancun",
+            "libraries": {},
+            "viaIR": true
+        },
+        "sources": {
+            "evm/MockYieldPool.sol": {
+                "keccak256": "0x344f1ca392fce178906c7e49be73f25754482cc1da9cde4e4b18935fc870dc7d",
+                "urls": [
+                    "bzz-raw://fc16ab45df49b8cdea70978272d8cfb16c02abbdf81a694f85fd6fe975497066",
+                    "dweb:/ipfs/QmXW7L6G75BaVL3U6mcGp1kSoDCsNfEcBcWsMxMsJwPZAZ"
+                ],
+                "license": "MIT"
+            }
+        },
+        "version": 1
+    },
+    "id": 10
+}

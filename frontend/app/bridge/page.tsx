@@ -34,7 +34,7 @@ const MAX_ETH = 1;
 
 function explorerTx(chainId: number, txHash: string) {
     if (chainId === BRIDGE.SEPOLIA_CHAIN_ID) return `https://sepolia.etherscan.io/tx/${txHash}`;
-    // Hub Testnet — Blockscout
+    // Hub Testnet - Blockscout
     return `https://blockscout-testnet.polkadot.io/tx/${txHash}`;
 }
 
@@ -47,7 +47,7 @@ const XCM_STAGE_LABELS: Record<XcmStatusStage, string> = {
     awaiting_signature: 'Waiting for signature',
     broadcasting: 'Broadcasting to network',
     in_block: 'In block on People Chain',
-    finalized: 'Finalized — awaiting Hub arrival',
+    finalized: 'Finalized - awaiting Hub arrival',
 };
 
 const XCM_STAGES: XcmStatusStage[] = [
@@ -222,7 +222,7 @@ export default function BridgePage() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PAS XCM Tab — sequential progressive steps
+// PAS XCM Tab - sequential progressive steps
 // ═══════════════════════════════════════════════════════════════════════════
 function PasTab() {
     const { address: hubAddress, isConnected } = useAccount();
@@ -264,7 +264,7 @@ function PasTab() {
         try {
             const free = await fetchPeopleBalance(address);
             setPeopleBalance(formatPASFromPeople(free));
-        } catch { setPeopleBalance('—'); }
+        } catch { setPeopleBalance('-'); }
     }
 
     async function sendXCM() {
@@ -313,7 +313,7 @@ function PasTab() {
 
     useEffect(() => () => { pollCleanupRef.current?.(); }, []);
 
-    const fmtWei = (w: bigint | null) => w !== null ? `${formatPASFromEVM(w)} PAS` : '—';
+    const fmtWei = (w: bigint | null) => w !== null ? `${formatPASFromEVM(w)} PAS` : '-';
     const canSend = isConnected && talismanConnected && !sending && parseFloat(amount) > 0;
     const isError = statusMsg.toLowerCase().startsWith('error') || statusMsg.toLowerCase().includes('failed');
 
@@ -359,7 +359,7 @@ function PasTab() {
                     <div className="space-y-2">
                         <StatRow label="Account" value={selectedAccount?.meta?.name || 'Account'} />
                         <StatRow label="Address" value={`${selectedAccount?.address.slice(0, 10)}…${selectedAccount?.address.slice(-6)}`} />
-                        <StatRow label="Balance" value={peopleBalance ? `${peopleBalance} PAS` : '—'} />
+                        <StatRow label="Balance" value={peopleBalance ? `${peopleBalance} PAS` : '-'} />
                         {substrateAccounts.length > 1 && (
                             <select
                                 className="w-full mt-1 rounded-xl border border-white/10 bg-black/40 text-sm text-white px-3 py-2 outline-none focus:border-white/30"
@@ -371,7 +371,7 @@ function PasTab() {
                             >
                                 {substrateAccounts.map((a) => (
                                     <option key={a.address} value={a.address}>
-                                        {a.meta?.name || 'Account'} — {a.address.slice(0, 12)}…
+                                        {a.meta?.name || 'Account'} - {a.address.slice(0, 12)}…
                                     </option>
                                 ))}
                             </select>
@@ -413,7 +413,7 @@ function PasTab() {
                         </div>
                     </div>
                     <p className="text-xs text-slate-500">
-                        To: <span className="font-mono text-slate-400">{hubAddress ?? '—'}</span>
+                        To: <span className="font-mono text-slate-400">{hubAddress ?? '-'}</span>
                     </p>
                     {arrived ? (
                         <div className="flex items-center gap-2 text-sm text-emerald-300">
@@ -454,7 +454,7 @@ function PasTab() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ETH → mUSDC Tab — Bridge / Reclaim inner tabs
+// ETH → mUSDC Tab - Bridge / Reclaim inner tabs
 // ═══════════════════════════════════════════════════════════════════════════
 type EthInnerTab = 'bridge' | 'reclaim';
 
@@ -645,7 +645,7 @@ function EthTab() {
                                 {!isConnected ? (
                                     <StateNotice tone="info" message="Connect MetaMask to continue." />
                                 ) : status === 'minted' ? (
-                                    /* Success card — dismissed manually with ✕ */
+                                    /* Success card - dismissed manually with ✕ */
                                     <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/25 px-4 py-3 space-y-1.5">
                                         <div className="flex items-center justify-between">
                                             <p className="text-sm font-semibold text-emerald-300">
@@ -669,14 +669,14 @@ function EthTab() {
                                         )}
                                     </div>
                                 ) : status === 'error' ? (
-                                    /* Error card — replaces button, dismissed with ✕ */
+                                    /* Error card - replaces button, dismissed with ✕ */
                                     <div className="flex items-center gap-3 rounded-xl border border-rose-500/20 bg-rose-500/8 px-4 py-3">
                                         <span className="text-rose-400 text-sm shrink-0">✕</span>
                                         <span className="text-sm text-rose-300 flex-1 min-w-0 break-words">{errorMsg ?? 'Transaction failed'}</span>
                                         <button onClick={reset} className="text-slate-500 hover:text-white text-sm leading-none shrink-0" aria-label="Dismiss">✕</button>
                                     </div>
                                 ) : busy ? (
-                                    /* Inline pipeline — replaces button while active */
+                                    /* Inline pipeline - replaces button while active */
                                     <InlineProgress
                                         status={status}
                                         txHash={lastTxHash}
@@ -696,7 +696,7 @@ function EthTab() {
                                         className="w-full py-3.5 rounded-xl bg-violet-600/80 border border-violet-500/30 text-white text-sm font-semibold
                                                    hover:bg-violet-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                                     >
-                                        {`Deposit ${ethAmount || '—'} ETH`}
+                                        {`Deposit ${ethAmount || '-'} ETH`}
                                     </button>
                                 )}
                             </div>

@@ -286,8 +286,8 @@ export default function SwapPage() {
 
                         <div
                             className={`flex items-center gap-3 rounded-xl border px-4 py-3 transition-colors ${hasValidQuote
-                                    ? 'border-emerald-500/20 bg-emerald-900/10'
-                                    : 'border-white/5 bg-black/20'
+                                ? 'border-emerald-500/20 bg-emerald-900/10'
+                                : 'border-white/5 bg-black/20'
                                 }`}
                         >
                             <div className="flex-1 min-w-0">
@@ -305,20 +305,20 @@ export default function SwapPage() {
                                         {quoteDisplay}
                                     </motion.span>
                                 ) : (
-                                    <span className="text-2xl font-light text-slate-600">—</span>
+                                    <span className="text-2xl font-light text-slate-600">-</span>
                                 )}
                             </div>
                             <span
                                 className={`shrink-0 text-sm font-semibold rounded-lg px-3 py-1.5 transition-colors ${hasValidQuote
-                                        ? 'text-emerald-300 bg-emerald-500/10 border border-emerald-500/20'
-                                        : 'text-slate-600 bg-white/5 border border-white/10'
+                                    ? 'text-emerald-300 bg-emerald-500/10 border border-emerald-500/20'
+                                    : 'text-slate-600 bg-white/5 border border-white/10'
                                     }`}
                             >
                                 mUSDC
                             </span>
                         </div>
 
-                        {/* Quote details — greyed out until user types */}
+                        {/* Quote details - greyed out until user types */}
                         <div
                             className={`space-y-1.5 px-1 transition-opacity duration-200 ${hasValidQuote ? 'opacity-100' : 'opacity-25 pointer-events-none'
                                 }`}
@@ -328,7 +328,7 @@ export default function SwapPage() {
                                 <span className="text-slate-300">
                                     {oraclePrice !== null
                                         ? `1 PAS ≈ $${oraclePrice.toFixed(2)}`
-                                        : '—'}
+                                        : '-'}
                                 </span>
                             </div>
                             <div className="flex items-center justify-between text-xs">
@@ -336,13 +336,13 @@ export default function SwapPage() {
                                     Fee ({Number(feeBps) / 100}%)
                                 </span>
                                 <span className="text-slate-300">
-                                    {feeDisplay ? `${feeDisplay} mUSDC` : '—'}
+                                    {feeDisplay ? `${feeDisplay} mUSDC` : '-'}
                                 </span>
                             </div>
                             <div className="flex items-center justify-between text-xs">
                                 <span className="text-slate-500">Min received (1% slippage)</span>
                                 <span className="text-slate-300">
-                                    {minOutDisplay ? `${minOutDisplay} mUSDC` : '—'}
+                                    {minOutDisplay ? `${minOutDisplay} mUSDC` : '-'}
                                 </span>
                             </div>
                         </div>
@@ -357,7 +357,7 @@ export default function SwapPage() {
                     {!!isCrashed && (
                         <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-2.5">
                             <p className="text-xs text-rose-400">
-                                Oracle is currently down — swaps are temporarily paused.
+                                Oracle is currently down - swaps are temporarily paused.
                             </p>
                         </div>
                     )}
