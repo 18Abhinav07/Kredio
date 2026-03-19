@@ -139,7 +139,7 @@ function CreditScorePanel({ scoreValue, tier, collateralRatioBps, interestRateBp
                         />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-3xl font-semibold" style={{ color: scoreTone }}>{score > 0 ? score : '-'}</span>
+                        <span className="text-3xl font-semibold" style={{ color: scoreTone }}>{score > 0 ? score : '—'}</span>
                         <span className="text-[10px] text-slate-500 mt-0.5">/ 100</span>
                     </div>
                 </div>
@@ -149,14 +149,14 @@ function CreditScorePanel({ scoreValue, tier, collateralRatioBps, interestRateBp
                     <div>
                         <p className="text-xs text-slate-400 uppercase tracking-wider">Max LTV</p>
                         <p className="text-xl font-semibold text-white mt-0.5">
-                            {collateralRatioBps > 0 ? `${((10000 / collateralRatioBps) * 100).toFixed(0)}%` : '-'}
+                            {collateralRatioBps > 0 ? `${((10000 / collateralRatioBps) * 100).toFixed(0)}%` : '—'}
                         </p>
                     </div>
                     <div className="h-px bg-white/5" />
                     <div>
                         <p className="text-xs text-slate-400 uppercase tracking-wider">Borrow Rate</p>
                         <p className="text-xl font-semibold text-white mt-0.5">
-                            {interestRateBps > 0 ? `${(interestRateBps / 100).toFixed(2)}%` : '-'}
+                            {interestRateBps > 0 ? `${(interestRateBps / 100).toFixed(2)}%` : '—'}
                             <span className="text-xs font-normal text-slate-500 ml-1">APY</span>
                         </p>
                     </div>
@@ -305,7 +305,7 @@ function HealthBar({ ratio }: { ratio: bigint }) {
                     tone === 'green' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
                         tone === 'yellow' ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' :
                             'bg-rose-500/10 border-rose-500/20 text-rose-400 animate-pulse')}>
-                    {isFinite(num) ? num.toFixed(2) : '-'} • {lbl}
+                    {isFinite(num) ? num.toFixed(2) : '—'} • {lbl}
                 </span>
             </div>
             <div className="w-full h-1.5 rounded-full bg-white/5 overflow-hidden ring-1 ring-inset ring-white/5">
@@ -322,8 +322,8 @@ function HealthBar({ ratio }: { ratio: bigint }) {
 }
 
 // ── Borrow position card (repay + withdraw) ───────────────────────────────
-type RepayPhase = 'idle' | 'confirming' | 'approving' | 'repaying' | 'success' | 'error';
-type WithdrawPhase = 'idle' | 'confirming' | 'withdrawing' | 'success' | 'error';
+type RepayPhase = 'idle' | 'confirming' | 'approving' | 'repaying' | 'success';
+type WithdrawPhase = 'idle' | 'confirming' | 'withdrawing' | 'success';
 
 function PASBorrowRow({ collateralWei, debtAtoms, accruedAtoms, totalOwedAtoms, healthRatio, oraclePrice8, ltvBps, onRefresh, onBusy }: {
     collateralWei: bigint; debtAtoms: bigint; accruedAtoms: bigint; totalOwedAtoms: bigint;
@@ -341,8 +341,9 @@ function PASBorrowRow({ collateralWei, debtAtoms, accruedAtoms, totalOwedAtoms, 
     useEffect(() => { if (!approveSuccess || repayPhase !== 'approving') return; setRepayPhase('repaying'); setTimeout(() => writeRepay({ address: config.pasMarket, abi: ABIS.KREDIO_PAS_MARKET, functionName: 'repay' }), 300); }, [approveSuccess]);
     useEffect(() => { if (!repaySuccess) return; setRepayPhase('success'); const t = setTimeout(() => { onRefresh(); setRepayPhase('idle'); onBusy(false); }, 1500); return () => clearTimeout(t); }, [repaySuccess]);
     useEffect(() => { if (!withdrawSuccess) return; setWithdrawPhase('success'); const t = setTimeout(() => { onRefresh(); setWithdrawPhase('idle'); onBusy(false); }, 1500); return () => clearTimeout(t); }, [withdrawSuccess]);
-    useEffect(() => { if ((approveIsError && repayPhase === 'approving') || (repayIsError && repayPhase === 'repaying')) { setRepayPhase('error'); resetApprove(); resetRepay(); const t = setTimeout(() => { setRepayPhase('idle'); onBusy(false); }, 3000); return () => clearTimeout(t); } }, [approveIsError, repayIsError, repayPhase]);
-    useEffect(() => { if (withdrawIsError && withdrawPhase === 'withdrawing') { setWithdrawPhase('error'); const t = setTimeout(() => { setWithdrawPhase('idle'); onBusy(false); }, 3000); return () => clearTimeout(t); } }, [withdrawIsError, withdrawPhase]);
+    useEffect(() => { if (approveIsError && repayPhase === 'approving') { setRepayPhase('idle'); resetApprove(); onBusy(false); } }, [approveIsError]);
+    useEffect(() => { if (repayIsError && repayPhase === 'repaying') { setRepayPhase('idle'); resetRepay(); onBusy(false); } }, [repayIsError]);
+    useEffect(() => { if (withdrawIsError && withdrawPhase === 'withdrawing') { setWithdrawPhase('idle'); onBusy(false); } }, [withdrawIsError]);
 
     // Approve maxUint256 so that additional interest accruing between the approve
     // block and the repay block can never cause the transferFrom to fail.
@@ -371,7 +372,7 @@ function PASBorrowRow({ collateralWei, debtAtoms, accruedAtoms, totalOwedAtoms, 
                 <span className="text-sm font-medium text-amber-400">{fmt6(accruedAtoms, 6)}</span> <span className="text-xs text-slate-500">mUSDC</span>
             </td>
             <td className="px-5 py-4 align-middle whitespace-nowrap">
-                <span className={cn("inline-flex items-center px-2 py-1 rounded text-xs font-semibold border", tone === 'green' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : tone === 'yellow' ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400 animate-pulse')}>{isFinite(healthNum(healthRatio)) ? healthNum(healthRatio).toFixed(2) : '-'}</span>
+                <span className={cn("inline-flex items-center px-2 py-1 rounded text-xs font-semibold border", tone === 'green' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : tone === 'yellow' ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400 animate-pulse')}>{isFinite(healthNum(healthRatio)) ? healthNum(healthRatio).toFixed(2) : '—'}</span>
             </td>
             <td className="px-5 py-4 align-middle text-right whitespace-nowrap">
                 <div className="flex items-center justify-end gap-2">
@@ -389,7 +390,6 @@ function PASBorrowRow({ collateralWei, debtAtoms, accruedAtoms, totalOwedAtoms, 
                             {repayPhase === 'approving' && (<div className="flex items-center gap-2 text-xs text-indigo-300 px-3 py-1.5"><Spinner small />Approving…</div>)}
                             {repayPhase === 'repaying' && (<div className="flex items-center gap-2 text-xs text-indigo-300 px-3 py-1.5"><Spinner small />Repaying…</div>)}
                             {repayPhase === 'success' && (<div className="flex items-center gap-1.5 text-xs text-emerald-400 px-3 py-1.5"><Check />Done</div>)}
-                            {repayPhase === 'error' && (<div className="flex items-center gap-1.5 text-xs text-rose-400 px-3 py-1.5">Action Cancelled</div>)}
                         </div>
                     ) : withdrawPhase !== 'idle' ? (
                         <div className="flex justify-end gap-2">
@@ -399,7 +399,6 @@ function PASBorrowRow({ collateralWei, debtAtoms, accruedAtoms, totalOwedAtoms, 
                             </>)}
                             {withdrawPhase === 'withdrawing' && (<div className="flex items-center gap-2 text-xs text-slate-400 px-3 py-1.5"><Spinner small />Withdrawing…</div>)}
                             {withdrawPhase === 'success' && (<div className="flex items-center gap-1.5 text-xs text-emerald-400 px-3 py-1.5"><Check />Done</div>)}
-                            {withdrawPhase === 'error' && (<div className="flex items-center gap-1.5 text-xs text-rose-400 px-3 py-1.5">Action Cancelled</div>)}
                         </div>
                     ) : null}
                 </div>
@@ -424,8 +423,9 @@ function USDCBorrowRow({ collateralAtoms, debtAtoms, accruedAtoms, totalOwedAtom
     useEffect(() => { if (!approveSuccess || repayPhase !== 'approving') return; setRepayPhase('repaying'); setTimeout(() => writeRepay({ address: config.lending, abi: ABIS.KREDIO_LENDING, functionName: 'repay' }), 300); }, [approveSuccess]);
     useEffect(() => { if (!repaySuccess) return; setRepayPhase('success'); const t = setTimeout(() => { onRefresh(); setRepayPhase('idle'); onBusy(false); }, 1500); return () => clearTimeout(t); }, [repaySuccess]);
     useEffect(() => { if (!withdrawSuccess) return; setWithdrawPhase('success'); const t = setTimeout(() => { onRefresh(); setWithdrawPhase('idle'); onBusy(false); }, 1500); return () => clearTimeout(t); }, [withdrawSuccess]);
-    useEffect(() => { if ((approveIsError && repayPhase === 'approving') || (repayIsError && repayPhase === 'repaying')) { setRepayPhase('error'); resetApprove(); resetRepay(); const t = setTimeout(() => { setRepayPhase('idle'); onBusy(false); }, 3000); return () => clearTimeout(t); } }, [approveIsError, repayIsError, repayPhase]);
-    useEffect(() => { if (withdrawIsError && withdrawPhase === 'withdrawing') { setWithdrawPhase('error'); const t = setTimeout(() => { setWithdrawPhase('idle'); onBusy(false); }, 3000); return () => clearTimeout(t); } }, [withdrawIsError, withdrawPhase]);
+    useEffect(() => { if (approveIsError && repayPhase === 'approving') { setRepayPhase('idle'); resetApprove(); onBusy(false); } }, [approveIsError]);
+    useEffect(() => { if (repayIsError && repayPhase === 'repaying') { setRepayPhase('idle'); resetRepay(); onBusy(false); } }, [repayIsError]);
+    useEffect(() => { if (withdrawIsError && withdrawPhase === 'withdrawing') { setWithdrawPhase('idle'); onBusy(false); } }, [withdrawIsError]);
 
     // Approve maxUint256 so that additional interest accruing between the approve
     // block and the repay block can never cause the transferFrom to fail.
@@ -444,7 +444,7 @@ function USDCBorrowRow({ collateralAtoms, debtAtoms, accruedAtoms, totalOwedAtom
             </td>
             <td className="px-5 py-4 align-middle whitespace-nowrap">
                 <span className="text-sm font-medium text-white">{fmt6(collateralAtoms > 0n ? collateralAtoms : walletCollateralAtoms)}</span> <span className="text-xs text-slate-500">mUSDC</span>
-                {walletCollateralAtoms > 0n && collateralAtoms === 0n && <span className="block text-[10px] text-slate-600 mt-0.5">Unlocked - no active position</span>}
+                {walletCollateralAtoms > 0n && collateralAtoms === 0n && <span className="block text-[10px] text-slate-600 mt-0.5">Unlocked — no active position</span>}
             </td>
             <td className="px-5 py-4 align-middle whitespace-nowrap">
                 <span className="text-sm font-medium text-white">{fmt6(debtAtoms)}</span> <span className="text-xs text-slate-500">mUSDC</span>
@@ -453,7 +453,7 @@ function USDCBorrowRow({ collateralAtoms, debtAtoms, accruedAtoms, totalOwedAtom
                 <span className="text-sm font-medium text-amber-400">{fmt6(accruedAtoms, 6)}</span> <span className="text-xs text-slate-500">mUSDC</span>
             </td>
             <td className="px-5 py-4 align-middle whitespace-nowrap">
-                <span className={cn("inline-flex items-center px-2 py-1 rounded text-xs font-semibold border", tone === 'green' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : tone === 'yellow' ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400 animate-pulse')}>{isFinite(healthNum(healthRatio)) ? healthNum(healthRatio).toFixed(2) : '-'}</span>
+                <span className={cn("inline-flex items-center px-2 py-1 rounded text-xs font-semibold border", tone === 'green' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : tone === 'yellow' ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400 animate-pulse')}>{isFinite(healthNum(healthRatio)) ? healthNum(healthRatio).toFixed(2) : '—'}</span>
             </td>
             <td className="px-5 py-4 align-middle text-right whitespace-nowrap">
                 <div className="flex items-center justify-end gap-2">
@@ -558,7 +558,7 @@ function IntelligentYieldPanel({
             {/* Description */}
             <p className="text-[11px] text-slate-500 leading-relaxed">
                 {investPct}% of idle pool capital is automatically deployed to a yield strategy.
-                Strategy yield is distributed directly into your pending harvest -
+                Strategy yield is distributed directly into your pending harvest —
                 {' '}<span className="text-white/60">claim it alongside your base borrower-interest yield above.</span>
                 {userPendingShare > 0n && (
                     <span className="text-amber-400 font-medium"> ~{fmt6(userPendingShare, 6)} mUSDC is accruing for you right now.</span>
@@ -573,8 +573,8 @@ function IntelligentYieldPanel({
 // ── Unified lending activity table ───────────────────────────────────────
 
 type WdTarget = 'lending' | 'pas' | null;
-type WdPhase = 'idle' | 'confirming' | 'withdrawing' | 'success' | 'error';
-type HvPhase = 'idle' | 'harvesting' | 'success' | 'error';
+type WdPhase = 'idle' | 'confirming' | 'withdrawing' | 'success';
+type HvPhase = 'idle' | 'harvesting' | 'success';
 
 const EVENT_META: Record<LendHistoryEntry['type'], { label: string; color: string }> = {
     deposit: { label: 'Deposit', color: 'text-indigo-300' },
@@ -626,8 +626,8 @@ function UnifiedLendingActivity({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [hvOk]);
 
-    useEffect(() => { if (wdErr && wdPhase === 'withdrawing') { setWdPhase('error'); const t = setTimeout(() => { setWdPhase('idle'); onBusy(false); }, 3000); return () => clearTimeout(t); } }, [wdErr, wdPhase]);
-    useEffect(() => { if (hvErr && hvPhase === 'harvesting') { setHvPhase('error'); const t = setTimeout(() => { setHvPhase('idle'); setHvTarget(null); onBusy(false); }, 3000); return () => clearTimeout(t); } }, [hvErr, hvPhase]);
+    useEffect(() => { if (wdErr && wdPhase === 'withdrawing') { setWdPhase('idle'); onBusy(false); } }, [wdErr, wdPhase]);
+    useEffect(() => { if (hvErr && hvPhase === 'harvesting') { setHvPhase('idle'); setHvTarget(null); onBusy(false); } }, [hvErr, hvPhase]);
 
     const openWithdraw = (target: 'lending' | 'pas') => {
         if (wdPhase !== 'idle') return;
@@ -712,13 +712,7 @@ function UnifiedLendingActivity({
                             <Check /> Withdrawal confirmed
                         </div>
                     )}
-                    {wdPhase === 'error' && (
-                        <div className="flex items-center gap-2 text-rose-400 text-xs py-1">
-                            Action Cancelled
-                        </div>
-                    )}
                 </td>
-
             </tr>
         );
     };
@@ -742,14 +736,14 @@ function UnifiedLendingActivity({
                             {fmt6(yieldAmt, 6)}
                         </span>
                     </td>
-                    <td className="px-5 py-4 text-right text-slate-700 hidden md:table-cell">-</td>
-                    <td className="px-5 py-4 text-right text-slate-700 hidden md:table-cell">-</td>
+                    <td className="px-5 py-4 text-right text-slate-700 hidden md:table-cell">—</td>
+                    <td className="px-5 py-4 text-right text-slate-700 hidden md:table-cell">—</td>
                     <td className="px-5 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                             {isHvThis && hvPhase !== 'idle' ? (
                                 <span className={cn('text-xs flex items-center gap-1.5 px-3 py-1.5',
-                                    hvPhase === 'success' ? 'text-emerald-400' : hvPhase === 'error' ? 'text-rose-400' : 'text-slate-400')}>
-                                    {hvPhase === 'harvesting' ? <><Spinner small /><span>Harvesting…</span></> : hvPhase === 'error' ? <span>Action Cancelled</span> : <><Check /><span>Claimed</span></>}
+                                    hvPhase === 'success' ? 'text-emerald-400' : 'text-slate-400')}>
+                                    {hvPhase === 'harvesting' ? <><Spinner small /><span>Harvesting…</span></> : <><Check /><span>Claimed</span></>}
                                 </span>
                             ) : (
                                 <button onClick={() => doHarvest(target)}
@@ -789,7 +783,7 @@ function UnifiedLendingActivity({
 
     return (
         <div className="flex flex-col gap-4">
-            {/* Intelligent Yield Strategy panel - only visible when lender has USDC deposits */}
+            {/* Intelligent Yield Strategy panel — only visible when lender has USDC deposits */}
             {lendingDeposit > 0n && (
                 <IntelligentYieldPanel
                     strategy={strategy}
@@ -867,16 +861,16 @@ function UnifiedLendingActivity({
                                     <td className={`px-5 py-4 font-medium text-sm ${meta.color}`}>{meta.label}</td>
                                     <td className="px-5 py-4 text-sm text-slate-400">{e.market}</td>
                                     <td className="px-5 py-4 text-right text-sm font-medium text-slate-200">{fmt6(e.amount, 6)}</td>
-                                    <td className="px-5 py-4 text-right text-slate-700 hidden sm:table-cell">-</td>
+                                    <td className="px-5 py-4 text-right text-slate-700 hidden sm:table-cell">—</td>
                                     <td className="px-5 py-4 text-right text-sm text-slate-500 hidden md:table-cell">{e.blockNumber.toString()}</td>
                                     <td className="px-5 py-4 text-right hidden md:table-cell">
                                         {e.txHash ? (
                                             <a href={`https://blockscout-testnet.polkadot.io/tx/${e.txHash}`} target="_blank" rel="noopener noreferrer" className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors">
                                                 {e.txHash.slice(0, 8)}…
                                             </a>
-                                        ) : '-'}
+                                        ) : '—'}
                                     </td>
-                                    <td className="px-5 py-4 text-right text-slate-700">-</td>
+                                    <td className="px-5 py-4 text-right text-slate-700">—</td>
                                 </tr>
                             );
                         })}
@@ -905,7 +899,7 @@ function UnifiedLendingActivity({
             </div>
 
             <p className="text-xs text-slate-500 px-1">
-                Yield accrues from borrower interest and the intelligent yield strategy. Harvest claims all pending yield - also auto-claimed on every deposit/withdraw. Withdraw supports partial amounts.
+                Yield accrues from borrower interest and the intelligent yield strategy. Harvest claims all pending yield — also auto-claimed on every deposit/withdraw. Withdraw supports partial amounts.
             </p>
         </div>
     );
@@ -931,7 +925,7 @@ function AnalyticsRow({
         { label: 'Score', value: score, colorClass: score >= 65 ? 'stroke-cyan-400' : score >= 50 ? 'stroke-emerald-400' : score >= 30 ? 'stroke-amber-400' : score > 0 ? 'stroke-rose-400' : 'stroke-slate-500' },
         { label: 'empty', value: 100 - score, colorClass: 'stroke-white/5' }
     ];
-    const maxLTV = collateralRatioBps > 0 ? `${((10000 / collateralRatioBps) * 100).toFixed(0)}%` : '-';
+    const maxLTV = collateralRatioBps > 0 ? `${((10000 / collateralRatioBps) * 100).toFixed(0)}%` : '—';
 
     // Global TVL Donut
     const totalPasTvl = pasMarket.totalDeposited;
@@ -1100,14 +1094,14 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    {/* loading state - only shown before first successful data load */}
+                    {/* loading state — only shown before first successful data load */}
                     {!hasLoadedOnce && (portfolio.loading || globalLoading) && !hasAnything && (
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-pulse">
                             {[1, 2, 3].map(i => <div key={i} className="rounded-xl border border-white/10 bg-transparent h-[320px]" />)}
                         </div>
                     )}
 
-                    {/* Main content - stays mounted after first load so transaction state is never lost */}
+                    {/* Main content — stays mounted after first load so transaction state is never lost */}
                     {(hasLoadedOnce || (!portfolio.loading && !globalLoading)) && (
                         <div className="flex flex-col gap-10">
 
@@ -1160,7 +1154,7 @@ export default function DashboardPage() {
                             {activeTab === 'positions' && (
                                 <div className="flex flex-col gap-8 items-start animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-                                    {/* Borrows - full width */}
+                                    {/* Borrows — full width */}
                                     <div className="w-full flex flex-col gap-4">
                                         <h2 className="text-base font-semibold text-white px-1 flex items-center gap-3">
                                             Borrow Positions <span className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent" />

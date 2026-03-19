@@ -201,6 +201,9 @@ async function step(actor, action, contractName, txFn, opts = {}) {
     console.log(`\n  [Step ${stepNum}] ${actor}: ${action}`);
 
     try {
+        console.log("     [Wait] 4000ms...");
+        await sleep(4000); // Wait for L2 state sync across RPC load balancers before estimation
+        console.log("     [Wait] Done. Estimating / Sending...");
         if (opts.beforeFn) entry.observedBefore = bigintSafe(await opts.beforeFn());
         const tx = await txFn();
         const receipt = await tx.wait();
@@ -881,7 +884,7 @@ async function main() {
     console.log(`  USER2 position: active=${u2PosFull.active}  debt=${fmt6(u2PosFull.debt)}  accrued=${fmt6(u2PosFull.accrued)}  totalOwed=${fmt6(u2PosFull.totalOwed)}`);
 
     if (u2PosFull.active) {
-        const repayAmt = u2PosFull.totalOwed + u6('50'); // +50 mUSDC buffer for tick accrual between approve and repay
+        const repayAmt = u2PosFull.totalOwed + u6('5000'); // +5000 mUSDC buffer for tick accrual between approve and repay
         await step('USER2', `Approve ${fmt6(repayAmt)} mUSDC to KredioLending for repayment`, 'MockUSDC',
             () => musdc.connect(users.USER2).approve(ADDR.LENDING, repayAmt),
             { expected: 'Allowance ≥ totalOwed' }
