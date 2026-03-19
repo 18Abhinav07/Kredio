@@ -1,0 +1,249 @@
+[00:00:00.700] Server  LOG     ✓ Ready in 493ms
+[00:00:06.212] Server  ERROR   Unsupported style property @media (min-width: 768px). Did you mean @media (minWidth: 768px)?
+[00:00:06.719] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:09.997] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:00:13.927] Server  LOG     ○ Compiling /bridge ...
+[00:00:21.668] Server  WARN    @polkadot/util has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 13.5.6	node_modules/@polkadot/util/cjs
+	esm 13.5.6	node_modules/@polkadot/util/
+[00:00:22.231] Server  WARN    @polkadot/util-crypto has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 13.5.6	node_modules/@polkadot/util-crypto/cjs
+	esm 13.5.6	node_modules/@polkadot/util-crypto/
+[00:00:22.231] Server  WARN    @polkadot/wasm-crypto has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 7.5.4	node_modules/@polkadot/wasm-crypto/cjs
+	esm 7.5.4	node_modules/@polkadot/wasm-crypto/
+[00:00:22.231] Server  WARN    @polkadot/wasm-bridge has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 7.5.4	node_modules/@polkadot/wasm-bridge/cjs
+	esm 7.5.4	node_modules/@polkadot/wasm-bridge/
+[00:00:22.231] Server  WARN    @polkadot/wasm-crypto-wasm has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 7.5.4	node_modules/@polkadot/wasm-crypto-wasm/cjs
+	esm 7.5.4	node_modules/@polkadot/wasm-crypto-wasm/
+[00:00:22.231] Server  WARN    @polkadot/wasm-util has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 7.5.4	node_modules/@polkadot/wasm-util/cjs
+	esm 7.5.4	node_modules/@polkadot/wasm-util/
+[00:00:23.548] Server  WARN    @polkadot/util has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 13.5.6	node_modules/@polkadot/util/cjs
+	esm 13.5.6	node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/api/node_modules/@polkadot/util/
+[00:00:23.551] Server  WARN    @polkadot/api has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 16.4.8	node_modules/@snowbridge/api/node_modules/@polkadot/api/cjs
+	esm 16.5.4	node_modules/@polkadot/api/
+[00:00:23.551] Server  WARN    @polkadot/util has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 13.5.6	node_modules/@polkadot/util/cjs
+	esm 13.5.6	node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/api/node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/rpc-augment/node_modules/@polkadot/util/
+[00:00:23.554] Server  WARN    @polkadot/rpc-augment has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 16.4.8	node_modules/@snowbridge/api/node_modules/@polkadot/rpc-augment/cjs
+	esm 16.5.4	node_modules/@polkadot/rpc-augment/
+[00:00:23.554] Server  WARN    @polkadot/keyring has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 13.5.6	node_modules/@polkadot/keyring/cjs
+	esm 14.0.1	node_modules/@polkadot/api/node_modules/@polkadot/keyring/
+[00:00:23.554] Server  WARN    @polkadot/util-crypto has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 13.5.6	node_modules/@polkadot/util-crypto/cjs
+	esm 13.5.6	node_modules/@polkadot/util-crypto/
+	esm 14.0.1	node_modules/@polkadot/api/node_modules/@polkadot/util-crypto/
+[00:00:23.560] Server  WARN    @polkadot/util has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 13.5.6	node_modules/@polkadot/util/cjs
+	esm 13.5.6	node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/api/node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/rpc-augment/node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/rpc-provider/node_modules/@polkadot/util/
+[00:00:23.563] Server  WARN    @polkadot/rpc-provider has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 16.4.8	node_modules/@snowbridge/api/node_modules/@polkadot/rpc-provider/cjs
+	esm 16.5.4	node_modules/@polkadot/rpc-provider/
+[00:00:23.565] Server  WARN    @polkadot/util has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 13.5.6	node_modules/@polkadot/util/cjs
+	esm 13.5.6	node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/api/node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/rpc-augment/node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/rpc-provider/node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/api-derive/node_modules/@polkadot/util/
+[00:00:23.568] Server  WARN    @polkadot/api-derive has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 16.4.8	node_modules/@snowbridge/api/node_modules/@polkadot/api-derive/cjs
+	esm 16.5.4	node_modules/@polkadot/api-derive/
+[00:00:23.568] Server  WARN    @polkadot/util has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 13.5.6	node_modules/@polkadot/util/cjs
+	esm 13.5.6	node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/api/node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/rpc-augment/node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/rpc-provider/node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/api-derive/node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/rpc-core/node_modules/@polkadot/util/
+[00:00:23.571] Server  WARN    @polkadot/rpc-core has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 16.4.8	node_modules/@snowbridge/api/node_modules/@polkadot/rpc-core/cjs
+	esm 16.5.4	node_modules/@polkadot/rpc-core/
+[00:00:23.571] Server  WARN    @polkadot/types has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 16.4.8	node_modules/@polkadot/types/cjs
+	esm 16.5.4	node_modules/@polkadot/rpc-core/node_modules/@polkadot/types/
+[00:00:23.572] Server  WARN    @polkadot/types-create has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 16.4.8	node_modules/@polkadot/types-create/cjs
+	esm 16.5.4	node_modules/@polkadot/rpc-core/node_modules/@polkadot/types-create/
+[00:00:23.572] Server  WARN    @polkadot/types-codec has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 16.4.8	node_modules/@polkadot/types-codec/cjs
+	esm 16.5.4	node_modules/@polkadot/rpc-core/node_modules/@polkadot/types-codec/
+[00:00:23.573] Server  WARN    @polkadot/util-crypto has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 13.5.6	node_modules/@polkadot/util-crypto/cjs
+	esm 13.5.6	node_modules/@polkadot/util-crypto/
+	esm 14.0.1	node_modules/@polkadot/api/node_modules/@polkadot/util-crypto/
+	esm 14.0.1	node_modules/@polkadot/rpc-core/node_modules/@polkadot/util-crypto/
+[00:00:23.574] Server  WARN    @polkadot/util-crypto has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 13.5.6	node_modules/@polkadot/util-crypto/cjs
+	esm 13.5.6	node_modules/@polkadot/util-crypto/
+	esm 14.0.1	node_modules/@polkadot/api/node_modules/@polkadot/util-crypto/
+	esm 14.0.1	node_modules/@polkadot/rpc-core/node_modules/@polkadot/util-crypto/
+	esm 14.0.1	node_modules/@polkadot/api-derive/node_modules/@polkadot/util-crypto/
+[00:00:23.574] Server  WARN    @polkadot/types has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 16.4.8	node_modules/@polkadot/types/cjs
+	esm 16.5.4	node_modules/@polkadot/rpc-core/node_modules/@polkadot/types/
+	esm 16.5.4	node_modules/@polkadot/api-derive/node_modules/@polkadot/types/
+[00:00:23.575] Server  WARN    @polkadot/types-create has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 16.4.8	node_modules/@polkadot/types-create/cjs
+	esm 16.5.4	node_modules/@polkadot/rpc-core/node_modules/@polkadot/types-create/
+	esm 16.5.4	node_modules/@polkadot/api-derive/node_modules/@polkadot/types-create/
+[00:00:23.575] Server  WARN    @polkadot/types-codec has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 16.4.8	node_modules/@polkadot/types-codec/cjs
+	esm 16.5.4	node_modules/@polkadot/rpc-core/node_modules/@polkadot/types-codec/
+	esm 16.5.4	node_modules/@polkadot/api-derive/node_modules/@polkadot/types-codec/
+[00:00:23.577] Server  WARN    @polkadot/types has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 16.4.8	node_modules/@polkadot/types/cjs
+	esm 16.5.4	node_modules/@polkadot/rpc-core/node_modules/@polkadot/types/
+	esm 16.5.4	node_modules/@polkadot/api-derive/node_modules/@polkadot/types/
+	esm 16.5.4	node_modules/@polkadot/api/node_modules/@polkadot/types/
+[00:00:23.578] Server  WARN    @polkadot/types-create has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 16.4.8	node_modules/@polkadot/types-create/cjs
+	esm 16.5.4	node_modules/@polkadot/rpc-core/node_modules/@polkadot/types-create/
+	esm 16.5.4	node_modules/@polkadot/api-derive/node_modules/@polkadot/types-create/
+	esm 16.5.4	node_modules/@polkadot/api/node_modules/@polkadot/types-create/
+[00:00:23.578] Server  WARN    @polkadot/types-codec has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 16.4.8	node_modules/@polkadot/types-codec/cjs
+	esm 16.5.4	node_modules/@polkadot/rpc-core/node_modules/@polkadot/types-codec/
+	esm 16.5.4	node_modules/@polkadot/api-derive/node_modules/@polkadot/types-codec/
+	esm 16.5.4	node_modules/@polkadot/api/node_modules/@polkadot/types-codec/
+[00:00:23.585] Server  WARN    @polkadot/util has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 13.5.6	node_modules/@polkadot/util/cjs
+	esm 13.5.6	node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/api/node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/rpc-augment/node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/rpc-provider/node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/api-derive/node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/rpc-core/node_modules/@polkadot/util/
+	esm 14.0.1	node_modules/@polkadot/types-known/node_modules/@polkadot/util/
+[00:00:23.588] Server  WARN    @polkadot/types-known has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 16.4.8	node_modules/@snowbridge/api/node_modules/@polkadot/types-known/cjs
+	esm 16.5.4	node_modules/@polkadot/types-known/
+[00:00:23.588] Server  WARN    @polkadot/types-create has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 16.4.8	node_modules/@polkadot/types-create/cjs
+	esm 16.5.4	node_modules/@polkadot/rpc-core/node_modules/@polkadot/types-create/
+	esm 16.5.4	node_modules/@polkadot/api-derive/node_modules/@polkadot/types-create/
+	esm 16.5.4	node_modules/@polkadot/api/node_modules/@polkadot/types-create/
+	esm 16.5.4	node_modules/@polkadot/types-known/node_modules/@polkadot/types-create/
+[00:00:23.588] Server  WARN    @polkadot/types-codec has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	cjs 16.4.8	node_modules/@polkadot/types-codec/cjs
+	esm 16.5.4	node_modules/@polkadot/rpc-core/node_modules/@polkadot/types-codec/
+	esm 16.5.4	node_modules/@polkadot/api-derive/node_modules/@polkadot/types-codec/
+	esm 16.5.4	node_modules/@polkadot/api/node_modules/@polkadot/types-codec/
+	esm 16.5.4	node_modules/@polkadot/types-known/node_modules/@polkadot/types-codec/
+[00:00:23.887] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:24.201] Browser ERROR   uncaughtError: Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <RedirectBoundary>
+      <RedirectErrorBoundary router={{...}}>
+        <InnerLayoutRouter url="/lend/" tree={[...]} params={{}} cacheNode={{rsc:<Fragment>, ...}} segmentPath={[...]} ...>
+          <SegmentViewNode type="page" pagePath="lend/page.tsx">
+            <SegmentTrieNode>
+            <ClientPageRoot Component={function LendUsdcPage} serverProvidedParams={{...}}>
+              <LendUsdcPage params={Promise} searchParams={Promise}>
+                <PageShell title="Lend" subtitle="Earn yield...">
+                  <div className="w-full max...">
+                    <div>
+                    <div className="max-w-lg m...">
+                      <div>
+                      <div>
+                        <div className="rounded-2x...">
+                          <h2>
+                          <LendDepositCard contractAddr="0x1eDaD127..." market="lending">
+                            <div className="space-y-4">
+-                             <div
+-                               className="rounded-xl border px-3 py-2 text-xs border-cyan-400/30 bg-cyan-500/10 text-..."
+-                             >
+          ...
+        ...
+

@@ -1,0 +1,9 @@
+{
+  "/borrow/page": "app/borrow/page.js",
+  "/bridge/page": "app/bridge/page.js",
+  "/lend/page": "app/lend/page.js",
+  "/liquidate/page": "app/liquidate/page.js",
+  "/markets/page": "app/markets/page.js",
+  "/page": "app/page.js",
+  "/swap/page": "app/swap/page.js"
+}
