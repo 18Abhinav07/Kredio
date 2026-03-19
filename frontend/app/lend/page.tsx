@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { useAccount, useBalance, useReadContract, usePublicClient, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseUnits, formatUnits } from 'viem';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
     fetchPeopleBalance, formatPASFromEVM, formatPASFromPeople,
     pollHubArrival, sendXCMToHub, type XcmStatusStage,
@@ -152,10 +151,9 @@ function LendDepositCard({
                 </div>
             )}
 
-            <AnimatePresence>
+            <>
                 {phase === 'success' && (
-                    <motion.div key="ok" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-                        className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-2">
+                    <div>
                         <div className="flex items-center gap-2 text-emerald-300 font-semibold text-sm"><Check /> Deposited {amountInput} mUSDC</div>
                         <InfoRow label="Earning" value={`${aprDisplay} APY`} />
                         <InfoRow label="Est. yield / year" value={`~${yearlyYield.toFixed(4)} mUSDC`} />
@@ -163,9 +161,9 @@ function LendDepositCard({
                             className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-300 hover:text-indigo-200 transition-colors mt-1">
                             View your position →
                         </Link>
-                    </motion.div>
+                    </div>
                 )}
-            </AnimatePresence>
+            </>
             {phase !== 'success' ? (
                 <button onClick={handleLend} disabled={!amountAtoms || isProcessing || !isConnected || phase === 'error'}
                     className={cn('w-full rounded-xl px-4 py-3 text-sm font-semibold transition-all flex items-center justify-center gap-2',
@@ -284,30 +282,27 @@ function SwapAndLendTab({ contractAddr, market }: { contractAddr: `0x${string}`;
                 <span className="text-slate-600">→</span>
                 <span className={cn('font-medium', step === 'lend' ? 'text-indigo-300' : step === 'done' ? 'text-emerald-400' : 'text-slate-600')}>2. Lend mUSDC</span>
             </div>
-            <AnimatePresence mode="wait">
+            <>
                 {step === 'swap' ? (
-                    <motion.div key="s" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-                        className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5">
+                    <div>
                         <SectionLabel n={1} label="Swap PAS → mUSDC" />
                         <SwapStep onSuccess={r => { setSwappedMusdc(r); setStep('lend'); }} />
-                    </motion.div>
+                    </div>
                 ) : (
-                    <motion.div key="sd" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                        className="rounded-2xl border border-emerald-500/20 bg-emerald-900/10 p-4 flex items-center gap-3">
+                    <div>
                         <Check />
                         <div className="text-sm"><span className="text-slate-400">Step 1 - </span><span className="text-emerald-300">Swapped PAS → {swappedMusdc} mUSDC</span></div>
-                    </motion.div>
+                    </div>
                 )}
-            </AnimatePresence>
-            <AnimatePresence>
+            </>
+            <>
                 {(step === 'lend' || step === 'done') && (
-                    <motion.div key="l" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                        className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5">
+                    <div>
                         <SectionLabel n={2} label="Lend mUSDC" done={step === 'done'} />
                         <LendDepositCard prefillAmount={swappedMusdc} onSuccess={() => setStep('done')} contractAddr={contractAddr} market={market} />
-                    </motion.div>
+                    </div>
                 )}
-            </AnimatePresence>
+            </>
             {step === 'done' && <button onClick={reset} className="text-xs text-indigo-400 hover:text-indigo-300">← Start again</button>}
         </div>
     );
@@ -407,10 +402,9 @@ function BridgeAndLendTab({ contractAddr, market }: { contractAddr: `0x${string}
             {!isConnected && <StateNotice tone="info" message="Connect MetaMask via the header first." />}
             {isConnected && (
                 <>
-                    <AnimatePresence mode="wait">
+                    <>
                         {step === 'bridge' ? (
-                            <motion.div key="ba" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-                                className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5 space-y-4">
+                            <div>
                                 <SectionLabel n={1} label="Bridge PAS from People Chain to Hub" />
                                 {!talismanConnected ? (
                                     <button onClick={connectTalisman}
@@ -470,18 +464,17 @@ function BridgeAndLendTab({ contractAddr, market }: { contractAddr: `0x${string}
                                         )}
                                     </>
                                 )}
-                            </motion.div>
+                            </div>
                         ) : (
-                            <motion.div key="bd" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                                className="rounded-2xl border border-emerald-500/20 bg-emerald-900/10 p-4 flex items-center gap-3">
+                            <div>
                                 <Check />
                                 <div className="text-sm"><span className="text-slate-400">Step 1 - </span><span className="text-emerald-300">+{arrivedWei ? formatPASFromEVM(arrivedWei) : bridgeAmount} PAS arrived on Hub</span></div>
-                            </motion.div>
+                            </div>
                         )}
-                    </AnimatePresence>
-                    <AnimatePresence>
+                    </>
+                    <>
                         {(step === 'swap' || step === 'lend' || step === 'done') && (
-                            <motion.div key="sp" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+                            <div>
                                 {step === 'swap' ? (
                                     <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5">
                                         <SectionLabel n={2} label="Swap PAS → mUSDC" />
@@ -493,18 +486,17 @@ function BridgeAndLendTab({ contractAddr, market }: { contractAddr: `0x${string}
                                         <div className="text-sm"><span className="text-slate-400">Step 2 - </span><span className="text-emerald-300">Swapped → {swappedMusdc} mUSDC</span></div>
                                     </div>
                                 )}
-                            </motion.div>
+                            </div>
                         )}
-                    </AnimatePresence>
-                    <AnimatePresence>
+                    </>
+                    <>
                         {(step === 'lend' || step === 'done') && (
-                            <motion.div key="lp" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                                className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5">
+                            <div>
                                 <SectionLabel n={3} label="Lend mUSDC" done={step === 'done'} />
                                 <LendDepositCard prefillAmount={swappedMusdc} onSuccess={() => setStep('done')} contractAddr={contractAddr} market={market} />
-                            </motion.div>
+                            </div>
                         )}
-                    </AnimatePresence>
+                    </>
                     {step === 'done' && <button onClick={reset} className="text-xs text-indigo-400 hover:text-indigo-300">← Start again</button>}
                 </>
             )}
@@ -528,10 +520,8 @@ export default function LendUsdcPage() {
                     <button className={tabCls(source === 'swap')} onClick={() => setSource('swap')}>Swap &amp; Lend</button>
                     <button className={tabCls(source === 'bridge')} onClick={() => setSource('bridge')}>Bridge &amp; Lend</button>
                 </div>
-                <AnimatePresence mode="wait">
-                    <motion.div key={source}
-                        initial={{ opacity: 0, x: source === 'musdc' ? -8 : 8 }}
-                        animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                <>
+                    <div>
                         {source === 'musdc' && (
                             <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5">
                                 <h2 className="text-base font-semibold text-white mb-4">Lend mUSDC directly</h2>
@@ -540,8 +530,8 @@ export default function LendUsdcPage() {
                         )}
                         {source === 'swap' && <SwapAndLendTab contractAddr={config.lending} market="lending" />}
                         {source === 'bridge' && <BridgeAndLendTab contractAddr={config.lending} market="lending" />}
-                    </motion.div>
-                </AnimatePresence>
+                    </div>
+                </>
             </div>
         </PageShell>
     );

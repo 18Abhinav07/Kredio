@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAccount, usePublicClient, useChainId, useSwitchChain } from 'wagmi';
 import { formatEther } from 'viem';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
     fetchPeopleBalance,
     formatPASFromEVM,
@@ -206,17 +205,11 @@ export default function BridgePage() {
             <div className="mb-2">
                 <BridgeTabBar active={activeTab} onChange={setActiveTab} />
             </div>
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={activeTab}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.18 }}
-                >
+            <>
+                <div>
                     {activeTab === 'pas' ? <PasTab /> : <EthTab />}
-                </motion.div>
-            </AnimatePresence>
+                </div>
+            </>
         </PageShell>
     );
 }
@@ -537,16 +530,9 @@ function EthTab() {
                 ))}
             </div>
 
-            <AnimatePresence mode="wait">
+            <>
                 {innerTab === 'bridge' ? (
-                    <motion.div
-                        key="bridge"
-                        initial={{ opacity: 0, y: 4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -4 }}
-                        transition={{ duration: 0.15 }}
-                        className="space-y-4"
-                    >
+                    <div className="space-y-4">
                         {/* Source chain */}
                         <Panel title="Source Chain">
                             <div className="grid grid-cols-1 gap-2 pt-1">
@@ -702,16 +688,10 @@ function EthTab() {
                             </div>
                         </Panel>
 
-                    </motion.div>
+                    </div>
                 ) : (
                     /* ── Reclaim tab ── */
-                    <motion.div
-                        key="reclaim"
-                        initial={{ opacity: 0, y: 4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -4 }}
-                        transition={{ duration: 0.15 }}
-                    >
+                    <div>
                         <Panel title="Reclaim ETH" subtitle="Burn mUSDC to receive your original ETH back on the source chain.">
                             {!isConnected ? (
                                 <StateNotice tone="info" message="Connect MetaMask to view your deposits." />
@@ -802,9 +782,9 @@ function EthTab() {
                                 </div>
                             )}
                         </Panel>
-                    </motion.div>
+                    </div>
                 )}
-            </AnimatePresence>
+            </>
         </div>
     );
 }

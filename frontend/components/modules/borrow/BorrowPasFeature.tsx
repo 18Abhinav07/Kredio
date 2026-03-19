@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { useAccount, useBalance, usePublicClient, useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi';
 import { parseUnits, formatUnits } from 'viem';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
     fetchPeopleBalance,
     formatPASFromEVM,
@@ -277,15 +276,14 @@ function BorrowStep({ depositedWei, maxBorrowAtoms, onSuccess }: {
 
     if (success) {
         return (
-            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-3">
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-3">
                 <div className="flex items-center gap-2 text-emerald-300 font-semibold text-sm"><Check /> Borrowed {borrowDisplay} mUSDC</div>
                 <p className="text-xs text-slate-400">Your position is active. Manage repayments, view health, and withdraw collateral from your positions page.</p>
                 <Link href="/dashboard"
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-300 hover:text-indigo-200 transition-colors">
                     View your position →
                 </Link>
-            </motion.div>
+            </div>
         );
     }
 
@@ -383,34 +381,31 @@ function HubTab() {
 
             {isConnected && (
                 <>
-                    <AnimatePresence mode="wait">
+                    <>
                         {step === 'deposit' ? (
-                            <motion.div key="dep-active" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-                                className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5">
+                            <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5">
                                 <SectionLabel n={1} label="Deposit PAS as Collateral" />
                                 <DepositStep onSuccess={(wei, mb) => { setDepositedWei(wei); setMaxBorrowAtoms(mb); setStep('borrow'); }} />
-                            </motion.div>
+                            </div>
                         ) : (
-                            <motion.div key="dep-done" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                                className="rounded-2xl border border-emerald-500/20 bg-emerald-900/10 p-4 flex items-center gap-3">
+                            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-900/10 p-4 flex items-center gap-3">
                                 <Check />
                                 <div className="text-sm">
                                     <span className="text-slate-400">Step 1 - </span>
                                     <span className="text-emerald-300">{formatDisplayBalance(depositedWei, 18, 4)} PAS deposited as collateral</span>
                                 </div>
-                            </motion.div>
+                            </div>
                         )}
-                    </AnimatePresence>
+                    </>
 
-                    <AnimatePresence>
+                    <>
                         {(step === 'borrow' || step === 'done') && (
-                            <motion.div key="borrow-panel" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                                className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5">
+                            <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5">
                                 <SectionLabel n={2} label="Borrow mUSDC" done={step === 'done'} />
                                 <BorrowStep depositedWei={depositedWei} maxBorrowAtoms={maxBorrowAtoms} onSuccess={() => setStep('done')} />
-                            </motion.div>
+                            </div>
                         )}
-                    </AnimatePresence>
+                    </>
 
                     {step === 'done' && (
                         <button onClick={reset} className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">← Start another borrow</button>
@@ -537,10 +532,9 @@ function PeopleTab() {
             {isConnected && (
                 <>
                     {/* Step 1 */}
-                    <AnimatePresence mode="wait">
+                    <>
                         {step === 'bridge' ? (
-                            <motion.div key="bridge-active" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-                                className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5 space-y-4">
+                            <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5 space-y-4">
                                 <SectionLabel n={1} label="Bridge PAS from People Chain" />
                                 {!talismanConnected ? (
                                     <button onClick={connectTalisman} className="w-full rounded-xl px-4 py-3 text-sm font-semibold bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center gap-2">
@@ -603,23 +597,22 @@ function PeopleTab() {
                                         )}
                                     </>
                                 )}
-                            </motion.div>
+                            </div>
                         ) : (
-                            <motion.div key="bridge-done" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                                className="rounded-2xl border border-emerald-500/20 bg-emerald-900/10 p-4 flex items-center gap-3">
+                            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-900/10 p-4 flex items-center gap-3">
                                 <Check />
                                 <div className="text-sm">
                                     <span className="text-slate-400">Step 1 - </span>
                                     <span className="text-emerald-300">+{arrivedWei ? formatPASFromEVM(arrivedWei) : bridgeAmount} PAS arrived on Hub</span>
                                 </div>
-                            </motion.div>
+                            </div>
                         )}
-                    </AnimatePresence>
+                    </>
 
                     {/* Step 2 */}
-                    <AnimatePresence>
+                    <>
                         {(step === 'deposit' || step === 'borrow' || step === 'done') && (
-                            <motion.div key="dep-panel" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+                            <div>
                                 {step === 'deposit' ? (
                                     <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5">
                                         <SectionLabel n={2} label="Deposit PAS as Collateral" />
@@ -637,20 +630,19 @@ function PeopleTab() {
                                         </div>
                                     </div>
                                 )}
-                            </motion.div>
+                            </div>
                         )}
-                    </AnimatePresence>
+                    </>
 
                     {/* Step 3 */}
-                    <AnimatePresence>
+                    <>
                         {(step === 'borrow' || step === 'done') && (
-                            <motion.div key="borrow-panel" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                                className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5">
+                            <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5">
                                 <SectionLabel n={3} label="Borrow mUSDC" done={step === 'done'} />
                                 <BorrowStep depositedWei={depositedWei} maxBorrowAtoms={maxBorrowAtoms} onSuccess={() => setStep('done')} />
-                            </motion.div>
+                            </div>
                         )}
-                    </AnimatePresence>
+                    </>
 
                     {step === 'done' && (
                         <button onClick={reset} className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">← Start another borrow</button>
@@ -675,11 +667,11 @@ export function BorrowPasFeature() {
                     <button className={tabCls(source === 'hub')} onClick={() => setSource('hub')}>PAS on Hub</button>
                     <button className={tabCls(source === 'people')} onClick={() => setSource('people')}>PAS on People Chain</button>
                 </div>
-                <AnimatePresence mode="wait">
-                    <motion.div key={source} initial={{ opacity: 0, x: source === 'hub' ? -8 : 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                <>
+                    <div>
                         {source === 'hub' ? <HubTab /> : <PeopleTab />}
-                    </motion.div>
-                </AnimatePresence>
+                    </div>
+                </>
             </div>
         
     );

@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { motion, AnimatePresence } from 'framer-motion';
 import config from '../../../lib/addresses';
 import { ABIS } from '../../../lib/constants';
 import { formatTokenAmount, cn } from '../../../lib/utils';
@@ -236,15 +235,14 @@ function BorrowStep({ collateralAtoms, maxBorrowAtoms, onSuccess }: {
 
     if (success) {
         return (
-            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-3">
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-3">
                 <div className="flex items-center gap-2 text-emerald-300 font-semibold text-sm"><Check /> Borrowed {borrowDisplay} mUSDC</div>
                 <p className="text-xs text-slate-400">Your position is active. Manage repayments, view health, and withdraw collateral from your positions page.</p>
                 <Link href="/dashboard"
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-300 hover:text-indigo-200 transition-colors">
                     View your position →
                 </Link>
-            </motion.div>
+            </div>
         );
     }
 
@@ -352,35 +350,32 @@ export function BorrowUsdcFeature() {
                         </div>
 
                         {/* Step 1 */}
-                        <AnimatePresence mode="wait">
+                        <>
                             {step === 'collateral' ? (
-                                <motion.div key="col-active" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-                                    className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5">
+                                <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5">
                                     <SectionLabel n={1} label="Deposit mUSDC as Collateral" />
                                     <CollateralStep onSuccess={(atoms, mb) => { setCollateralAtoms(atoms); setMaxBorrowAtoms(mb); setStep('borrow'); }} />
-                                </motion.div>
+                                </div>
                             ) : (
-                                <motion.div key="col-done" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                                    className="rounded-2xl border border-emerald-500/20 bg-emerald-900/10 p-4 flex items-center gap-3">
+                                <div className="rounded-2xl border border-emerald-500/20 bg-emerald-900/10 p-4 flex items-center gap-3">
                                     <Check />
                                     <div className="text-sm">
                                         <span className="text-slate-400">Step 1 - </span>
                                         <span className="text-emerald-300">{formatTokenAmount(collateralAtoms, 6, 2, false)} mUSDC ready as collateral</span>
                                     </div>
-                                </motion.div>
+                                </div>
                             )}
-                        </AnimatePresence>
+                        </>
 
                         {/* Step 2 */}
-                        <AnimatePresence>
+                        <>
                             {(step === 'borrow' || step === 'done') && (
-                                <motion.div key="borrow-panel" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                                    className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5">
+                                <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5">
                                     <SectionLabel n={2} label="Borrow mUSDC" done={step === 'done'} />
                                     <BorrowStep collateralAtoms={collateralAtoms} maxBorrowAtoms={maxBorrowAtoms} onSuccess={() => setStep('done')} />
-                                </motion.div>
+                                </div>
                             )}
-                        </AnimatePresence>
+                        </>
 
                         {step === 'done' && (
                             <button onClick={reset} className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">← Start another borrow</button>
