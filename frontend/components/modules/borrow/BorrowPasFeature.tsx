@@ -662,16 +662,15 @@ function PeopleTab() {
 }
 
 // ── Main Page ──────────────────────────────────────────────────────────────
-export default function BorrowPasPage() {
+export function BorrowPasFeature() {
     const [source, setSource] = useState<SourceTab>('hub');
     const tabCls = (active: boolean) => cn(
         'px-4 py-2 rounded-xl text-xs font-semibold border transition-colors',
         active ? 'bg-white text-black border-white' : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
     );
     return (
-        <PageShell title="Borrow" subtitle="Deposit PAS as collateral and borrow mUSDC from KredioPASMarket.">
-            <div className="max-w-lg mx-auto space-y-4">
-                <MarketModeSwitch base="/borrow" active="pas" />
+        
+                <div className="max-w-lg mx-auto space-y-4">
                 <div className="inline-flex gap-1 rounded-xl border border-white/10 bg-black/30 p-1">
                     <button className={tabCls(source === 'hub')} onClick={() => setSource('hub')}>PAS on Hub</button>
                     <button className={tabCls(source === 'people')} onClick={() => setSource('people')}>PAS on People Chain</button>
@@ -682,6 +681,6 @@ export default function BorrowPasPage() {
                     </motion.div>
                 </AnimatePresence>
             </div>
-        </PageShell>
+        
     );
 }

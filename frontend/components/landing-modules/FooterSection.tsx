@@ -5,8 +5,8 @@ import { T, GLASS } from './tokens';
 
 const NAV_LINKS = [
     { label: 'Dashboard', href: '/dashboard' },
-    { label: 'Lend',      href: '/lend/usdc'  },
-    { label: 'Borrow',    href: '/borrow/usdc' },
+    { label: 'Lend',      href: '/lend'  },
+    { label: 'Borrow',    href: '/borrow' },
     { label: 'Swap',      href: '/swap'        },
     { label: 'Bridge',    href: '/bridge'      },
     { label: 'Markets',   href: '/markets'     },

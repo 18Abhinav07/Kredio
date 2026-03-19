@@ -293,7 +293,7 @@ function BorrowStep({ collateralAtoms, maxBorrowAtoms, onSuccess }: {
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────
-export default function BorrowUsdcPage() {
+export function BorrowUsdcFeature() {
     const { isConnected, address } = useAccount();
     const { isWrongNetwork } = useAccess();
     const portfolio = useUserPortfolio();
@@ -327,9 +327,8 @@ export default function BorrowUsdcPage() {
     }, [portfolio.loading, portfolio.lendingCollateralWallet, scoreRaw]);
 
     return (
-        <PageShell title="Borrow" subtitle="Deposit mUSDC collateral, then borrow based on your credit score.">
-            <div className="max-w-lg mx-auto space-y-4">
-                <MarketModeSwitch base="/borrow" active="usdc" />
+        
+                <div className="max-w-lg mx-auto space-y-4">
                 {!isConnected && <StateNotice tone="info" message="Connect MetaMask via the header to borrow." />}
                 {isConnected && isWrongNetwork && <StateNotice tone="error" message="Switch to the correct network to continue." />}
 
@@ -389,6 +388,6 @@ export default function BorrowUsdcPage() {
                     </>
                 )}
             </div>
-        </PageShell>
+        
     );
 }
