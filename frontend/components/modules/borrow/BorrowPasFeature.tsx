@@ -203,8 +203,8 @@ function DepositStep({ prefillAmount, onSuccess }: {
                 className={cn('w-full rounded-xl px-4 py-3 text-sm font-semibold transition-all flex items-center justify-center gap-2',
                     busy ? 'bg-white/5 border border-white/10 text-slate-400 cursor-not-allowed'
                         : phase === 'error' ? 'bg-rose-500/20 border-rose-500/30 text-rose-400 cursor-not-allowed'
-                        : !input || overBalance || oracle.isCrashed ? 'bg-white/5 border border-white/10 text-slate-600 cursor-not-allowed'
-                            : 'bg-indigo-600 hover:bg-indigo-500 text-white')}>
+                            : !input || overBalance || oracle.isCrashed ? 'bg-white/5 border border-white/10 text-slate-600 cursor-not-allowed'
+                                : 'bg-indigo-600 hover:bg-indigo-500 text-white')}>
                 {busy ? <><Spinner />{statusMsg}</> : phase === 'error' ? 'Action Cancelled' : `Deposit ${input || '0'} PAS as Collateral`}
             </button>
             {oracle.isCrashed && <StateNotice tone="error" message="Oracle is down - collateral deposits paused." />}
@@ -326,8 +326,8 @@ function BorrowStep({ depositedWei, maxBorrowAtoms, onSuccess }: {
                 className={cn('w-full rounded-xl px-4 py-3 text-sm font-semibold transition-all flex items-center justify-center gap-2',
                     busy ? 'bg-white/5 border border-white/10 text-slate-400 cursor-not-allowed'
                         : phase === 'error' ? 'bg-rose-500/20 border-rose-500/30 text-rose-400 cursor-not-allowed'
-                        : borrowAtoms === 0n ? 'bg-white/5 border border-white/10 text-slate-600 cursor-not-allowed'
-                            : 'bg-emerald-700 hover:bg-emerald-600 text-white')}>
+                            : borrowAtoms === 0n ? 'bg-white/5 border border-white/10 text-slate-600 cursor-not-allowed'
+                                : 'bg-emerald-700 hover:bg-emerald-600 text-white')}>
                 {busy ? <><Spinner />{statusMsg}</> : phase === 'error' ? 'Action Cancelled' : `Borrow ${borrowDisplay} mUSDC`}
             </button>
 
@@ -502,6 +502,11 @@ function PeopleTab() {
                     if (elapsedRef.current) clearInterval(elapsedRef.current);
                     setStep('deposit');
                 },
+                onTimeout: () => {
+                    setBridging(false);
+                    setBridgeStatus('Error: PAS did not arrive on Hub within 2 minutes. Check the People Chain extrinsic in Subscan and retry.');
+                    if (elapsedRef.current) clearInterval(elapsedRef.current);
+                },
             });
         } catch (err) {
             setBridgeStatus(`Error: ${err instanceof Error ? err.message : 'Unknown'}`);
@@ -548,7 +553,14 @@ function PeopleTab() {
                                     </div>
                                 )}
                                 {subAccounts.length > 1 && (
-                                    <select value={selectedAcc?.address} onChange={e => { const a = subAccounts.find(x => x.address === e.target.value); if (a) setSelectedAcc(a); }}
+                                    <select value={selectedAcc?.address} onChange={e => {
+                                        const a = subAccounts.find(x => x.address === e.target.value);
+                                        if (!a) return;
+                                        setSelectedAcc(a);
+                                        fetchPeopleBalance(a.address)
+                                            .then(free => setPeopleBalance(formatPASFromPeople(free)))
+                                            .catch(() => setPeopleBalance('-'));
+                                    }}
                                         className="w-full rounded-xl border border-white/10 bg-black/40 text-sm text-white px-3 py-2 outline-none">
                                         {subAccounts.map(a => <option key={a.address} value={a.address}>{a.meta?.name ?? a.address.slice(0, 20) + '...'}</option>)}
                                     </select>
@@ -661,18 +673,18 @@ export function BorrowPasFeature() {
         active ? 'bg-white text-black border-white' : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
     );
     return (
-        
-                <div className="max-w-lg mx-auto space-y-4">
-                <div className="inline-flex gap-1 rounded-xl border border-white/10 bg-black/30 p-1">
-                    <button className={tabCls(source === 'hub')} onClick={() => setSource('hub')}>PAS on Hub</button>
-                    <button className={tabCls(source === 'people')} onClick={() => setSource('people')}>PAS on People Chain</button>
-                </div>
-                <>
-                    <div>
-                        {source === 'hub' ? <HubTab /> : <PeopleTab />}
-                    </div>
-                </>
+
+        <div className="max-w-lg mx-auto space-y-4">
+            <div className="inline-flex gap-1 rounded-xl border border-white/10 bg-black/30 p-1">
+                <button className={tabCls(source === 'hub')} onClick={() => setSource('hub')}>PAS on Hub</button>
+                <button className={tabCls(source === 'people')} onClick={() => setSource('people')}>PAS on People Chain</button>
             </div>
-        
+            <>
+                <div>
+                    {source === 'hub' ? <HubTab /> : <PeopleTab />}
+                </div>
+            </>
+        </div>
+
     );
 }

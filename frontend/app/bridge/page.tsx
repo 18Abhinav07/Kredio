@@ -7,7 +7,6 @@ import {
     fetchPeopleBalance,
     formatPASFromEVM,
     formatPASFromPeople,
-    h160ToSS58,
     pollHubArrival,
     sendXCMToHub,
     type XcmStatusStage,
@@ -281,7 +280,6 @@ function PasTab() {
                 onStatus: (stage: XcmStatusStage, detail?: string) => {
                     setCurrentStage(stage);
                     setStatusMsg(detail || XCM_STAGE_LABELS[stage]);
-                    if (stage === 'in_block') setSending(false);
                 },
             });
             if (snapshot !== undefined && publicClient) {
@@ -296,7 +294,13 @@ function PasTab() {
                         setStatusMsg(`+${formatPASFromEVM(delta)} PAS arrived on Hub`);
                         setSending(false);
                     },
+                    onTimeout: () => {
+                        setSending(false);
+                        setStatusMsg('Error: PAS did not arrive on Hub within 2 minutes. Check the People Chain extrinsic in Subscan and retry.');
+                    },
                 });
+            } else {
+                setSending(false);
             }
         } catch (err) {
             setStatusMsg(`Error: ${err instanceof Error ? err.message : String(err)}`);

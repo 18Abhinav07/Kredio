@@ -525,6 +525,10 @@
     pointer-events: none;
   }
 
+  .invisible {
+    visibility: hidden;
+  }
+
   .visible {
     visibility: visible;
   }
@@ -3753,6 +3757,10 @@
 
   .text-yellow-300 {
     color: var(--color-yellow-300);
+  }
+
+  .lowercase {
+    text-transform: lowercase;
   }
 
   .uppercase {

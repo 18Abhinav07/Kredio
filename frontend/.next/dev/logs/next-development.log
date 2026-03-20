@@ -1,4 +1,63 @@
-[00:00:01.213] Server  LOG     ✓ Ready in 974ms
-[00:00:03.414] Server  ERROR   Unsupported style property @media (min-width: 768px). Did you mean @media (minWidth: 768px)?
-[00:00:04.001] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:06.405] Browser WARN    Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+[00:00:00.953] Server  LOG     ✓ Ready in 737ms
+[00:00:03.274] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:04.384] Browser ERROR   uncaughtError: Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <RedirectErrorBoundary router={{...}}>
+      <InnerLayoutRouter url="/bridge/" tree={[...]} params={{}} cacheNode={{rsc:<Fragment>, ...}} segmentPath={[...]} ...>
+        <SegmentViewNode type="page" pagePath="bridge/pag...">
+          <SegmentTrieNode>
+          <ClientPageRoot Component={function BridgePage} serverProvidedParams={{...}}>
+            <BridgePage params={Promise} searchParams={Promise}>
+              <PageShell title="Bridge" subtitle="Transfer a...">
+                <div className="w-full max...">
+                  <div>
+                  <div>
+                  <div>
+                    <PasTab>
+                      <div className="space-y-3 ...">
+                        <WalletStep index={1} title="Connect Me..." subtitle="Your EVM a..." done={true} locked={false}>
+                          <div
++                           className="rounded-2xl border p-5 transition-all duration-300 border-emerald-500/30 bg-eme..."
+-                           className="rounded-2xl border p-5 transition-all duration-300 border-white/10 bg-black/30 ..."
+                          >
+                            <div className="flex items...">
+                              <div
++                               className="flex-shrink-0 w-8 h-8 rounded-full border flex items-center justify-center ..."
+-                               className="flex-shrink-0 w-8 h-8 rounded-full border flex items-center justify-center ..."
+                              >
++                               ✓
+-                               1
+                              ...
+                        ...
+        ...
+      ...
+
+[00:00:06.672] Browser INFO    web3Enable: Enabled 1 extension: talisman/3.3.0
+[00:00:06.672] Browser INFO    web3Accounts: Found 1 address
+[00:00:08.023] Browser WARN    2026-03-20 11:08:37        REGISTRY: Unknown signed extensions StorageWeightReclaim found, treating them as no-effect
+[00:00:08.023] Browser WARN    2026-03-20 11:08:37        API/INIT: RPC methods not decorated: archive_v1_body, archive_v1_call, archive_v1_finalizedHeight, archive_v1_genesisHash, archive_v1_hashByHeight, archive_v1_header, archive_v1_stopStorage, archive_v1_storage, archive_v1_storageDiff, archive_v1_storageDiff_stopStorageDiff, chainHead_v1_body, chainHead_v1_call, chainHead_v1_continue, chainHead_v1_follow, chainHead_v1_header, chainHead_v1_stopOperation, chainHead_v1_storage, chainHead_v1_unfollow, chainHead_v1_unpin, chainSpec_v1_chainName, chainSpec_v1_genesisHash, chainSpec_v1_properties, transactionWatch_v1_submitAndWatch, transactionWatch_v1_unwatch, transaction_v1_broadcast, transaction_v1_stop
+[00:00:17.980] Browser WARN    2026-03-20 11:08:47        REGISTRY: Unknown signed extensions StorageWeightReclaim found, treating them as no-effect
+[00:00:17.980] Browser WARN    2026-03-20 11:08:47        API/INIT: RPC methods not decorated: archive_v1_body, archive_v1_call, archive_v1_finalizedHeight, archive_v1_genesisHash, archive_v1_hashByHeight, archive_v1_header, archive_v1_stopStorage, archive_v1_storage, archive_v1_storageDiff, archive_v1_storageDiff_stopStorageDiff, chainHead_v1_body, chainHead_v1_call, chainHead_v1_continue, chainHead_v1_follow, chainHead_v1_header, chainHead_v1_stopOperation, chainHead_v1_storage, chainHead_v1_unfollow, chainHead_v1_unpin, chainSpec_v1_chainName, chainSpec_v1_genesisHash, chainSpec_v1_properties, transactionWatch_v1_submitAndWatch, transactionWatch_v1_unwatch, transaction_v1_broadcast, transaction_v1_stop
+[00:00:18.338] Browser WARN    @polkadot/api has multiple versions, ensure that there is only one installed.
+Either remove and explicitly install matching versions or dedupe using your package manager.
+The following conflicting packages were found:
+	esm 16.5.4	node_modules/@polkadot/api/
+	esm 16.4.8	node_modules/@snowbridge/api/node_modules/@polkadot/api/
+[00:00:38.568] Browser WARN    2026-03-20 11:09:08        REGISTRY: Unknown signed extensions EthSetOrigin, StorageWeightReclaim found, treating them as no-effect
+[00:00:38.568] Browser WARN    2026-03-20 11:09:08        API/INIT: RPC methods not decorated: archive_v1_body, archive_v1_call, archive_v1_finalizedHeight, archive_v1_genesisHash, archive_v1_hashByHeight, archive_v1_header, archive_v1_stopStorage, archive_v1_storage, archive_v1_storageDiff, archive_v1_storageDiff_stopStorageDiff, chainHead_v1_body, chainHead_v1_call, chainHead_v1_continue, chainHead_v1_follow, chainHead_v1_header, chainHead_v1_stopOperation, chainHead_v1_storage, chainHead_v1_unfollow, chainHead_v1_unpin, chainSpec_v1_chainName, chainSpec_v1_genesisHash, chainSpec_v1_properties, transactionWatch_v1_submitAndWatch, transactionWatch_v1_unwatch, transaction_v1_broadcast, transaction_v1_stop
+[00:00:40.933] Browser INFO    web3Accounts: Found 1 address
+[00:41:47.075] Browser INFO    web3Enable: Enabled 1 extension: talisman/3.3.0
+[00:41:47.075] Browser INFO    web3Accounts: Found 1 address
+[00:41:48.470] Browser WARN    2026-03-20 11:50:18        REGISTRY: Unknown signed extensions StorageWeightReclaim found, treating them as no-effect
+[00:41:48.470] Browser WARN    2026-03-20 11:50:18        API/INIT: RPC methods not decorated: archive_v1_body, archive_v1_call, archive_v1_finalizedHeight, archive_v1_genesisHash, archive_v1_hashByHeight, archive_v1_header, archive_v1_stopStorage, archive_v1_storage, archive_v1_storageDiff, archive_v1_storageDiff_stopStorageDiff, chainHead_v1_body, chainHead_v1_call, chainHead_v1_continue, chainHead_v1_follow, chainHead_v1_header, chainHead_v1_stopOperation, chainHead_v1_storage, chainHead_v1_unfollow, chainHead_v1_unpin, chainSpec_v1_chainName, chainSpec_v1_genesisHash, chainSpec_v1_properties, transactionWatch_v1_submitAndWatch, transactionWatch_v1_unwatch, transaction_v1_broadcast, transaction_v1_stop

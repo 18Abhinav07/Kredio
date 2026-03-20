@@ -1,7 +1,5 @@
 {
   "/borrow/page": "app/borrow/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/lend/page": "app/lend/page.js",
-  "/markets/page": "app/markets/page.js",
-  "/page": "app/page.js"
+  "/bridge/page": "app/bridge/page.js",
+  "/lend/page": "app/lend/page.js"
 }

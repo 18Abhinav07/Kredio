@@ -339,9 +339,13 @@ function BridgeAndLendTab({ contractAddr, market }: { contractAddr: `0x${string}
     const previewMusdc = (() => {
         if (!bridgeAmount || Number(bridgeAmount) <= 0 || oracle.price8 === 0n) return null;
         try {
-            const pw = parseUnits(bridgeAmount, 18);
-            const atoms = (pw * oracle.price8 * 9970n) / (BigInt('100000000000000000000000000') * 10000n);
-            return formatTokenAmount(atoms, 6, 2, false);
+            // bridgeAmount is a plain human PAS value (e.g. "1" = 1 PAS).
+            // oracle.price8 is PAS/USD with 8 decimals (e.g. 464340000 = $4.6434).
+            // mUSDC has 6 decimals. Fee = 0.30% (9970/10000).
+            const pasParsed = parseFloat(bridgeAmount);
+            const priceUSD = Number(oracle.price8) / 1e8;
+            const mUSDCAtoms = BigInt(Math.floor(pasParsed * priceUSD * 0.9970 * 1e6));
+            return formatTokenAmount(mUSDCAtoms, 6, 2, false);
         } catch { return null; }
     })();
     useEffect(() => () => { pollCleanupRef.current?.(); if (elapsedRef.current) clearInterval(elapsedRef.current); }, []);
@@ -370,11 +374,17 @@ function BridgeAndLendTab({ contractAddr, market }: { contractAddr: `0x${string}
             pollCleanupRef.current?.();
             pollCleanupRef.current = pollHubArrival({
                 address: hubAddress, before, publicClient, onTick: () => { },
+                onError: msg => setBridgeStatus(`Polling error: ${msg}`),
                 onArrival: delta => {
                     setBridgeStatus(`+${formatPASFromEVM(delta)} PAS arrived on Hub`);
                     setBridging(false); setArrivedWei(delta);
                     if (elapsedRef.current) clearInterval(elapsedRef.current);
                     setStep('swap');
+                },
+                onTimeout: () => {
+                    setBridging(false);
+                    setBridgeStatus('Error: PAS did not arrive on Hub within 2 minutes. Check the People Chain extrinsic in Subscan and retry.');
+                    if (elapsedRef.current) clearInterval(elapsedRef.current);
                 },
             });
         } catch (err) {
@@ -420,7 +430,14 @@ function BridgeAndLendTab({ contractAddr, market }: { contractAddr: `0x${string}
                                 )}
                                 {subAccounts.length > 1 && (
                                     <select value={selectedAcc?.address}
-                                        onChange={e => { const a = subAccounts.find(x => x.address === e.target.value); if (a) setSelectedAcc(a); }}
+                                        onChange={e => {
+                                            const a = subAccounts.find(x => x.address === e.target.value);
+                                            if (!a) return;
+                                            setSelectedAcc(a);
+                                            fetchPeopleBalance(a.address)
+                                                .then(free => setPeopleBalance(formatPASFromPeople(free)))
+                                                .catch(() => setPeopleBalance('-'));
+                                        }}
                                         className="w-full rounded-xl border border-white/10 bg-black/40 text-sm text-white px-3 py-2 outline-none">
                                         {subAccounts.map(a => <option key={a.address} value={a.address}>{a.meta?.name ?? a.address.slice(0, 20) + '…'}</option>)}
                                     </select>

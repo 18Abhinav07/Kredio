@@ -11,6 +11,8 @@ __turbopack_context__.s([
     ()=>PAS_SUBSTRATE_DECIMALS,
     "PEOPLE_RPC",
     ()=>PEOPLE_RPC,
+    "PEOPLE_RPCS",
+    ()=>PEOPLE_RPCS,
     "fetchPeopleBalance",
     ()=>fetchPeopleBalance,
     "formatPASFromEVM",
@@ -25,11 +27,45 @@ __turbopack_context__.s([
     ()=>sendXCMToHub
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$viem$2f$_esm$2f$utils$2f$unit$2f$formatUnits$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/viem/_esm/utils/unit/formatUnits.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$viem$2f$_esm$2f$utils$2f$address$2f$isAddress$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/viem/_esm/utils/address/isAddress.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$viem$2f$_esm$2f$utils$2f$unit$2f$parseUnits$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/viem/_esm/utils/unit/parseUnits.js [app-client] (ecmascript)");
 ;
-const PEOPLE_RPC = 'wss://people-paseo.rpc.amforc.com';
-const PAS_SUBSTRATE_DECIMALS = 10;
-const PAS_EVM_DECIMALS = 18;
+const PEOPLE_RPC = 'wss://sys.ibp.network/people-paseo';
+const PEOPLE_RPCS = [
+    PEOPLE_RPC,
+    'wss://people-paseo.rpc.amforc.com',
+    'wss://people-paseo.dotters.network'
+];
+const PAS_SUBSTRATE_DECIMALS = 10; // PAS on People Chain (Substrate) = 10 decimals (1 PAS = 10^10 planck)
+const PAS_EVM_DECIMALS = 18; // PAS on Asset Hub EVM (Frontier) = 18 decimals
 const MUSDC_DECIMALS = 6;
+async function withPeopleApi(work) {
+    const { ApiPromise, WsProvider } = await __turbopack_context__.A("[project]/node_modules/@polkadot/api/index.js [app-client] (ecmascript, async loader)");
+    const tried = [];
+    let lastError;
+    for (const endpoint of PEOPLE_RPCS){
+        let api = null;
+        try {
+            // 10-second connect timeout so dead endpoints don't stall the whole flow
+            const provider = new WsProvider(endpoint, 1000, {}, 10_000);
+            api = await ApiPromise.create({
+                provider
+            });
+            return await work(api);
+        } catch (error) {
+            tried.push(endpoint);
+            lastError = error;
+        } finally{
+            if (api) {
+                try {
+                    await api.disconnect();
+                } catch  {}
+            }
+        }
+    }
+    const reason = lastError instanceof Error ? lastError.message : String(lastError ?? 'Unknown RPC error');
+    throw new Error(`People Chain RPC unavailable (${tried.join(', ')}): ${reason}`);
+}
 async function h160ToSS58(evmAddress) {
     const { hexToU8a } = await __turbopack_context__.A("[project]/node_modules/@polkadot/util/index.js [app-client] (ecmascript, async loader)");
     const { encodeAddress } = await __turbopack_context__.A("[project]/node_modules/@polkadot/util-crypto/index.js [app-client] (ecmascript, async loader)");
@@ -37,10 +73,9 @@ async function h160ToSS58(evmAddress) {
     if (h160.length !== 20) {
         throw new Error('Invalid EVM address: expected 20-byte H160');
     }
-    const pad = new Uint8Array(12).fill(0xee);
     const id32 = new Uint8Array(32);
-    id32.set(h160, 0);
-    id32.set(pad, 20);
+    id32.set(h160, 0); // H160 in first 20 bytes
+    id32.fill(0xee, 20); // 0xEE padding in last 12 bytes
     return encodeAddress(id32, 0);
 }
 function formatPASFromEVM(wei) {
@@ -50,26 +85,18 @@ function formatPASFromPeople(raw) {
     return Number.parseFloat((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$viem$2f$_esm$2f$utils$2f$unit$2f$formatUnits$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["formatUnits"])(raw, PAS_SUBSTRATE_DECIMALS)).toFixed(4);
 }
 async function fetchPeopleBalance(address) {
-    // Lazy-load @polkadot/api to avoid bundling WASM into the initial chunk.
-    const { ApiPromise, WsProvider } = await __turbopack_context__.A("[project]/node_modules/@polkadot/api/index.js [app-client] (ecmascript, async loader)");
-    const provider = new WsProvider(PEOPLE_RPC);
-    const api = await ApiPromise.create({
-        provider
-    });
-    try {
+    return withPeopleApi(async (api)=>{
         const acct = await api.query.system.account(address);
         const free = BigInt(acct.data.free.toString());
         return free;
-    } finally{
-        await api.disconnect();
-    }
+    });
 }
 function toSubstrateAmount(amountPAS) {
     const parsed = Number.parseFloat(amountPAS);
     if (!Number.isFinite(parsed) || parsed <= 0) {
         throw new Error('Amount must be greater than 0');
     }
-    return String(Math.round(parsed * 10 ** PAS_SUBSTRATE_DECIMALS));
+    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$viem$2f$_esm$2f$utils$2f$unit$2f$parseUnits$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["parseUnits"])(amountPAS, PAS_SUBSTRATE_DECIMALS).toString();
 }
 function normalizeXcmError(error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -80,72 +107,109 @@ function normalizeXcmError(error) {
 }
 async function sendXCMToHub(params) {
     const { senderAddress, destinationEVM, amountPAS, onStatus } = params;
-    // Lazy-load @polkadot/api and @paraspell/sdk-pjs only when this function
-    // is actually called (i.e., when the user triggers a bridge transaction).
-    const { ApiPromise, WsProvider } = await __turbopack_context__.A("[project]/node_modules/@polkadot/api/index.js [app-client] (ecmascript, async loader)");
-    const { Builder } = await __turbopack_context__.A("[project]/node_modules/@paraspell/sdk-pjs/dist/index.mjs [app-client] (ecmascript, async loader)");
-    let api = null;
+    if (!(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$viem$2f$_esm$2f$utils$2f$address$2f$isAddress$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["isAddress"])(destinationEVM)) {
+        throw new Error('Invalid Hub EVM destination address.');
+    }
     try {
-        onStatus?.('connecting', 'Connecting to People Chain...');
-        const provider = new WsProvider(PEOPLE_RPC);
-        api = await ApiPromise.create({
-            provider
-        });
-        onStatus?.('building', 'Building XCM transaction...');
-        const amount = toSubstrateAmount(amountPAS);
-        const ss58Dest = await h160ToSS58(destinationEVM);
-        const tx = await Builder(api).from('PeoplePaseo').to('AssetHubPaseo').currency({
-            symbol: 'PAS',
-            amount
-        }).address(ss58Dest).senderAddress(senderAddress).build();
-        onStatus?.('awaiting_signature', 'Waiting for Talisman signature...');
-        const { web3FromAddress } = await __turbopack_context__.A("[project]/node_modules/@polkadot/extension-dapp/index.js [app-client] (ecmascript, async loader)");
-        const injector = await web3FromAddress(senderAddress);
-        return await new Promise((resolve, reject)=>{
-            tx.signAndSend(senderAddress, {
-                signer: injector.signer,
-                nonce: -1
-            }, ({ status, dispatchError })=>{
-                if (status.isBroadcast) {
-                    onStatus?.('broadcasting', 'Broadcasting to network...');
-                }
-                if (status.isInBlock) {
-                    onStatus?.('in_block', 'In block - waiting for finalization...');
-                }
-                if (status.isFinalized) {
-                    if (dispatchError) {
-                        reject(new Error(dispatchError.toString()));
-                        return;
+        return await withPeopleApi(async (api)=>{
+            onStatus?.('connecting', 'Connecting to People Chain...');
+            onStatus?.('building', 'Building XCM transaction...');
+            const amount = toSubstrateAmount(amountPAS);
+            // Convert EVM address to the SS58 AccountId32 that Asset Hub Frontier uses
+            // for eth_getBalance. Encoding: H160 (first 20 bytes) || 0xEE×12 (last 12 bytes).
+            // This produces a valid SS58 that ParaSpell accepts AND that maps back to the
+            // EVM wallet — confirmed working in production.
+            const { encodeAddress } = await __turbopack_context__.A("[project]/node_modules/@polkadot/util-crypto/index.js [app-client] (ecmascript, async loader)");
+            const { hexToU8a } = await __turbopack_context__.A("[project]/node_modules/@polkadot/util/index.js [app-client] (ecmascript, async loader)");
+            const h160 = hexToU8a(destinationEVM);
+            const id32 = new Uint8Array(32);
+            id32.set(h160, 0);
+            id32.fill(0xee, 20);
+            const ss58Dest = encodeAddress(id32, 0);
+            const { Builder } = await __turbopack_context__.A("[project]/node_modules/@paraspell/sdk-pjs/dist/index.mjs [app-client] (ecmascript, async loader)");
+            const tx = await Builder(api).from('PeoplePaseo').to('AssetHubPaseo').currency({
+                symbol: 'PAS',
+                amount
+            }).address(ss58Dest).senderAddress(senderAddress).build();
+            onStatus?.('awaiting_signature', 'Waiting for Talisman signature...');
+            const { web3FromAddress } = await __turbopack_context__.A("[project]/node_modules/@polkadot/extension-dapp/index.js [app-client] (ecmascript, async loader)");
+            const injector = await web3FromAddress(senderAddress);
+            return await new Promise((resolve, reject)=>{
+                let unsub = null;
+                const cleanup = ()=>{
+                    if (unsub) {
+                        try {
+                            unsub();
+                        } catch  {}
+                        unsub = null;
                     }
-                    onStatus?.('finalized', 'Finalized on People Chain.');
-                    const blockHash = status.asFinalized?.toHex?.() ?? '';
-                    resolve({
-                        blockHash
-                    });
-                }
-            }).catch((err)=>reject(err));
+                };
+                tx.signAndSend(senderAddress, {
+                    signer: injector.signer,
+                    nonce: -1
+                }, ({ status, dispatchError })=>{
+                    if (status.isBroadcast) onStatus?.('broadcasting', 'Broadcasting to network...');
+                    if (status.isInBlock) onStatus?.('in_block', 'In block - waiting for finalization...');
+                    if (status.isFinalized) {
+                        if (dispatchError) {
+                            cleanup();
+                            if (dispatchError.isModule && dispatchError.asModule) {
+                                const decoded = api.registry.findMetaError(dispatchError.asModule);
+                                reject(new Error(`${decoded.section}.${decoded.name}: ${decoded.docs.join(' ')}`));
+                                return;
+                            }
+                            reject(new Error(dispatchError.toString()));
+                            return;
+                        }
+                        onStatus?.('finalized', 'Finalized on People Chain.');
+                        cleanup();
+                        resolve({
+                            blockHash: status.asFinalized?.toHex?.() ?? ''
+                        });
+                    }
+                }).then((u)=>{
+                    unsub = u;
+                }).catch((err)=>{
+                    cleanup();
+                    reject(err);
+                });
+            });
         });
     } catch (error) {
         throw normalizeXcmError(error);
-    } finally{
-        if (api) {
-            await api.disconnect();
-        }
     }
 }
 function pollHubArrival(params) {
-    const { address, before, publicClient, onArrival, onTick, intervalMs = 3000 } = params;
+    const { address, before, publicClient, onArrival, onTick, onError, intervalMs = 3000, maxDurationMs = 120000, onTimeout } = params;
     let stopped = false;
+    let consecutiveErrors = 0;
+    const startedAt = Date.now();
     const timer = setInterval(async ()=>{
         if (stopped) return;
-        const current = await publicClient.getBalance({
-            address
-        });
-        onTick?.(current);
-        if (current > before) {
+        try {
+            const current = await publicClient.getBalance({
+                address
+            });
+            consecutiveErrors = 0;
+            onTick?.(current);
+            if (current > before) {
+                stopped = true;
+                clearInterval(timer);
+                onArrival(current - before);
+                return;
+            }
+        } catch (err) {
+            consecutiveErrors++;
+            const msg = err instanceof Error ? err.message : String(err);
+            console.warn(`[pollHubArrival] getBalance error #${consecutiveErrors}:`, msg);
+            if (consecutiveErrors >= 3) {
+                onError?.(`Hub RPC error (${consecutiveErrors}x): ${msg}`);
+            }
+        }
+        if (Date.now() - startedAt >= maxDurationMs) {
             stopped = true;
             clearInterval(timer);
-            onArrival(current - before);
+            onTimeout?.(Date.now() - startedAt);
         }
     }, intervalMs);
     return ()=>{
@@ -2530,9 +2594,13 @@ function BridgeAndLendTab({ contractAddr, market }) {
     const previewMusdc = (()=>{
         if (!bridgeAmount || Number(bridgeAmount) <= 0 || oracle.price8 === 0n) return null;
         try {
-            const pw = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$viem$2f$_esm$2f$utils$2f$unit$2f$parseUnits$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["parseUnits"])(bridgeAmount, 18);
-            const atoms = pw * oracle.price8 * 9970n / (BigInt('100000000000000000000000000') * 10000n);
-            return (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["formatTokenAmount"])(atoms, 6, 2, false);
+            // bridgeAmount is a plain human PAS value (e.g. "1" = 1 PAS).
+            // oracle.price8 is PAS/USD with 8 decimals (e.g. 464340000 = $4.6434).
+            // mUSDC has 6 decimals. Fee = 0.30% (9970/10000).
+            const pasParsed = parseFloat(bridgeAmount);
+            const priceUSD = Number(oracle.price8) / 1e8;
+            const mUSDCAtoms = BigInt(Math.floor(pasParsed * priceUSD * 0.9970 * 1e6));
+            return (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["formatTokenAmount"])(mUSDCAtoms, 6, 2, false);
         } catch  {
             return null;
         }
@@ -2590,12 +2658,18 @@ function BridgeAndLendTab({ contractAddr, market }) {
                 before,
                 publicClient,
                 onTick: ()=>{},
+                onError: (msg)=>setBridgeStatus(`Polling error: ${msg}`),
                 onArrival: (delta)=>{
                     setBridgeStatus(`+${(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$xcm$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["formatPASFromEVM"])(delta)} PAS arrived on Hub`);
                     setBridging(false);
                     setArrivedWei(delta);
                     if (elapsedRef.current) clearInterval(elapsedRef.current);
                     setStep('swap');
+                },
+                onTimeout: ()=>{
+                    setBridging(false);
+                    setBridgeStatus('Error: PAS did not arrive on Hub within 2 minutes. Check the People Chain extrinsic in Subscan and retry.');
+                    if (elapsedRef.current) clearInterval(elapsedRef.current);
                 }
             });
         } catch (err) {
@@ -2632,7 +2706,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                 children: "→"
                             }, void 0, false, {
                                 fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 395,
+                                lineNumber: 405,
                                 columnNumber: 35
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2644,18 +2718,18 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 396,
+                                lineNumber: 406,
                                 columnNumber: 25
                             }, this)
                         ]
                     }, s, true, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 394,
+                        lineNumber: 404,
                         columnNumber: 21
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 392,
+                lineNumber: 402,
                 columnNumber: 13
             }, this),
             !isConnected && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$ProtocolUI$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["StateNotice"], {
@@ -2663,7 +2737,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                 message: "Connect MetaMask via the header first."
             }, void 0, false, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 402,
+                lineNumber: 412,
                 columnNumber: 30
             }, this),
             isConnected && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -2676,7 +2750,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                     label: "Bridge PAS from People Chain to Hub"
                                 }, void 0, false, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 408,
+                                    lineNumber: 418,
                                     columnNumber: 33
                                 }, this),
                                 !talismanConnected ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2685,7 +2759,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                     children: "Connect Talisman"
                                 }, void 0, false, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 410,
+                                    lineNumber: 420,
                                     columnNumber: 37
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "rounded-xl border border-purple-500/20 bg-purple-500/10 px-3 py-2 flex items-center gap-2 text-xs",
@@ -2694,7 +2768,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                             className: "w-2 h-2 rounded-full bg-emerald-400 shrink-0"
                                         }, void 0, false, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 416,
+                                            lineNumber: 426,
                                             columnNumber: 41
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2702,7 +2776,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                             children: selectedAcc?.meta?.name ?? selectedAcc?.address.slice(0, 14) + '…'
                                         }, void 0, false, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 417,
+                                            lineNumber: 427,
                                             columnNumber: 41
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2713,20 +2787,22 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 418,
+                                            lineNumber: 428,
                                             columnNumber: 41
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 415,
+                                    lineNumber: 425,
                                     columnNumber: 37
                                 }, this),
                                 subAccounts.length > 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
                                     value: selectedAcc?.address,
                                     onChange: (e)=>{
                                         const a = subAccounts.find((x)=>x.address === e.target.value);
-                                        if (a) setSelectedAcc(a);
+                                        if (!a) return;
+                                        setSelectedAcc(a);
+                                        (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$xcm$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fetchPeopleBalance"])(a.address).then((free)=>setPeopleBalance((0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$xcm$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["formatPASFromPeople"])(free))).catch(()=>setPeopleBalance('-'));
                                     },
                                     className: "w-full rounded-xl border border-white/10 bg-black/40 text-sm text-white px-3 py-2 outline-none",
                                     children: subAccounts.map((a)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -2734,12 +2810,12 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                             children: a.meta?.name ?? a.address.slice(0, 20) + '…'
                                         }, a.address, false, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 425,
+                                            lineNumber: 442,
                                             columnNumber: 63
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 422,
+                                    lineNumber: 432,
                                     columnNumber: 37
                                 }, this),
                                 talismanConnected && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -2752,7 +2828,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     children: "PAS amount to bridge"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 431,
+                                                    lineNumber: 448,
                                                     columnNumber: 45
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2769,7 +2845,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                             className: "flex-1 bg-transparent text-xl font-light text-white placeholder-slate-600 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/lend/page.tsx",
-                                                            lineNumber: 433,
+                                                            lineNumber: 450,
                                                             columnNumber: 49
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2777,19 +2853,19 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                             children: "PAS"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/lend/page.tsx",
-                                                            lineNumber: 436,
+                                                            lineNumber: 453,
                                                             columnNumber: 49
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 432,
+                                                    lineNumber: 449,
                                                     columnNumber: 45
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 430,
+                                            lineNumber: 447,
                                             columnNumber: 41
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2801,7 +2877,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     tone: "green"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 440,
+                                                    lineNumber: 457,
                                                     columnNumber: 45
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(InfoRow, {
@@ -2809,7 +2885,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     value: oracle.price8 > 0n ? `$${(Number(oracle.price8) / 1e8).toFixed(4)}` : '-'
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 441,
+                                                    lineNumber: 458,
                                                     columnNumber: 45
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(InfoRow, {
@@ -2817,13 +2893,13 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     value: "~30 seconds"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 442,
+                                                    lineNumber: 459,
                                                     columnNumber: 45
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 439,
+                                            lineNumber: 456,
                                             columnNumber: 41
                                         }, this),
                                         bridgeStatus && bridging && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2833,7 +2909,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     small: true
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 446,
+                                                    lineNumber: 463,
                                                     columnNumber: 49
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2841,7 +2917,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     children: bridgeStatus
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 447,
+                                                    lineNumber: 464,
                                                     columnNumber: 49
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2852,13 +2928,13 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 448,
+                                                    lineNumber: 465,
                                                     columnNumber: 49
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 445,
+                                            lineNumber: 462,
                                             columnNumber: 45
                                         }, this),
                                         bridgeStatus && bridgeStatus.startsWith('Error') && !bridging ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2869,7 +2945,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     children: "✕"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 453,
+                                                    lineNumber: 470,
                                                     columnNumber: 49
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2877,7 +2953,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     children: bridgeStatus.replace(/^Error:\s*/, '')
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 454,
+                                                    lineNumber: 471,
                                                     columnNumber: 49
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2887,13 +2963,13 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     children: "✕"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 455,
+                                                    lineNumber: 472,
                                                     columnNumber: 49
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 452,
+                                            lineNumber: 469,
                                             columnNumber: 45
                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                             onClick: handleBridge,
@@ -2903,7 +2979,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Spinner, {}, void 0, false, {
                                                         fileName: "[project]/app/lend/page.tsx",
-                                                        lineNumber: 462,
+                                                        lineNumber: 479,
                                                         columnNumber: 63
                                                     }, this),
                                                     "Bridging…"
@@ -2911,7 +2987,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                             }, void 0, true) : `Bridge ${bridgeAmount || '0'} PAS to Hub`
                                         }, void 0, false, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 458,
+                                            lineNumber: 475,
                                             columnNumber: 45
                                         }, this)
                                     ]
@@ -2919,13 +2995,13 @@ function BridgeAndLendTab({ contractAddr, market }) {
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 407,
+                            lineNumber: 417,
                             columnNumber: 29
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Check, {}, void 0, false, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 470,
+                                    lineNumber: 487,
                                     columnNumber: 33
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2936,7 +3012,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                             children: "Step 1 - "
                                         }, void 0, false, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 471,
+                                            lineNumber: 488,
                                             columnNumber: 58
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2948,19 +3024,19 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 471,
+                                            lineNumber: 488,
                                             columnNumber: 107
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 471,
+                                    lineNumber: 488,
                                     columnNumber: 33
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 469,
+                            lineNumber: 486,
                             columnNumber: 29
                         }, this)
                     }, void 0, false),
@@ -2974,7 +3050,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                         label: "Swap PAS → mUSDC"
                                     }, void 0, false, {
                                         fileName: "[project]/app/lend/page.tsx",
-                                        lineNumber: 480,
+                                        lineNumber: 497,
                                         columnNumber: 41
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SwapStep, {
@@ -2984,20 +3060,20 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                         }
                                     }, void 0, false, {
                                         fileName: "[project]/app/lend/page.tsx",
-                                        lineNumber: 481,
+                                        lineNumber: 498,
                                         columnNumber: 41
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 479,
+                                lineNumber: 496,
                                 columnNumber: 37
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "rounded-2xl border border-emerald-500/20 bg-emerald-900/10 p-4 flex items-center gap-3",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Check, {}, void 0, false, {
                                         fileName: "[project]/app/lend/page.tsx",
-                                        lineNumber: 485,
+                                        lineNumber: 502,
                                         columnNumber: 41
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3008,7 +3084,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                 children: "Step 2 - "
                                             }, void 0, false, {
                                                 fileName: "[project]/app/lend/page.tsx",
-                                                lineNumber: 486,
+                                                lineNumber: 503,
                                                 columnNumber: 66
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3020,24 +3096,24 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/lend/page.tsx",
-                                                lineNumber: 486,
+                                                lineNumber: 503,
                                                 columnNumber: 115
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/lend/page.tsx",
-                                        lineNumber: 486,
+                                        lineNumber: 503,
                                         columnNumber: 41
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 484,
+                                lineNumber: 501,
                                 columnNumber: 37
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 477,
+                            lineNumber: 494,
                             columnNumber: 29
                         }, this)
                     }, void 0, false),
@@ -3050,7 +3126,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                     done: step === 'done'
                                 }, void 0, false, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 495,
+                                    lineNumber: 512,
                                     columnNumber: 33
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(LendDepositCard, {
@@ -3060,13 +3136,13 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                     market: market
                                 }, void 0, false, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 496,
+                                    lineNumber: 513,
                                     columnNumber: 33
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 494,
+                            lineNumber: 511,
                             columnNumber: 29
                         }, this)
                     }, void 0, false),
@@ -3076,7 +3152,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                         children: "← Start again"
                     }, void 0, false, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 500,
+                        lineNumber: 517,
                         columnNumber: 41
                     }, this)
                 ]
@@ -3084,7 +3160,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
         ]
     }, void 0, true, {
         fileName: "[project]/app/lend/page.tsx",
-        lineNumber: 391,
+        lineNumber: 401,
         columnNumber: 9
     }, this);
 }
@@ -3116,7 +3192,7 @@ function LendUsdcPage() {
                             children: "mUSDC"
                         }, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 519,
+                            lineNumber: 536,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3125,7 +3201,7 @@ function LendUsdcPage() {
                             children: "Swap & Lend"
                         }, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 520,
+                            lineNumber: 537,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3134,13 +3210,13 @@ function LendUsdcPage() {
                             children: "Bridge & Lend"
                         }, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 521,
+                            lineNumber: 538,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/lend/page.tsx",
-                    lineNumber: 518,
+                    lineNumber: 535,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -3154,7 +3230,7 @@ function LendUsdcPage() {
                                         children: "Lend mUSDC directly"
                                     }, void 0, false, {
                                         fileName: "[project]/app/lend/page.tsx",
-                                        lineNumber: 527,
+                                        lineNumber: 544,
                                         columnNumber: 33
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(LendDepositCard, {
@@ -3162,13 +3238,13 @@ function LendUsdcPage() {
                                         market: "lending"
                                     }, void 0, false, {
                                         fileName: "[project]/app/lend/page.tsx",
-                                        lineNumber: 528,
+                                        lineNumber: 545,
                                         columnNumber: 33
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 526,
+                                lineNumber: 543,
                                 columnNumber: 29
                             }, this),
                             source === 'swap' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SwapAndLendTab, {
@@ -3176,7 +3252,7 @@ function LendUsdcPage() {
                                 market: "lending"
                             }, void 0, false, {
                                 fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 531,
+                                lineNumber: 548,
                                 columnNumber: 47
                             }, this),
                             source === 'bridge' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(BridgeAndLendTab, {
@@ -3184,25 +3260,25 @@ function LendUsdcPage() {
                                 market: "lending"
                             }, void 0, false, {
                                 fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 532,
+                                lineNumber: 549,
                                 columnNumber: 49
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 524,
+                        lineNumber: 541,
                         columnNumber: 21
                     }, this)
                 }, void 0, false)
             ]
         }, void 0, true, {
             fileName: "[project]/app/lend/page.tsx",
-            lineNumber: 517,
+            lineNumber: 534,
             columnNumber: 13
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/lend/page.tsx",
-        lineNumber: 516,
+        lineNumber: 533,
         columnNumber: 9
     }, this);
 }

@@ -11,6 +11,8 @@ __turbopack_context__.s([
     ()=>PAS_SUBSTRATE_DECIMALS,
     "PEOPLE_RPC",
     ()=>PEOPLE_RPC,
+    "PEOPLE_RPCS",
+    ()=>PEOPLE_RPCS,
     "fetchPeopleBalance",
     ()=>fetchPeopleBalance,
     "formatPASFromEVM",
@@ -25,11 +27,45 @@ __turbopack_context__.s([
     ()=>sendXCMToHub
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$viem$2f$_esm$2f$utils$2f$unit$2f$formatUnits$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/viem/_esm/utils/unit/formatUnits.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$viem$2f$_esm$2f$utils$2f$address$2f$isAddress$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/viem/_esm/utils/address/isAddress.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$viem$2f$_esm$2f$utils$2f$unit$2f$parseUnits$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/viem/_esm/utils/unit/parseUnits.js [app-client] (ecmascript)");
 ;
-const PEOPLE_RPC = 'wss://people-paseo.rpc.amforc.com';
-const PAS_SUBSTRATE_DECIMALS = 10;
-const PAS_EVM_DECIMALS = 18;
+const PEOPLE_RPC = 'wss://sys.ibp.network/people-paseo';
+const PEOPLE_RPCS = [
+    PEOPLE_RPC,
+    'wss://people-paseo.rpc.amforc.com',
+    'wss://people-paseo.dotters.network'
+];
+const PAS_SUBSTRATE_DECIMALS = 10; // PAS on People Chain (Substrate) = 10 decimals (1 PAS = 10^10 planck)
+const PAS_EVM_DECIMALS = 18; // PAS on Asset Hub EVM (Frontier) = 18 decimals
 const MUSDC_DECIMALS = 6;
+async function withPeopleApi(work) {
+    const { ApiPromise, WsProvider } = await __turbopack_context__.A("[project]/node_modules/@polkadot/api/index.js [app-client] (ecmascript, async loader)");
+    const tried = [];
+    let lastError;
+    for (const endpoint of PEOPLE_RPCS){
+        let api = null;
+        try {
+            // 10-second connect timeout so dead endpoints don't stall the whole flow
+            const provider = new WsProvider(endpoint, 1000, {}, 10_000);
+            api = await ApiPromise.create({
+                provider
+            });
+            return await work(api);
+        } catch (error) {
+            tried.push(endpoint);
+            lastError = error;
+        } finally{
+            if (api) {
+                try {
+                    await api.disconnect();
+                } catch  {}
+            }
+        }
+    }
+    const reason = lastError instanceof Error ? lastError.message : String(lastError ?? 'Unknown RPC error');
+    throw new Error(`People Chain RPC unavailable (${tried.join(', ')}): ${reason}`);
+}
 async function h160ToSS58(evmAddress) {
     const { hexToU8a } = await __turbopack_context__.A("[project]/node_modules/@polkadot/util/index.js [app-client] (ecmascript, async loader)");
     const { encodeAddress } = await __turbopack_context__.A("[project]/node_modules/@polkadot/util-crypto/index.js [app-client] (ecmascript, async loader)");
@@ -37,10 +73,9 @@ async function h160ToSS58(evmAddress) {
     if (h160.length !== 20) {
         throw new Error('Invalid EVM address: expected 20-byte H160');
     }
-    const pad = new Uint8Array(12).fill(0xee);
     const id32 = new Uint8Array(32);
-    id32.set(h160, 0);
-    id32.set(pad, 20);
+    id32.set(h160, 0); // H160 in first 20 bytes
+    id32.fill(0xee, 20); // 0xEE padding in last 12 bytes
     return encodeAddress(id32, 0);
 }
 function formatPASFromEVM(wei) {
@@ -50,26 +85,18 @@ function formatPASFromPeople(raw) {
     return Number.parseFloat((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$viem$2f$_esm$2f$utils$2f$unit$2f$formatUnits$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["formatUnits"])(raw, PAS_SUBSTRATE_DECIMALS)).toFixed(4);
 }
 async function fetchPeopleBalance(address) {
-    // Lazy-load @polkadot/api to avoid bundling WASM into the initial chunk.
-    const { ApiPromise, WsProvider } = await __turbopack_context__.A("[project]/node_modules/@polkadot/api/index.js [app-client] (ecmascript, async loader)");
-    const provider = new WsProvider(PEOPLE_RPC);
-    const api = await ApiPromise.create({
-        provider
-    });
-    try {
+    return withPeopleApi(async (api)=>{
         const acct = await api.query.system.account(address);
         const free = BigInt(acct.data.free.toString());
         return free;
-    } finally{
-        await api.disconnect();
-    }
+    });
 }
 function toSubstrateAmount(amountPAS) {
     const parsed = Number.parseFloat(amountPAS);
     if (!Number.isFinite(parsed) || parsed <= 0) {
         throw new Error('Amount must be greater than 0');
     }
-    return String(Math.round(parsed * 10 ** PAS_SUBSTRATE_DECIMALS));
+    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$viem$2f$_esm$2f$utils$2f$unit$2f$parseUnits$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["parseUnits"])(amountPAS, PAS_SUBSTRATE_DECIMALS).toString();
 }
 function normalizeXcmError(error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -80,72 +107,109 @@ function normalizeXcmError(error) {
 }
 async function sendXCMToHub(params) {
     const { senderAddress, destinationEVM, amountPAS, onStatus } = params;
-    // Lazy-load @polkadot/api and @paraspell/sdk-pjs only when this function
-    // is actually called (i.e., when the user triggers a bridge transaction).
-    const { ApiPromise, WsProvider } = await __turbopack_context__.A("[project]/node_modules/@polkadot/api/index.js [app-client] (ecmascript, async loader)");
-    const { Builder } = await __turbopack_context__.A("[project]/node_modules/@paraspell/sdk-pjs/dist/index.mjs [app-client] (ecmascript, async loader)");
-    let api = null;
+    if (!(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$viem$2f$_esm$2f$utils$2f$address$2f$isAddress$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["isAddress"])(destinationEVM)) {
+        throw new Error('Invalid Hub EVM destination address.');
+    }
     try {
-        onStatus?.('connecting', 'Connecting to People Chain...');
-        const provider = new WsProvider(PEOPLE_RPC);
-        api = await ApiPromise.create({
-            provider
-        });
-        onStatus?.('building', 'Building XCM transaction...');
-        const amount = toSubstrateAmount(amountPAS);
-        const ss58Dest = await h160ToSS58(destinationEVM);
-        const tx = await Builder(api).from('PeoplePaseo').to('AssetHubPaseo').currency({
-            symbol: 'PAS',
-            amount
-        }).address(ss58Dest).senderAddress(senderAddress).build();
-        onStatus?.('awaiting_signature', 'Waiting for Talisman signature...');
-        const { web3FromAddress } = await __turbopack_context__.A("[project]/node_modules/@polkadot/extension-dapp/index.js [app-client] (ecmascript, async loader)");
-        const injector = await web3FromAddress(senderAddress);
-        return await new Promise((resolve, reject)=>{
-            tx.signAndSend(senderAddress, {
-                signer: injector.signer,
-                nonce: -1
-            }, ({ status, dispatchError })=>{
-                if (status.isBroadcast) {
-                    onStatus?.('broadcasting', 'Broadcasting to network...');
-                }
-                if (status.isInBlock) {
-                    onStatus?.('in_block', 'In block - waiting for finalization...');
-                }
-                if (status.isFinalized) {
-                    if (dispatchError) {
-                        reject(new Error(dispatchError.toString()));
-                        return;
+        return await withPeopleApi(async (api)=>{
+            onStatus?.('connecting', 'Connecting to People Chain...');
+            onStatus?.('building', 'Building XCM transaction...');
+            const amount = toSubstrateAmount(amountPAS);
+            // Convert EVM address to the SS58 AccountId32 that Asset Hub Frontier uses
+            // for eth_getBalance. Encoding: H160 (first 20 bytes) || 0xEE×12 (last 12 bytes).
+            // This produces a valid SS58 that ParaSpell accepts AND that maps back to the
+            // EVM wallet — confirmed working in production.
+            const { encodeAddress } = await __turbopack_context__.A("[project]/node_modules/@polkadot/util-crypto/index.js [app-client] (ecmascript, async loader)");
+            const { hexToU8a } = await __turbopack_context__.A("[project]/node_modules/@polkadot/util/index.js [app-client] (ecmascript, async loader)");
+            const h160 = hexToU8a(destinationEVM);
+            const id32 = new Uint8Array(32);
+            id32.set(h160, 0);
+            id32.fill(0xee, 20);
+            const ss58Dest = encodeAddress(id32, 0);
+            const { Builder } = await __turbopack_context__.A("[project]/node_modules/@paraspell/sdk-pjs/dist/index.mjs [app-client] (ecmascript, async loader)");
+            const tx = await Builder(api).from('PeoplePaseo').to('AssetHubPaseo').currency({
+                symbol: 'PAS',
+                amount
+            }).address(ss58Dest).senderAddress(senderAddress).build();
+            onStatus?.('awaiting_signature', 'Waiting for Talisman signature...');
+            const { web3FromAddress } = await __turbopack_context__.A("[project]/node_modules/@polkadot/extension-dapp/index.js [app-client] (ecmascript, async loader)");
+            const injector = await web3FromAddress(senderAddress);
+            return await new Promise((resolve, reject)=>{
+                let unsub = null;
+                const cleanup = ()=>{
+                    if (unsub) {
+                        try {
+                            unsub();
+                        } catch  {}
+                        unsub = null;
                     }
-                    onStatus?.('finalized', 'Finalized on People Chain.');
-                    const blockHash = status.asFinalized?.toHex?.() ?? '';
-                    resolve({
-                        blockHash
-                    });
-                }
-            }).catch((err)=>reject(err));
+                };
+                tx.signAndSend(senderAddress, {
+                    signer: injector.signer,
+                    nonce: -1
+                }, ({ status, dispatchError })=>{
+                    if (status.isBroadcast) onStatus?.('broadcasting', 'Broadcasting to network...');
+                    if (status.isInBlock) onStatus?.('in_block', 'In block - waiting for finalization...');
+                    if (status.isFinalized) {
+                        if (dispatchError) {
+                            cleanup();
+                            if (dispatchError.isModule && dispatchError.asModule) {
+                                const decoded = api.registry.findMetaError(dispatchError.asModule);
+                                reject(new Error(`${decoded.section}.${decoded.name}: ${decoded.docs.join(' ')}`));
+                                return;
+                            }
+                            reject(new Error(dispatchError.toString()));
+                            return;
+                        }
+                        onStatus?.('finalized', 'Finalized on People Chain.');
+                        cleanup();
+                        resolve({
+                            blockHash: status.asFinalized?.toHex?.() ?? ''
+                        });
+                    }
+                }).then((u)=>{
+                    unsub = u;
+                }).catch((err)=>{
+                    cleanup();
+                    reject(err);
+                });
+            });
         });
     } catch (error) {
         throw normalizeXcmError(error);
-    } finally{
-        if (api) {
-            await api.disconnect();
-        }
     }
 }
 function pollHubArrival(params) {
-    const { address, before, publicClient, onArrival, onTick, intervalMs = 3000 } = params;
+    const { address, before, publicClient, onArrival, onTick, onError, intervalMs = 3000, maxDurationMs = 120000, onTimeout } = params;
     let stopped = false;
+    let consecutiveErrors = 0;
+    const startedAt = Date.now();
     const timer = setInterval(async ()=>{
         if (stopped) return;
-        const current = await publicClient.getBalance({
-            address
-        });
-        onTick?.(current);
-        if (current > before) {
+        try {
+            const current = await publicClient.getBalance({
+                address
+            });
+            consecutiveErrors = 0;
+            onTick?.(current);
+            if (current > before) {
+                stopped = true;
+                clearInterval(timer);
+                onArrival(current - before);
+                return;
+            }
+        } catch (err) {
+            consecutiveErrors++;
+            const msg = err instanceof Error ? err.message : String(err);
+            console.warn(`[pollHubArrival] getBalance error #${consecutiveErrors}:`, msg);
+            if (consecutiveErrors >= 3) {
+                onError?.(`Hub RPC error (${consecutiveErrors}x): ${msg}`);
+            }
+        }
+        if (Date.now() - startedAt >= maxDurationMs) {
             stopped = true;
             clearInterval(timer);
-            onArrival(current - before);
+            onTimeout?.(Date.now() - startedAt);
         }
     }, intervalMs);
     return ()=>{
@@ -987,12 +1051,12 @@ function StepConnector({ done }) {
             className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])('w-px h-4 transition-colors duration-500', done ? 'bg-emerald-500/60' : 'bg-white/10')
         }, void 0, false, {
             fileName: "[project]/app/bridge/page.tsx",
-            lineNumber: 73,
+            lineNumber: 72,
             columnNumber: 13
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/bridge/page.tsx",
-        lineNumber: 72,
+        lineNumber: 71,
         columnNumber: 9
     }, this);
 }
@@ -1008,7 +1072,7 @@ function WalletStep({ index, title, subtitle, done, locked, children }) {
                     children: done ? '✓' : index
                 }, void 0, false, {
                     fileName: "[project]/app/bridge/page.tsx",
-                    lineNumber: 94,
+                    lineNumber: 93,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1019,7 +1083,7 @@ function WalletStep({ index, title, subtitle, done, locked, children }) {
                             children: title
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 105,
+                            lineNumber: 104,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1027,7 +1091,7 @@ function WalletStep({ index, title, subtitle, done, locked, children }) {
                             children: subtitle
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 109,
+                            lineNumber: 108,
                             columnNumber: 21
                         }, this),
                         !locked && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1035,24 +1099,24 @@ function WalletStep({ index, title, subtitle, done, locked, children }) {
                             children: children
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 110,
+                            lineNumber: 109,
                             columnNumber: 33
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/bridge/page.tsx",
-                    lineNumber: 104,
+                    lineNumber: 103,
                     columnNumber: 17
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/bridge/page.tsx",
-            lineNumber: 93,
+            lineNumber: 92,
             columnNumber: 13
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/bridge/page.tsx",
-        lineNumber: 85,
+        lineNumber: 84,
         columnNumber: 9
     }, this);
 }
@@ -1068,7 +1132,7 @@ function InlineProgress({ status, txHash, srcChainId }) {
                     className: "block w-3.5 h-3.5 rounded-full border-2 border-violet-400 border-t-transparent animate-spin flex-shrink-0"
                 }, void 0, false, {
                     fileName: "[project]/app/bridge/page.tsx",
-                    lineNumber: 127,
+                    lineNumber: 126,
                     columnNumber: 17
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1076,7 +1140,7 @@ function InlineProgress({ status, txHash, srcChainId }) {
                     children: statusToStepLabel(status)
                 }, void 0, false, {
                     fileName: "[project]/app/bridge/page.tsx",
-                    lineNumber: 128,
+                    lineNumber: 127,
                     columnNumber: 17
                 }, this),
                 txHash && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -1087,18 +1151,18 @@ function InlineProgress({ status, txHash, srcChainId }) {
                     children: "Tx ↗"
                 }, void 0, false, {
                     fileName: "[project]/app/bridge/page.tsx",
-                    lineNumber: 130,
+                    lineNumber: 129,
                     columnNumber: 21
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/bridge/page.tsx",
-            lineNumber: 126,
+            lineNumber: 125,
             columnNumber: 13
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/bridge/page.tsx",
-        lineNumber: 125,
+        lineNumber: 124,
         columnNumber: 9
     }, this);
 }
@@ -1124,24 +1188,24 @@ function XcmPipeline({ currentStage, arrived }) {
                                     children: "✓"
                                 }, void 0, false, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 153,
+                                    lineNumber: 152,
                                     columnNumber: 37
                                 }, this) : isActive ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                     className: "block w-3 h-3 rounded-full border-2 border-violet-400 border-t-transparent animate-spin"
                                 }, void 0, false, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 155,
+                                    lineNumber: 154,
                                     columnNumber: 37
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                     className: "block w-2 h-2 rounded-full bg-white/15"
                                 }, void 0, false, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 157,
+                                    lineNumber: 156,
                                     columnNumber: 37
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/bridge/page.tsx",
-                                lineNumber: 151,
+                                lineNumber: 150,
                                 columnNumber: 29
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1149,13 +1213,13 @@ function XcmPipeline({ currentStage, arrived }) {
                                 children: XCM_STAGE_LABELS[stage]
                             }, void 0, false, {
                                 fileName: "[project]/app/bridge/page.tsx",
-                                lineNumber: 160,
+                                lineNumber: 159,
                                 columnNumber: 29
                             }, this)
                         ]
                     }, stage, true, {
                         fileName: "[project]/app/bridge/page.tsx",
-                        lineNumber: 150,
+                        lineNumber: 149,
                         columnNumber: 25
                     }, this);
                 }),
@@ -1169,12 +1233,12 @@ function XcmPipeline({ currentStage, arrived }) {
                                 children: "✓"
                             }, void 0, false, {
                                 fileName: "[project]/app/bridge/page.tsx",
-                                lineNumber: 172,
+                                lineNumber: 171,
                                 columnNumber: 29
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 171,
+                            lineNumber: 170,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1182,24 +1246,24 @@ function XcmPipeline({ currentStage, arrived }) {
                             children: "PAS arrived on Hub"
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 174,
+                            lineNumber: 173,
                             columnNumber: 25
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/bridge/page.tsx",
-                    lineNumber: 170,
+                    lineNumber: 169,
                     columnNumber: 21
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/bridge/page.tsx",
-            lineNumber: 145,
+            lineNumber: 144,
             columnNumber: 13
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/bridge/page.tsx",
-        lineNumber: 144,
+        lineNumber: 143,
         columnNumber: 9
     }, this);
 }
@@ -1216,12 +1280,12 @@ function BridgeTabBar({ active, onChange }) {
                 children: t === 'pas' ? 'PAS via XCM' : 'ETH → mUSDC'
             }, t, false, {
                 fileName: "[project]/app/bridge/page.tsx",
-                lineNumber: 189,
+                lineNumber: 188,
                 columnNumber: 17
             }, this))
     }, void 0, false, {
         fileName: "[project]/app/bridge/page.tsx",
-        lineNumber: 187,
+        lineNumber: 186,
         columnNumber: 9
     }, this);
 }
@@ -1240,35 +1304,35 @@ function BridgePage() {
                     onChange: setActiveTab
                 }, void 0, false, {
                     fileName: "[project]/app/bridge/page.tsx",
-                    lineNumber: 206,
+                    lineNumber: 205,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/bridge/page.tsx",
-                lineNumber: 205,
+                lineNumber: 204,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     children: activeTab === 'pas' ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(PasTab, {}, void 0, false, {
                         fileName: "[project]/app/bridge/page.tsx",
-                        lineNumber: 210,
+                        lineNumber: 209,
                         columnNumber: 44
                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(EthTab, {}, void 0, false, {
                         fileName: "[project]/app/bridge/page.tsx",
-                        lineNumber: 210,
+                        lineNumber: 209,
                         columnNumber: 57
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/bridge/page.tsx",
-                    lineNumber: 209,
+                    lineNumber: 208,
                     columnNumber: 17
                 }, this)
             }, void 0, false)
         ]
     }, void 0, true, {
         fileName: "[project]/app/bridge/page.tsx",
-        lineNumber: 204,
+        lineNumber: 203,
         columnNumber: 9
     }, this);
 }
@@ -1349,7 +1413,6 @@ function PasTab() {
                 onStatus: (stage, detail)=>{
                     setCurrentStage(stage);
                     setStatusMsg(detail || XCM_STAGE_LABELS[stage]);
-                    if (stage === 'in_block') setSending(false);
                 }
             });
             if (snapshot !== undefined && publicClient) {
@@ -1363,8 +1426,14 @@ function PasTab() {
                         setArrived(true);
                         setStatusMsg(`+${(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$xcm$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["formatPASFromEVM"])(delta)} PAS arrived on Hub`);
                         setSending(false);
+                    },
+                    onTimeout: ()=>{
+                        setSending(false);
+                        setStatusMsg('Error: PAS did not arrive on Hub within 2 minutes. Check the People Chain extrinsic in Subscan and retry.');
                     }
                 });
+            } else {
+                setSending(false);
             }
         } catch (err) {
             setStatusMsg(`Error: ${err instanceof Error ? err.message : String(err)}`);
@@ -1398,7 +1467,7 @@ function PasTab() {
                             value: `${hubAddress?.slice(0, 10)}…${hubAddress?.slice(-6)}`
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 326,
+                            lineNumber: 330,
                             columnNumber: 25
                         }, this),
                         balanceNow !== null && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$ProtocolUI$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["StatRow"], {
@@ -1407,32 +1476,32 @@ function PasTab() {
                             tone: arrived ? 'green' : 'default'
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 328,
+                            lineNumber: 332,
                             columnNumber: 29
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/bridge/page.tsx",
-                    lineNumber: 325,
+                    lineNumber: 329,
                     columnNumber: 21
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                     className: "text-xs text-slate-400",
                     children: "Use the wallet button in the header to connect."
                 }, void 0, false, {
                     fileName: "[project]/app/bridge/page.tsx",
-                    lineNumber: 332,
+                    lineNumber: 336,
                     columnNumber: 21
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/bridge/page.tsx",
-                lineNumber: 317,
+                lineNumber: 321,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(StepConnector, {
                 done: isConnected
             }, void 0, false, {
                 fileName: "[project]/app/bridge/page.tsx",
-                lineNumber: 336,
+                lineNumber: 340,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(WalletStep, {
@@ -1450,7 +1519,7 @@ function PasTab() {
                             variant: "primary"
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 348,
+                            lineNumber: 352,
                             columnNumber: 25
                         }, this),
                         statusMsg && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1458,13 +1527,13 @@ function PasTab() {
                             children: statusMsg
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 349,
+                            lineNumber: 353,
                             columnNumber: 39
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/bridge/page.tsx",
-                    lineNumber: 347,
+                    lineNumber: 351,
                     columnNumber: 21
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "space-y-2",
@@ -1474,7 +1543,7 @@ function PasTab() {
                             value: selectedAccount?.meta?.name || 'Account'
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 353,
+                            lineNumber: 357,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$ProtocolUI$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["StatRow"], {
@@ -1482,7 +1551,7 @@ function PasTab() {
                             value: `${selectedAccount?.address.slice(0, 10)}…${selectedAccount?.address.slice(-6)}`
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 354,
+                            lineNumber: 358,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$ProtocolUI$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["StatRow"], {
@@ -1490,7 +1559,7 @@ function PasTab() {
                             value: peopleBalance ? `${peopleBalance} PAS` : '-'
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 355,
+                            lineNumber: 359,
                             columnNumber: 25
                         }, this),
                         substrateAccounts.length > 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -1510,30 +1579,30 @@ function PasTab() {
                                     ]
                                 }, a.address, true, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 366,
+                                    lineNumber: 370,
                                     columnNumber: 37
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 357,
+                            lineNumber: 361,
                             columnNumber: 29
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/bridge/page.tsx",
-                    lineNumber: 352,
+                    lineNumber: 356,
                     columnNumber: 21
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/bridge/page.tsx",
-                lineNumber: 339,
+                lineNumber: 343,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(StepConnector, {
                 done: talismanConnected
             }, void 0, false, {
                 fileName: "[project]/app/bridge/page.tsx",
-                lineNumber: 376,
+                lineNumber: 380,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(WalletStep, {
@@ -1552,7 +1621,7 @@ function PasTab() {
                                     children: "Amount"
                                 }, void 0, false, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 388,
+                                    lineNumber: 392,
                                     columnNumber: 25
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1568,7 +1637,7 @@ function PasTab() {
                                             className: "w-36 rounded-xl border border-white/10 bg-black/40 text-sm text-white px-3 py-2 outline-none focus:border-violet-500/40 disabled:opacity-50"
                                         }, void 0, false, {
                                             fileName: "[project]/app/bridge/page.tsx",
-                                            lineNumber: 390,
+                                            lineNumber: 394,
                                             columnNumber: 29
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1576,7 +1645,7 @@ function PasTab() {
                                             children: "PAS"
                                         }, void 0, false, {
                                             fileName: "[project]/app/bridge/page.tsx",
-                                            lineNumber: 399,
+                                            lineNumber: 403,
                                             columnNumber: 29
                                         }, this),
                                         [
@@ -1590,19 +1659,19 @@ function PasTab() {
                                                 children: v
                                             }, v, false, {
                                                 fileName: "[project]/app/bridge/page.tsx",
-                                                lineNumber: 401,
+                                                lineNumber: 405,
                                                 columnNumber: 33
                                             }, this))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 389,
+                                    lineNumber: 393,
                                     columnNumber: 25
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 387,
+                            lineNumber: 391,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1614,13 +1683,13 @@ function PasTab() {
                                     children: hubAddress ?? '-'
                                 }, void 0, false, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 409,
+                                    lineNumber: 413,
                                     columnNumber: 29
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 408,
+                            lineNumber: 412,
                             columnNumber: 21
                         }, this),
                         arrived ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1630,14 +1699,14 @@ function PasTab() {
                                     children: "✓"
                                 }, void 0, false, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 413,
+                                    lineNumber: 417,
                                     columnNumber: 29
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                     children: "PAS arrived on Hub"
                                 }, void 0, false, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 414,
+                                    lineNumber: 418,
                                     columnNumber: 29
                                 }, this),
                                 balanceBefore !== null && balanceNow !== null && balanceNow > balanceBefore && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1649,13 +1718,13 @@ function PasTab() {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 416,
+                                    lineNumber: 420,
                                     columnNumber: 33
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 412,
+                            lineNumber: 416,
                             columnNumber: 25
                         }, this) : isError ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "flex items-center gap-3 rounded-xl border border-rose-500/20 bg-rose-500/8 px-4 py-3",
@@ -1665,7 +1734,7 @@ function PasTab() {
                                     children: "✕"
                                 }, void 0, false, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 423,
+                                    lineNumber: 427,
                                     columnNumber: 29
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1673,7 +1742,7 @@ function PasTab() {
                                     children: statusMsg
                                 }, void 0, false, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 424,
+                                    lineNumber: 428,
                                     columnNumber: 29
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1683,13 +1752,13 @@ function PasTab() {
                                     children: "✕"
                                 }, void 0, false, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 425,
+                                    lineNumber: 429,
                                     columnNumber: 29
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 422,
+                            lineNumber: 426,
                             columnNumber: 25
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$ProtocolUI$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ActionButton"], {
                             label: sending ? 'Sending via XCM…' : 'Send PAS via Talisman',
@@ -1699,18 +1768,18 @@ function PasTab() {
                             variant: "primary"
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 428,
+                            lineNumber: 432,
                             columnNumber: 25
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/bridge/page.tsx",
-                    lineNumber: 386,
+                    lineNumber: 390,
                     columnNumber: 17
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/bridge/page.tsx",
-                lineNumber: 379,
+                lineNumber: 383,
                 columnNumber: 13
             }, this),
             hasSent && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1720,18 +1789,18 @@ function PasTab() {
                     arrived: arrived
                 }, void 0, false, {
                     fileName: "[project]/app/bridge/page.tsx",
-                    lineNumber: 442,
+                    lineNumber: 446,
                     columnNumber: 21
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/bridge/page.tsx",
-                lineNumber: 441,
+                lineNumber: 445,
                 columnNumber: 17
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/bridge/page.tsx",
-        lineNumber: 314,
+        lineNumber: 318,
         columnNumber: 9
     }, this);
 }
@@ -1851,12 +1920,12 @@ function EthTab() {
                         children: t === 'bridge' ? 'Bridge' : 'Reclaim'
                     }, t, false, {
                         fileName: "[project]/app/bridge/page.tsx",
-                        lineNumber: 523,
+                        lineNumber: 527,
                         columnNumber: 21
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/app/bridge/page.tsx",
-                lineNumber: 521,
+                lineNumber: 525,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -1876,7 +1945,7 @@ function EthTab() {
                                                 children: c.name
                                             }, void 0, false, {
                                                 fileName: "[project]/app/bridge/page.tsx",
-                                                lineNumber: 552,
+                                                lineNumber: 556,
                                                 columnNumber: 41
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1886,7 +1955,7 @@ function EthTab() {
                                                         className: "w-2 h-2 rounded-full bg-emerald-400"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/bridge/page.tsx",
-                                                        lineNumber: 555,
+                                                        lineNumber: 559,
                                                         columnNumber: 49
                                                     }, this),
                                                     !c.inboxAddress && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1894,29 +1963,29 @@ function EthTab() {
                                                         children: "coming soon"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/bridge/page.tsx",
-                                                        lineNumber: 558,
+                                                        lineNumber: 562,
                                                         columnNumber: 49
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/bridge/page.tsx",
-                                                lineNumber: 553,
+                                                lineNumber: 557,
                                                 columnNumber: 41
                                             }, this)
                                         ]
                                     }, c.chainId, true, {
                                         fileName: "[project]/app/bridge/page.tsx",
-                                        lineNumber: 540,
+                                        lineNumber: 544,
                                         columnNumber: 37
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/app/bridge/page.tsx",
-                                lineNumber: 538,
+                                lineNumber: 542,
                                 columnNumber: 29
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 537,
+                            lineNumber: 541,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$ProtocolUI$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Panel"], {
@@ -1939,7 +2008,7 @@ function EthTab() {
                                                 className: "w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-violet-500/50 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50 pr-36"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/bridge/page.tsx",
-                                                lineNumber: 570,
+                                                lineNumber: 574,
                                                 columnNumber: 37
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1955,18 +2024,18 @@ function EthTab() {
                                                         children: v
                                                     }, v, false, {
                                                         fileName: "[project]/app/bridge/page.tsx",
-                                                        lineNumber: 586,
+                                                        lineNumber: 590,
                                                         columnNumber: 45
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/app/bridge/page.tsx",
-                                                lineNumber: 584,
+                                                lineNumber: 588,
                                                 columnNumber: 37
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/bridge/page.tsx",
-                                        lineNumber: 569,
+                                        lineNumber: 573,
                                         columnNumber: 33
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1980,7 +2049,7 @@ function EthTab() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/bridge/page.tsx",
-                                        lineNumber: 593,
+                                        lineNumber: 597,
                                         columnNumber: 33
                                     }, this),
                                     (quote || quoteLoading) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1990,7 +2059,7 @@ function EthTab() {
                                             children: "Fetching price…"
                                         }, void 0, false, {
                                             fileName: "[project]/app/bridge/page.tsx",
-                                            lineNumber: 601,
+                                            lineNumber: 605,
                                             columnNumber: 45
                                         }, this) : quote ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "space-y-1",
@@ -2006,7 +2075,7 @@ function EthTab() {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/bridge/page.tsx",
-                                                            lineNumber: 605,
+                                                            lineNumber: 609,
                                                             columnNumber: 53
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2014,7 +2083,7 @@ function EthTab() {
                                                             children: "→"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/bridge/page.tsx",
-                                                            lineNumber: 606,
+                                                            lineNumber: 610,
                                                             columnNumber: 53
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2025,7 +2094,7 @@ function EthTab() {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/bridge/page.tsx",
-                                                            lineNumber: 607,
+                                                            lineNumber: 611,
                                                             columnNumber: 53
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2033,7 +2102,7 @@ function EthTab() {
                                                             children: "→"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/bridge/page.tsx",
-                                                            lineNumber: 608,
+                                                            lineNumber: 612,
                                                             columnNumber: 53
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2044,13 +2113,13 @@ function EthTab() {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/bridge/page.tsx",
-                                                            lineNumber: 609,
+                                                            lineNumber: 613,
                                                             columnNumber: 53
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/bridge/page.tsx",
-                                                    lineNumber: 604,
+                                                    lineNumber: 608,
                                                     columnNumber: 49
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2066,18 +2135,18 @@ function EthTab() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/bridge/page.tsx",
-                                                    lineNumber: 611,
+                                                    lineNumber: 615,
                                                     columnNumber: 49
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/bridge/page.tsx",
-                                            lineNumber: 603,
+                                            lineNumber: 607,
                                             columnNumber: 45
                                         }, this) : null
                                     }, void 0, false, {
                                         fileName: "[project]/app/bridge/page.tsx",
-                                        lineNumber: 596,
+                                        lineNumber: 600,
                                         columnNumber: 37
                                     }, this),
                                     address && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2094,24 +2163,24 @@ function EthTab() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/bridge/page.tsx",
-                                                lineNumber: 622,
+                                                lineNumber: 626,
                                                 columnNumber: 41
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/bridge/page.tsx",
-                                        lineNumber: 620,
+                                        lineNumber: 624,
                                         columnNumber: 37
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/bridge/page.tsx",
-                                lineNumber: 568,
+                                lineNumber: 572,
                                 columnNumber: 29
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 567,
+                            lineNumber: 571,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$ProtocolUI$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Panel"], {
@@ -2123,7 +2192,7 @@ function EthTab() {
                                     message: "Connect MetaMask to continue."
                                 }, void 0, false, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 632,
+                                    lineNumber: 636,
                                     columnNumber: 37
                                 }, this) : status === 'minted' ? /* Success card - dismissed manually with ✕ */ /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "rounded-xl bg-emerald-500/10 border border-emerald-500/25 px-4 py-3 space-y-1.5",
@@ -2140,7 +2209,7 @@ function EthTab() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/bridge/page.tsx",
-                                                    lineNumber: 637,
+                                                    lineNumber: 641,
                                                     columnNumber: 45
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2150,13 +2219,13 @@ function EthTab() {
                                                     children: "✕"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/bridge/page.tsx",
-                                                    lineNumber: 640,
+                                                    lineNumber: 644,
                                                     columnNumber: 45
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/bridge/page.tsx",
-                                            lineNumber: 636,
+                                            lineNumber: 640,
                                             columnNumber: 41
                                         }, this),
                                         mintedResult && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -2167,7 +2236,7 @@ function EthTab() {
                                             children: "View Hub Tx ↗"
                                         }, void 0, false, {
                                             fileName: "[project]/app/bridge/page.tsx",
-                                            lineNumber: 647,
+                                            lineNumber: 651,
                                             columnNumber: 45
                                         }, this),
                                         lastTxHash && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -2178,13 +2247,13 @@ function EthTab() {
                                             children: "View Source Tx ↗"
                                         }, void 0, false, {
                                             fileName: "[project]/app/bridge/page.tsx",
-                                            lineNumber: 652,
+                                            lineNumber: 656,
                                             columnNumber: 45
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 635,
+                                    lineNumber: 639,
                                     columnNumber: 37
                                 }, this) : status === 'error' ? /* Error card - replaces button, dismissed with ✕ */ /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "flex items-center gap-3 rounded-xl border border-rose-500/20 bg-rose-500/8 px-4 py-3",
@@ -2194,7 +2263,7 @@ function EthTab() {
                                             children: "✕"
                                         }, void 0, false, {
                                             fileName: "[project]/app/bridge/page.tsx",
-                                            lineNumber: 660,
+                                            lineNumber: 664,
                                             columnNumber: 41
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2202,7 +2271,7 @@ function EthTab() {
                                             children: errorMsg ?? 'Transaction failed'
                                         }, void 0, false, {
                                             fileName: "[project]/app/bridge/page.tsx",
-                                            lineNumber: 661,
+                                            lineNumber: 665,
                                             columnNumber: 41
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2212,13 +2281,13 @@ function EthTab() {
                                             children: "✕"
                                         }, void 0, false, {
                                             fileName: "[project]/app/bridge/page.tsx",
-                                            lineNumber: 662,
+                                            lineNumber: 666,
                                             columnNumber: 41
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 659,
+                                    lineNumber: 663,
                                     columnNumber: 37
                                 }, this) : busy ? /* Inline pipeline - replaces button while active */ /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(InlineProgress, {
                                     status: status,
@@ -2226,7 +2295,7 @@ function EthTab() {
                                     srcChainId: selectedChainId
                                 }, void 0, false, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 666,
+                                    lineNumber: 670,
                                     columnNumber: 37
                                 }, this) : chainId !== selectedChainId ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                     onClick: ()=>handleChainSelect(selectedChainId),
@@ -2237,7 +2306,7 @@ function EthTab() {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 672,
+                                    lineNumber: 676,
                                     columnNumber: 37
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                     onClick: handleDeposit,
@@ -2246,23 +2315,23 @@ function EthTab() {
                                     children: `Deposit ${ethAmount || '-'} ETH`
                                 }, void 0, false, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 679,
+                                    lineNumber: 683,
                                     columnNumber: 37
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/bridge/page.tsx",
-                                lineNumber: 630,
+                                lineNumber: 634,
                                 columnNumber: 29
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 629,
+                            lineNumber: 633,
                             columnNumber: 25
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/bridge/page.tsx",
-                    lineNumber: 535,
+                    lineNumber: 539,
                     columnNumber: 21
                 }, this) : /* ── Reclaim tab ── */ /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$ProtocolUI$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Panel"], {
@@ -2273,14 +2342,14 @@ function EthTab() {
                             message: "Connect MetaMask to view your deposits."
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 697,
+                            lineNumber: 701,
                             columnNumber: 33
                         }, this) : history.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                             className: "text-sm text-slate-500 py-2",
                             children: "No deposits found for this address."
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 699,
+                            lineNumber: 703,
                             columnNumber: 33
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "space-y-3 pt-1",
@@ -2299,7 +2368,7 @@ function EthTab() {
                                                     children: srcChain?.name ?? `Chain ${rec.sourceChainId}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/bridge/page.tsx",
-                                                    lineNumber: 723,
+                                                    lineNumber: 727,
                                                     columnNumber: 53
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2307,13 +2376,13 @@ function EthTab() {
                                                     children: rec.status
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/bridge/page.tsx",
-                                                    lineNumber: 726,
+                                                    lineNumber: 730,
                                                     columnNumber: 53
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/bridge/page.tsx",
-                                            lineNumber: 722,
+                                            lineNumber: 726,
                                             columnNumber: 49
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2327,7 +2396,7 @@ function EthTab() {
                                                     children: "→"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/bridge/page.tsx",
-                                                    lineNumber: 739,
+                                                    lineNumber: 743,
                                                     columnNumber: 53
                                                 }, this),
                                                 ' ',
@@ -2339,13 +2408,13 @@ function EthTab() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/bridge/page.tsx",
-                                                    lineNumber: 740,
+                                                    lineNumber: 744,
                                                     columnNumber: 53
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/bridge/page.tsx",
-                                            lineNumber: 737,
+                                            lineNumber: 741,
                                             columnNumber: 49
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2359,7 +2428,7 @@ function EthTab() {
                                                     children: "Source Tx ↗"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/bridge/page.tsx",
-                                                    lineNumber: 743,
+                                                    lineNumber: 747,
                                                     columnNumber: 53
                                                 }, this),
                                                 canRedeem && (reclaimingTx === rec.sourceTxHash ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2379,7 +2448,7 @@ function EthTab() {
                                                                     strokeWidth: "4"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/bridge/page.tsx",
-                                                                    lineNumber: 755,
+                                                                    lineNumber: 759,
                                                                     columnNumber: 69
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
@@ -2388,20 +2457,20 @@ function EthTab() {
                                                                     d: "M4 12a8 8 0 018-8v8z"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/bridge/page.tsx",
-                                                                    lineNumber: 756,
+                                                                    lineNumber: 760,
                                                                     columnNumber: 69
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/bridge/page.tsx",
-                                                            lineNumber: 754,
+                                                            lineNumber: 758,
                                                             columnNumber: 65
                                                         }, this),
                                                         RECLAIM_STEP_LABELS[reclaimStep] ?? 'Processing…'
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/bridge/page.tsx",
-                                                    lineNumber: 753,
+                                                    lineNumber: 757,
                                                     columnNumber: 61
                                                 }, this) : reclaimErrorTx === rec.sourceTxHash && reclaimError ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     className: "flex items-center gap-2",
@@ -2411,7 +2480,7 @@ function EthTab() {
                                                             children: reclaimError
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/bridge/page.tsx",
-                                                            lineNumber: 762,
+                                                            lineNumber: 766,
                                                             columnNumber: 65
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2421,13 +2490,13 @@ function EthTab() {
                                                             children: "✕"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/bridge/page.tsx",
-                                                            lineNumber: 763,
+                                                            lineNumber: 767,
                                                             columnNumber: 65
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/bridge/page.tsx",
-                                                    lineNumber: 761,
+                                                    lineNumber: 765,
                                                     columnNumber: 61
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                     onClick: ()=>{
@@ -2443,42 +2512,42 @@ function EthTab() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/bridge/page.tsx",
-                                                    lineNumber: 766,
+                                                    lineNumber: 770,
                                                     columnNumber: 61
                                                 }, this))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/bridge/page.tsx",
-                                            lineNumber: 742,
+                                            lineNumber: 746,
                                             columnNumber: 49
                                         }, this)
                                     ]
                                 }, rec.sourceTxHash, true, {
                                     fileName: "[project]/app/bridge/page.tsx",
-                                    lineNumber: 711,
+                                    lineNumber: 715,
                                     columnNumber: 45
                                 }, this);
                             })
                         }, void 0, false, {
                             fileName: "[project]/app/bridge/page.tsx",
-                            lineNumber: 701,
+                            lineNumber: 705,
                             columnNumber: 33
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/bridge/page.tsx",
-                        lineNumber: 695,
+                        lineNumber: 699,
                         columnNumber: 25
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/bridge/page.tsx",
-                    lineNumber: 694,
+                    lineNumber: 698,
                     columnNumber: 21
                 }, this)
             }, void 0, false)
         ]
     }, void 0, true, {
         fileName: "[project]/app/bridge/page.tsx",
-        lineNumber: 518,
+        lineNumber: 522,
         columnNumber: 9
     }, this);
 }
