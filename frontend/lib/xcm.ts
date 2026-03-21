@@ -109,7 +109,10 @@ function normalizeXcmError(error: unknown): Error {
 }
 
 async function getBuilder(api: any) {
-    const { Builder } = await import("@paraspell/sdk-pjs");
+    const Builder = (window as any).ParaSpell?.Builder;
+    if (!Builder) {
+        throw new Error("ParaSpell not loaded from CDN.");
+    }
     return Builder(api);
 }
 
@@ -185,7 +188,7 @@ export async function sendXCMToHub(params: SendXcmParams): Promise<{ blockHash: 
                     }
                 },
             )
-                .then((u) => { unsub = u; })
+                .then((u: () => void) => { unsub = u; })
                 .catch((err: unknown) => { cleanup(); reject(err); });
         });
 

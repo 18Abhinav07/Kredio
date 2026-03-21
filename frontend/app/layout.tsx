@@ -1,5 +1,6 @@
 "use client"
 
+import Script from "next/script"
 import { WagmiProvider, useAccount, useChainId, useSwitchChain, useBalance, useWalletClient } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RainbowKitProvider, ConnectButton, darkTheme } from '@rainbow-me/rainbowkit'
@@ -241,6 +242,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     return (
         <html lang="en" className={outfit.variable} suppressHydrationWarning>
             <body className="bg-slate-950 min-h-screen text-slate-100 font-sans antialiased overflow-x-hidden">
+                <Script src="https://unpkg.com/@paraspell/sdk-pjs/dist/index.umd.js" strategy="beforeInteractive" />
                 <WagmiProvider config={wagmiConfig}>
                     <QueryClientProvider client={queryClient}>
                         <RainbowKitProvider
