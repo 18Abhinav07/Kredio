@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next build --webpack",
-    "lint": "eslint",
-    "postinstall": "node scripts/fix-polkadot-wasm.js"
+    "lint": "eslint"
   },
   "dependencies": {
     "@metamask/sdk": "^0.34.0",
