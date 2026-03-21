@@ -1,4 +1,5 @@
 "use client"
+// cache-bust: 1
 
 import { formatUnits, isAddress, parseUnits } from 'viem';
 import type { ApiPromise as PolkadotApiPromise } from '@polkadot/api';
