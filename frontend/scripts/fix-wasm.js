@@ -6,31 +6,41 @@ const { execSync } = require("child_process");
 const target = "`proving${'\\0'}0`";
 const replacement = "`proving${'\\u0000'}0`";
 
-// Find all copies of the offending file
-const result = execSync(
-    `find node_modules/@polkadot -name "bundle-polkadot-util-crypto.js" 2>/dev/null`,
-    { encoding: "utf8" }
-).trim();
+console.log("[fix-wasm] Searching for all copies of bundle-polkadot-util-crypto.js...");
 
-if (!result) {
-    console.log("[fix-wasm] No bundle files found.");
-    process.exit(0);
+let files = [];
+try {
+    const result = execSync(
+        `find node_modules/@polkadot -name "bundle-polkadot-util-crypto.js"`,
+        { encoding: "utf8" }
+    ).trim();
+    files = result.split("\n").filter(Boolean);
+} catch (e) {
+    console.log("[fix-wasm] find command failed or no files found. Skipping.");
+    process.exit(0); // Always exit 0 — never block npm install
 }
 
-const files = result.split("\n").filter(Boolean);
+console.log(`[fix-wasm] Found ${files.length} file(s).`);
+
 let patchedCount = 0;
 
 for (const file of files) {
-    const content = fs.readFileSync(file, "utf8");
+    try {
+        const content = fs.readFileSync(file, "utf8");
 
-    if (!content.includes(target)) {
-        console.log(`[fix-wasm] Already patched or not affected: ${file}`);
-        continue;
+        if (!content.includes(target)) {
+            console.log(`[fix-wasm] Already patched: ${file}`);
+            continue;
+        }
+
+        fs.writeFileSync(file, content.replace(target, replacement));
+        console.log(`[fix-wasm] Patched: ${file}`);
+        patchedCount++;
+    } catch (e) {
+        console.log(`[fix-wasm] Error processing ${file}: ${e.message}`);
+        // Continue — never throw
     }
-
-    fs.writeFileSync(file, content.replace(target, replacement));
-    console.log(`[fix-wasm] Patched: ${file}`);
-    patchedCount++;
 }
 
 console.log(`[fix-wasm] Done. ${patchedCount} file(s) patched.`);
+process.exit(0); // Always exit 0
