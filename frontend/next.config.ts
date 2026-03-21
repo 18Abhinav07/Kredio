@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   ],
 
   webpack: (config) => {
+    config.optimization.splitChunks = false;
     config.module.rules.push({
       test: /\.js$/,
       include: /node_modules\/(@paraspell\/sdk-pjs)/,

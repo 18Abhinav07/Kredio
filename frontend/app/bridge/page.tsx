@@ -136,47 +136,7 @@ function InlineProgress({
     );
 }
 
-function XcmPipeline({ currentStage, arrived }: { currentStage: XcmStatusStage | null; arrived: boolean }) {
-    if (!currentStage) return null;
-    const currentIdx = XCM_STAGES.indexOf(currentStage);
-    return (
-        <Panel title="XCM Pipeline">
-            <div className="space-y-1 pt-1">
-                {XCM_STAGES.map((stage, i) => {
-                    const isDone = arrived ? true : i < currentIdx;
-                    const isActive = !arrived && i === currentIdx;
-                    return (
-                        <div key={stage} className="flex items-center gap-3 py-1.5">
-                            <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
-                                {isDone ? (
-                                    <span className="text-emerald-400 text-sm">✓</span>
-                                ) : isActive ? (
-                                    <span className="block w-3 h-3 rounded-full border-2 border-violet-400 border-t-transparent animate-spin" />
-                                ) : (
-                                    <span className="block w-2 h-2 rounded-full bg-white/15" />
-                                )}
-                            </div>
-                            <span className={cn(
-                                'text-sm',
-                                isDone ? 'text-emerald-300' : isActive ? 'text-white font-medium' : 'text-slate-600',
-                            )}>
-                                {XCM_STAGE_LABELS[stage]}
-                            </span>
-                        </div>
-                    );
-                })}
-                {arrived && (
-                    <div className="flex items-center gap-3 py-1.5">
-                        <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
-                            <span className="text-emerald-400 text-sm">✓</span>
-                        </div>
-                        <span className="text-sm text-emerald-300 font-medium">PAS arrived on Hub</span>
-                    </div>
-                )}
-            </div>
-        </Panel>
-    );
-}
+
 
 // ─── Top-level tab ───────────────────────────────────────────────────────────
 type BridgeTab = 'pas' | 'eth';
@@ -264,6 +224,7 @@ function PasTab() {
         setSending(true);
         setArrived(false);
         setHasSent(true);
+        setCurrentStage(null);
         setStatusMsg('');
         try {
             let snapshot: bigint | undefined;
@@ -306,6 +267,8 @@ function PasTab() {
         } catch (err) {
             setStatusMsg(`Error: ${err instanceof Error ? err.message : String(err)}`);
             setSending(false);
+            setHasSent(false);
+            setCurrentStage(null);
         }
     }
 
@@ -413,40 +376,36 @@ function PasTab() {
                     <p className="text-xs text-slate-500">
                         To: <span className="font-mono text-slate-400">{hubAddress ?? '-'}</span>
                     </p>
+                    {isError && (
+                        <div className="flex items-center gap-3 rounded-xl border border-rose-500/20 bg-rose-500/8 px-4 py-3 mb-3 mt-3">
+                            <span className="text-rose-400 text-sm shrink-0">✕</span>
+                            <span className="text-sm text-rose-300 flex-1 min-w-0 break-words">{statusMsg}</span>
+                            <button onClick={() => setStatusMsg('')} className="text-slate-500 hover:text-white text-sm leading-none shrink-0" aria-label="Dismiss">✕</button>
+                        </div>
+                    )}
                     {arrived ? (
-                        <div className="flex items-center gap-2 text-sm text-emerald-300">
+                        <div className="flex items-center gap-2 text-sm text-emerald-300 mt-3 border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 rounded-xl">
                             <span>✓</span>
                             <span>PAS arrived on Hub</span>
                             {balanceBefore !== null && balanceNow !== null && balanceNow > balanceBefore && (
-                                <span className="text-emerald-400 font-semibold">
+                                <span className="text-emerald-400 font-semibold ml-auto">
                                     +{formatPASFromEVM(balanceNow - balanceBefore)} PAS
                                 </span>
                             )}
                         </div>
-                    ) : isError ? (
-                        <div className="flex items-center gap-3 rounded-xl border border-rose-500/20 bg-rose-500/8 px-4 py-3">
-                            <span className="text-rose-400 text-sm shrink-0">✕</span>
-                            <span className="text-sm text-rose-300 flex-1 min-w-0 truncate">{statusMsg}</span>
-                            <button onClick={() => setStatusMsg('')} className="text-slate-500 hover:text-white text-sm leading-none shrink-0" aria-label="Dismiss">✕</button>
-                        </div>
                     ) : (
-                        <ActionButton
-                            label={sending ? 'Sending via XCM…' : 'Send PAS via Talisman'}
-                            onClick={sendXCM}
-                            disabled={!canSend}
-                            loading={sending}
-                            variant="primary"
-                        />
+                        <div className="mt-3">
+                            <ActionButton
+                                label={sending ? (currentStage ? `${XCM_STAGE_LABELS[currentStage]}...` : 'Sending via XCM…') : 'Send PAS via Talisman'}
+                                onClick={sendXCM}
+                                disabled={!canSend}
+                                loading={sending}
+                                variant="primary"
+                            />
+                        </div>
                     )}
                 </div>
             </WalletStep>
-
-            {/* XCM Pipeline */}
-            {hasSent && (
-                <div className="pt-1">
-                    <XcmPipeline currentStage={currentStage} arrived={arrived} />
-                </div>
-            )}
         </div>
     );
 }
