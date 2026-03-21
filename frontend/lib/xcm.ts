@@ -108,13 +108,7 @@ function normalizeXcmError(error: unknown): Error {
     return new Error(message || 'XCM transfer failed');
 }
 
-async function getBuilder(api: any) {
-    const Builder = (window as any).ParaSpell?.Builder;
-    if (!Builder) {
-        throw new Error("ParaSpell not loaded from CDN.");
-    }
-    return Builder(api);
-}
+
 
 export async function sendXCMToHub(params: SendXcmParams): Promise<{ blockHash: string }> {
     const { senderAddress, destinationEVM, amountPAS, onStatus } = params;
@@ -141,7 +135,9 @@ export async function sendXCMToHub(params: SendXcmParams): Promise<{ blockHash: 
         id32.fill(0xee, 20);
         const ss58Dest = encodeAddress(id32, 0);
 
-        const builder = await getBuilder(api);
+        const { loadBuilder } = await import("./paraspell-runtime");
+        const Builder = await loadBuilder();
+        const builder = Builder(api);
         const tx = await builder
             .from('PeoplePaseo')
             .to('AssetHubPaseo')
