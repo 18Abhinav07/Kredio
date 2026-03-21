@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 22, "column": 0}, "map": {"version":3,"sources":["file:///Users/18abhinav07/Documents/Kredio/frontend/app/docs/page.tsx"],"sourcesContent":["import { redirect } from 'next/navigation';\n\nexport default function DocsIndex() {\n    redirect('/docs/intro');\n}\n"],"names":[],"mappings":";;;;AAAA;AAAA;;AAEe,SAAS;IACpB,IAAA,iMAAQ,EAAC;AACb"}}]
+}

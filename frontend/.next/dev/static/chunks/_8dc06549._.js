@@ -1611,7 +1611,7 @@ function Spinner({ small }) {
         className: `inline-block rounded-full border-current border-t-transparent animate-spin shrink-0 ${s}`
     }, void 0, false, {
         fileName: "[project]/app/lend/page.tsx",
-        lineNumber: 26,
+        lineNumber: 27,
         columnNumber: 12
     }, this);
 }
@@ -1629,12 +1629,12 @@ function Check() {
             d: "M5 13l4 4L19 7"
         }, void 0, false, {
             fileName: "[project]/app/lend/page.tsx",
-            lineNumber: 31,
+            lineNumber: 32,
             columnNumber: 13
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/lend/page.tsx",
-        lineNumber: 30,
+        lineNumber: 31,
         columnNumber: 9
     }, this);
 }
@@ -1648,7 +1648,7 @@ function SectionLabel({ n, label, done }) {
                 children: done ? '✓' : n
             }, void 0, false, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 38,
+                lineNumber: 39,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1656,13 +1656,13 @@ function SectionLabel({ n, label, done }) {
                 children: label
             }, void 0, false, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 42,
+                lineNumber: 43,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/lend/page.tsx",
-        lineNumber: 37,
+        lineNumber: 38,
         columnNumber: 9
     }, this);
 }
@@ -1676,7 +1676,7 @@ function InfoRow({ label, value, tone }) {
                 children: label
             }, void 0, false, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 49,
+                lineNumber: 50,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1684,13 +1684,13 @@ function InfoRow({ label, value, tone }) {
                 children: value
             }, void 0, false, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 50,
+                lineNumber: 51,
                 columnNumber: 13
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/lend/page.tsx",
-        lineNumber: 48,
+        lineNumber: 49,
         columnNumber: 9
     }, this);
 }
@@ -1700,7 +1700,7 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
     const { address, isConnected } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wagmi$2f$dist$2f$esm$2f$hooks$2f$useConnection$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__useConnection__as__useAccount$3e$__["useAccount"])();
     const { isWrongNetwork } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$hooks$2f$useAccess$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAccess"])();
     const { logAction } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$providers$2f$ActionLogProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useActionLog"])();
-    const { lending } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$hooks$2f$useProtocolData$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useGlobalProtocolData"])();
+    const { lending, pasMarket } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$hooks$2f$useProtocolData$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useGlobalProtocolData"])();
     const portfolio = (0, __TURBOPACK__imported__module__$5b$project$5d2f$hooks$2f$useProtocolData$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useUserPortfolio"])();
     const [amountInput, setAmountInput] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(prefillAmount ?? '');
     const [phase, setPhase] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('idle');
@@ -1725,7 +1725,8 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
         }
     });
     const musdcBalance = balRaw ?? 0n;
-    const utilBps = lending.utilizationBps;
+    const marketData = market === 'pas' ? pasMarket : lending;
+    const utilBps = marketData.utilizationBps;
     // Estimated lender APY: avg borrow rate (~10%) × utilization × 90% (after 10% protocol fee)
     const aprNum = Number(utilBps) / 10000 * 9;
     const aprDisplay = utilBps === 0n ? '-' : `${aprNum.toFixed(2)}%`;
@@ -1844,7 +1845,7 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
                         children: "Amount (mUSDC)"
                     }, void 0, false, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 133,
+                        lineNumber: 136,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1861,7 +1862,7 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
                                 className: "flex-1 bg-transparent text-xl font-light text-white placeholder-slate-600 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             }, void 0, false, {
                                 fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 135,
+                                lineNumber: 138,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1869,13 +1870,13 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
                                 children: "mUSDC"
                             }, void 0, false, {
                                 fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 138,
+                                lineNumber: 141,
                                 columnNumber: 21
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 134,
+                        lineNumber: 137,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1890,19 +1891,19 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 140,
+                                lineNumber: 143,
                                 columnNumber: 71
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 140,
+                        lineNumber: 143,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 132,
+                lineNumber: 135,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1913,7 +1914,7 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
                         value: aprDisplay
                     }, void 0, false, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 143,
+                        lineNumber: 146,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(InfoRow, {
@@ -1921,7 +1922,7 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
                         value: `${(Number(utilBps) / 100).toFixed(2)}%`
                     }, void 0, false, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 144,
+                        lineNumber: 147,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(InfoRow, {
@@ -1929,13 +1930,13 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
                         value: `~${yearlyYield.toFixed(4)} mUSDC`
                     }, void 0, false, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 145,
+                        lineNumber: 148,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 142,
+                lineNumber: 145,
                 columnNumber: 13
             }, this),
             !dismissed && !isProcessing && phase !== 'success' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1946,7 +1947,7 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
                         children: "ℹ 2 wallet confirmations required: approve, then deposit."
                     }, void 0, false, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 149,
+                        lineNumber: 152,
                         columnNumber: 21
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1955,13 +1956,13 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
                         children: "✕"
                     }, void 0, false, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 150,
+                        lineNumber: 153,
                         columnNumber: 21
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 148,
+                lineNumber: 151,
                 columnNumber: 17
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -1972,7 +1973,7 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Check, {}, void 0, false, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 157,
+                                    lineNumber: 160,
                                     columnNumber: 105
                                 }, this),
                                 " Deposited ",
@@ -1981,7 +1982,7 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 157,
+                            lineNumber: 160,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(InfoRow, {
@@ -1989,7 +1990,7 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
                             value: `${aprDisplay} APY`
                         }, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 158,
+                            lineNumber: 161,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(InfoRow, {
@@ -1997,7 +1998,7 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
                             value: `~${yearlyYield.toFixed(4)} mUSDC`
                         }, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 159,
+                            lineNumber: 162,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -2006,13 +2007,13 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
                             children: "View your position →"
                         }, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 160,
+                            lineNumber: 163,
                             columnNumber: 25
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/lend/page.tsx",
-                    lineNumber: 156,
+                    lineNumber: 159,
                     columnNumber: 21
                 }, this)
             }, void 0, false),
@@ -2023,14 +2024,14 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
                 children: [
                     isProcessing && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Spinner, {}, void 0, false, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 174,
+                        lineNumber: 177,
                         columnNumber: 38
                     }, this),
                     btnLabel
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 168,
+                lineNumber: 171,
                 columnNumber: 17
             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                 onClick: reset,
@@ -2038,7 +2039,7 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
                 children: "Lend more mUSDC"
             }, void 0, false, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 177,
+                lineNumber: 180,
                 columnNumber: 17
             }, this),
             !isConnected && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$ProtocolUI$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["StateNotice"], {
@@ -2046,17 +2047,17 @@ function LendDepositCard({ prefillAmount, onSuccess, contractAddr, market }) {
                 message: "Connect MetaMask via the header to lend."
             }, void 0, false, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 181,
+                lineNumber: 184,
                 columnNumber: 30
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/lend/page.tsx",
-        lineNumber: 131,
+        lineNumber: 134,
         columnNumber: 9
     }, this);
 }
-_s(LendDepositCard, "m3UHlgKzL20QFW4O/TMKqa9eG8w=", false, function() {
+_s(LendDepositCard, "GnZW8lIpPO99jqiYsdKO8WvRQWo=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$wagmi$2f$dist$2f$esm$2f$hooks$2f$useConnection$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__useConnection__as__useAccount$3e$__["useAccount"],
         __TURBOPACK__imported__module__$5b$project$5d2f$hooks$2f$useAccess$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAccess"],
@@ -2176,7 +2177,7 @@ _c4 = LendDepositCard;
                         children: "PAS to swap"
                     }, void 0, false, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 229,
+                        lineNumber: 232,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2193,7 +2194,7 @@ _c4 = LendDepositCard;
                                 className: "flex-1 bg-transparent text-xl font-light text-white placeholder-slate-600 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             }, void 0, false, {
                                 fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 231,
+                                lineNumber: 234,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2201,13 +2202,13 @@ _c4 = LendDepositCard;
                                 children: "PAS"
                             }, void 0, false, {
                                 fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 234,
+                                lineNumber: 237,
                                 columnNumber: 21
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 230,
+                        lineNumber: 233,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2225,13 +2226,13 @@ _c4 = LendDepositCard;
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/lend/page.tsx",
-                                        lineNumber: 237,
+                                        lineNumber: 240,
                                         columnNumber: 63
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 237,
+                                lineNumber: 240,
                                 columnNumber: 21
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2244,13 +2245,13 @@ _c4 = LendDepositCard;
                                 children: "Max"
                             }, void 0, false, {
                                 fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 238,
+                                lineNumber: 241,
                                 columnNumber: 21
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 236,
+                        lineNumber: 239,
                         columnNumber: 17
                     }, this),
                     overBalance && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2258,13 +2259,13 @@ _c4 = LendDepositCard;
                         children: "Amount exceeds balance"
                     }, void 0, false, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 241,
+                        lineNumber: 244,
                         columnNumber: 33
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 228,
+                lineNumber: 231,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2279,33 +2280,33 @@ _c4 = LendDepositCard;
                                     small: true
                                 }, void 0, false, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 245,
+                                    lineNumber: 248,
                                     columnNumber: 119
                                 }, this),
                                 "Calculating..."
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 245,
+                            lineNumber: 248,
                             columnNumber: 54
                         }, this) : quoteDisplay ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                             className: "text-2xl font-light text-emerald-300",
                             children: quoteDisplay
                         }, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 246,
+                            lineNumber: 249,
                             columnNumber: 42
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                             className: "text-2xl font-light text-slate-600",
                             children: "-"
                         }, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 247,
+                            lineNumber: 250,
                             columnNumber: 31
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 244,
+                        lineNumber: 247,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2313,13 +2314,13 @@ _c4 = LendDepositCard;
                         children: "mUSDC"
                     }, void 0, false, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 249,
+                        lineNumber: 252,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 243,
+                lineNumber: 246,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2330,7 +2331,7 @@ _c4 = LendDepositCard;
                         value: oraclePrice ? `1 PAS ≈ $${oraclePrice.toFixed(4)}` : '-'
                     }, void 0, false, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 252,
+                        lineNumber: 255,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(InfoRow, {
@@ -2338,13 +2339,13 @@ _c4 = LendDepositCard;
                         value: hasQuote ? `${(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["formatTokenAmount"])(quoteResult * feeBps / (10000n - feeBps), 6, 4, false)} mUSDC` : '-'
                     }, void 0, false, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 253,
+                        lineNumber: 256,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 251,
+                lineNumber: 254,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2367,7 +2368,7 @@ _c4 = LendDepositCard;
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Spinner, {}, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 265,
+                            lineNumber: 268,
                             columnNumber: 27
                         }, this),
                         isSigning ? 'Waiting for MetaMask…' : 'Confirming…'
@@ -2375,7 +2376,7 @@ _c4 = LendDepositCard;
                 }, void 0, true) : phase === 'error' ? 'Action Cancelled' : `Swap ${amount || '0'} PAS → mUSDC`
             }, void 0, false, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 255,
+                lineNumber: 258,
                 columnNumber: 13
             }, this),
             oracle.isCrashed && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$ProtocolUI$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["StateNotice"], {
@@ -2383,13 +2384,13 @@ _c4 = LendDepositCard;
                 message: "Oracle is down - swaps paused."
             }, void 0, false, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 267,
+                lineNumber: 270,
                 columnNumber: 34
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/lend/page.tsx",
-        lineNumber: 227,
+        lineNumber: 230,
         columnNumber: 9
     }, this);
 }
@@ -2424,7 +2425,7 @@ _c5 = SwapStep;
                         children: "1. Swap PAS → mUSDC"
                     }, void 0, false, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 281,
+                        lineNumber: 284,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2432,7 +2433,7 @@ _c5 = SwapStep;
                         children: "→"
                     }, void 0, false, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 282,
+                        lineNumber: 285,
                         columnNumber: 17
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2440,13 +2441,13 @@ _c5 = SwapStep;
                         children: "2. Lend mUSDC"
                     }, void 0, false, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 283,
+                        lineNumber: 286,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 280,
+                lineNumber: 283,
                 columnNumber: 13
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -2457,7 +2458,7 @@ _c5 = SwapStep;
                             label: "Swap PAS → mUSDC"
                         }, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 288,
+                            lineNumber: 291,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SwapStep, {
@@ -2467,19 +2468,19 @@ _c5 = SwapStep;
                             }
                         }, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 289,
+                            lineNumber: 292,
                             columnNumber: 25
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/lend/page.tsx",
-                    lineNumber: 287,
+                    lineNumber: 290,
                     columnNumber: 21
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Check, {}, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 293,
+                            lineNumber: 296,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2490,7 +2491,7 @@ _c5 = SwapStep;
                                     children: "Step 1 - "
                                 }, void 0, false, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 294,
+                                    lineNumber: 297,
                                     columnNumber: 50
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2502,19 +2503,19 @@ _c5 = SwapStep;
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 294,
+                                    lineNumber: 297,
                                     columnNumber: 99
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 294,
+                            lineNumber: 297,
                             columnNumber: 25
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/lend/page.tsx",
-                    lineNumber: 292,
+                    lineNumber: 295,
                     columnNumber: 21
                 }, this)
             }, void 0, false),
@@ -2527,7 +2528,7 @@ _c5 = SwapStep;
                             done: step === 'done'
                         }, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 301,
+                            lineNumber: 304,
                             columnNumber: 25
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(LendDepositCard, {
@@ -2537,13 +2538,13 @@ _c5 = SwapStep;
                             market: market
                         }, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 302,
+                            lineNumber: 305,
                             columnNumber: 25
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/lend/page.tsx",
-                    lineNumber: 300,
+                    lineNumber: 303,
                     columnNumber: 21
                 }, this)
             }, void 0, false),
@@ -2553,13 +2554,13 @@ _c5 = SwapStep;
                 children: "← Start again"
             }, void 0, false, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 306,
+                lineNumber: 309,
                 columnNumber: 33
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/lend/page.tsx",
-        lineNumber: 279,
+        lineNumber: 282,
         columnNumber: 9
     }, this);
 }
@@ -2706,7 +2707,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                 children: "→"
                             }, void 0, false, {
                                 fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 405,
+                                lineNumber: 408,
                                 columnNumber: 35
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2718,18 +2719,18 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 406,
+                                lineNumber: 409,
                                 columnNumber: 25
                             }, this)
                         ]
                     }, s, true, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 404,
+                        lineNumber: 407,
                         columnNumber: 21
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 402,
+                lineNumber: 405,
                 columnNumber: 13
             }, this),
             !isConnected && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$ProtocolUI$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["StateNotice"], {
@@ -2737,7 +2738,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                 message: "Connect MetaMask via the header first."
             }, void 0, false, {
                 fileName: "[project]/app/lend/page.tsx",
-                lineNumber: 412,
+                lineNumber: 415,
                 columnNumber: 30
             }, this),
             isConnected && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -2750,7 +2751,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                     label: "Bridge PAS from People Chain to Hub"
                                 }, void 0, false, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 418,
+                                    lineNumber: 421,
                                     columnNumber: 33
                                 }, this),
                                 !talismanConnected ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2759,7 +2760,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                     children: "Connect Talisman"
                                 }, void 0, false, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 420,
+                                    lineNumber: 423,
                                     columnNumber: 37
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "rounded-xl border border-purple-500/20 bg-purple-500/10 px-3 py-2 flex items-center gap-2 text-xs",
@@ -2768,7 +2769,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                             className: "w-2 h-2 rounded-full bg-emerald-400 shrink-0"
                                         }, void 0, false, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 426,
+                                            lineNumber: 429,
                                             columnNumber: 41
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2776,7 +2777,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                             children: selectedAcc?.meta?.name ?? selectedAcc?.address.slice(0, 14) + '…'
                                         }, void 0, false, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 427,
+                                            lineNumber: 430,
                                             columnNumber: 41
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2787,13 +2788,13 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 428,
+                                            lineNumber: 431,
                                             columnNumber: 41
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 425,
+                                    lineNumber: 428,
                                     columnNumber: 37
                                 }, this),
                                 subAccounts.length > 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -2810,12 +2811,12 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                             children: a.meta?.name ?? a.address.slice(0, 20) + '…'
                                         }, a.address, false, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 442,
+                                            lineNumber: 445,
                                             columnNumber: 63
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 432,
+                                    lineNumber: 435,
                                     columnNumber: 37
                                 }, this),
                                 talismanConnected && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -2828,7 +2829,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     children: "PAS amount to bridge"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 448,
+                                                    lineNumber: 451,
                                                     columnNumber: 45
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2845,7 +2846,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                             className: "flex-1 bg-transparent text-xl font-light text-white placeholder-slate-600 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/lend/page.tsx",
-                                                            lineNumber: 450,
+                                                            lineNumber: 453,
                                                             columnNumber: 49
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2853,19 +2854,19 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                             children: "PAS"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/lend/page.tsx",
-                                                            lineNumber: 453,
+                                                            lineNumber: 456,
                                                             columnNumber: 49
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 449,
+                                                    lineNumber: 452,
                                                     columnNumber: 45
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 447,
+                                            lineNumber: 450,
                                             columnNumber: 41
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2877,7 +2878,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     tone: "green"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 457,
+                                                    lineNumber: 460,
                                                     columnNumber: 45
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(InfoRow, {
@@ -2885,7 +2886,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     value: oracle.price8 > 0n ? `$${(Number(oracle.price8) / 1e8).toFixed(4)}` : '-'
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 458,
+                                                    lineNumber: 461,
                                                     columnNumber: 45
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(InfoRow, {
@@ -2893,13 +2894,13 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     value: "~30 seconds"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 459,
+                                                    lineNumber: 462,
                                                     columnNumber: 45
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 456,
+                                            lineNumber: 459,
                                             columnNumber: 41
                                         }, this),
                                         bridgeStatus && bridging && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2909,7 +2910,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     small: true
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 463,
+                                                    lineNumber: 466,
                                                     columnNumber: 49
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2917,7 +2918,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     children: bridgeStatus
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 464,
+                                                    lineNumber: 467,
                                                     columnNumber: 49
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2928,13 +2929,13 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 465,
+                                                    lineNumber: 468,
                                                     columnNumber: 49
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 462,
+                                            lineNumber: 465,
                                             columnNumber: 45
                                         }, this),
                                         bridgeStatus && bridgeStatus.startsWith('Error') && !bridging ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2945,7 +2946,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     children: "✕"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 470,
+                                                    lineNumber: 473,
                                                     columnNumber: 49
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2953,7 +2954,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     children: bridgeStatus.replace(/^Error:\s*/, '')
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 471,
+                                                    lineNumber: 474,
                                                     columnNumber: 49
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2963,13 +2964,13 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                     children: "✕"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/lend/page.tsx",
-                                                    lineNumber: 472,
+                                                    lineNumber: 475,
                                                     columnNumber: 49
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 469,
+                                            lineNumber: 472,
                                             columnNumber: 45
                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                             onClick: handleBridge,
@@ -2979,7 +2980,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Spinner, {}, void 0, false, {
                                                         fileName: "[project]/app/lend/page.tsx",
-                                                        lineNumber: 479,
+                                                        lineNumber: 482,
                                                         columnNumber: 63
                                                     }, this),
                                                     "Bridging…"
@@ -2987,7 +2988,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                             }, void 0, true) : `Bridge ${bridgeAmount || '0'} PAS to Hub`
                                         }, void 0, false, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 475,
+                                            lineNumber: 478,
                                             columnNumber: 45
                                         }, this)
                                     ]
@@ -2995,13 +2996,13 @@ function BridgeAndLendTab({ contractAddr, market }) {
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 417,
+                            lineNumber: 420,
                             columnNumber: 29
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Check, {}, void 0, false, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 487,
+                                    lineNumber: 490,
                                     columnNumber: 33
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3012,7 +3013,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                             children: "Step 1 - "
                                         }, void 0, false, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 488,
+                                            lineNumber: 491,
                                             columnNumber: 58
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3024,19 +3025,19 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/lend/page.tsx",
-                                            lineNumber: 488,
+                                            lineNumber: 491,
                                             columnNumber: 107
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 488,
+                                    lineNumber: 491,
                                     columnNumber: 33
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 486,
+                            lineNumber: 489,
                             columnNumber: 29
                         }, this)
                     }, void 0, false),
@@ -3050,7 +3051,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                         label: "Swap PAS → mUSDC"
                                     }, void 0, false, {
                                         fileName: "[project]/app/lend/page.tsx",
-                                        lineNumber: 497,
+                                        lineNumber: 500,
                                         columnNumber: 41
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SwapStep, {
@@ -3060,20 +3061,20 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                         }
                                     }, void 0, false, {
                                         fileName: "[project]/app/lend/page.tsx",
-                                        lineNumber: 498,
+                                        lineNumber: 501,
                                         columnNumber: 41
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 496,
+                                lineNumber: 499,
                                 columnNumber: 37
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "rounded-2xl border border-emerald-500/20 bg-emerald-900/10 p-4 flex items-center gap-3",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Check, {}, void 0, false, {
                                         fileName: "[project]/app/lend/page.tsx",
-                                        lineNumber: 502,
+                                        lineNumber: 505,
                                         columnNumber: 41
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3084,7 +3085,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                 children: "Step 2 - "
                                             }, void 0, false, {
                                                 fileName: "[project]/app/lend/page.tsx",
-                                                lineNumber: 503,
+                                                lineNumber: 506,
                                                 columnNumber: 66
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3096,24 +3097,24 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/lend/page.tsx",
-                                                lineNumber: 503,
+                                                lineNumber: 506,
                                                 columnNumber: 115
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/lend/page.tsx",
-                                        lineNumber: 503,
+                                        lineNumber: 506,
                                         columnNumber: 41
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 501,
+                                lineNumber: 504,
                                 columnNumber: 37
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 494,
+                            lineNumber: 497,
                             columnNumber: 29
                         }, this)
                     }, void 0, false),
@@ -3126,7 +3127,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                     done: step === 'done'
                                 }, void 0, false, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 512,
+                                    lineNumber: 515,
                                     columnNumber: 33
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(LendDepositCard, {
@@ -3136,13 +3137,13 @@ function BridgeAndLendTab({ contractAddr, market }) {
                                     market: market
                                 }, void 0, false, {
                                     fileName: "[project]/app/lend/page.tsx",
-                                    lineNumber: 513,
+                                    lineNumber: 516,
                                     columnNumber: 33
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 511,
+                            lineNumber: 514,
                             columnNumber: 29
                         }, this)
                     }, void 0, false),
@@ -3152,7 +3153,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
                         children: "← Start again"
                     }, void 0, false, {
                         fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 517,
+                        lineNumber: 520,
                         columnNumber: 41
                     }, this)
                 ]
@@ -3160,7 +3161,7 @@ function BridgeAndLendTab({ contractAddr, market }) {
         ]
     }, void 0, true, {
         fileName: "[project]/app/lend/page.tsx",
-        lineNumber: 401,
+        lineNumber: 404,
         columnNumber: 9
     }, this);
 }
@@ -3175,14 +3176,90 @@ _c7 = BridgeAndLendTab;
 function LendUsdcPage() {
     _s4();
     const [source, setSource] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('musdc');
-    const { lending } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$hooks$2f$useProtocolData$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useGlobalProtocolData"])();
+    const [marketAction, setMarketAction] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('lending');
+    const { lending, pasMarket } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$hooks$2f$useProtocolData$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useGlobalProtocolData"])();
     const tabCls = (active)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])('px-3 py-2 rounded-xl text-xs font-semibold border transition-colors', active ? 'bg-white text-black border-white' : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10');
+    const mktCls = (active)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])('px-4 py-2 rounded-xl text-sm font-semibold border transition-all', active ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10');
+    const activeMarketAddr = marketAction === 'pas' ? __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$addresses$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].pasMarket : __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$addresses$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].lending;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$ProtocolUI$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PageShell"], {
         title: "Lend",
-        subtitle: "Earn yield by lending mUSDC to the USDC lending pool. Source from mUSDC, Hub PAS, or People Chain PAS.",
+        subtitle: "Earn yield by lending mUSDC to the protocols. Source from mUSDC, Hub PAS, or People Chain PAS.",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "max-w-lg mx-auto space-y-4",
+            className: "max-w-lg mx-auto space-y-6",
             children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "grid grid-cols-2 gap-2 p-1 rounded-2xl border border-white/10 bg-black/40",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                            className: mktCls(marketAction === 'lending'),
+                            onClick: ()=>setMarketAction('lending'),
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex flex-col items-center gap-0.5",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        children: "USDC Market"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/lend/page.tsx",
+                                        lineNumber: 550,
+                                        columnNumber: 29
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "text-[10px] opacity-60 font-medium",
+                                        children: "Supply main pool"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/lend/page.tsx",
+                                        lineNumber: 551,
+                                        columnNumber: 29
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/lend/page.tsx",
+                                lineNumber: 549,
+                                columnNumber: 25
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/app/lend/page.tsx",
+                            lineNumber: 548,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                            className: mktCls(marketAction === 'pas'),
+                            onClick: ()=>setMarketAction('pas'),
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex flex-col items-center gap-0.5",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        children: "PAS Market"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/lend/page.tsx",
+                                        lineNumber: 556,
+                                        columnNumber: 29
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "text-[10px] opacity-60 font-medium",
+                                        children: "Supply PAS borrowers"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/lend/page.tsx",
+                                        lineNumber: 557,
+                                        columnNumber: 29
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/lend/page.tsx",
+                                lineNumber: 555,
+                                columnNumber: 25
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/app/lend/page.tsx",
+                            lineNumber: 554,
+                            columnNumber: 21
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/lend/page.tsx",
+                    lineNumber: 547,
+                    columnNumber: 17
+                }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "inline-flex gap-1 rounded-xl border border-white/10 bg-black/30 p-1",
                     children: [
@@ -3192,7 +3269,7 @@ function LendUsdcPage() {
                             children: "mUSDC"
                         }, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 536,
+                            lineNumber: 563,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3201,7 +3278,7 @@ function LendUsdcPage() {
                             children: "Swap & Lend"
                         }, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 537,
+                            lineNumber: 564,
                             columnNumber: 21
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3210,79 +3287,78 @@ function LendUsdcPage() {
                             children: "Bridge & Lend"
                         }, void 0, false, {
                             fileName: "[project]/app/lend/page.tsx",
-                            lineNumber: 538,
+                            lineNumber: 565,
                             columnNumber: 21
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/lend/page.tsx",
-                    lineNumber: 535,
+                    lineNumber: 562,
                     columnNumber: 17
                 }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
-                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        children: [
-                            source === 'musdc' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                        className: "text-base font-semibold text-white mb-4",
-                                        children: "Lend mUSDC directly"
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/lend/page.tsx",
-                                        lineNumber: 544,
-                                        columnNumber: 33
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(LendDepositCard, {
-                                        contractAddr: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$addresses$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].lending,
-                                        market: "lending"
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/lend/page.tsx",
-                                        lineNumber: 545,
-                                        columnNumber: 33
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 543,
-                                columnNumber: 29
-                            }, this),
-                            source === 'swap' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SwapAndLendTab, {
-                                contractAddr: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$addresses$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].lending,
-                                market: "lending"
-                            }, void 0, false, {
-                                fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 548,
-                                columnNumber: 47
-                            }, this),
-                            source === 'bridge' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(BridgeAndLendTab, {
-                                contractAddr: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$addresses$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].lending,
-                                market: "lending"
-                            }, void 0, false, {
-                                fileName: "[project]/app/lend/page.tsx",
-                                lineNumber: 549,
-                                columnNumber: 49
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/app/lend/page.tsx",
-                        lineNumber: 541,
-                        columnNumber: 21
-                    }, this)
-                }, void 0, false)
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "space-y-4",
+                    children: [
+                        source === 'musdc' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                    className: "text-base font-semibold text-white mb-4",
+                                    children: "Lend mUSDC directly"
+                                }, void 0, false, {
+                                    fileName: "[project]/app/lend/page.tsx",
+                                    lineNumber: 571,
+                                    columnNumber: 29
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(LendDepositCard, {
+                                    contractAddr: activeMarketAddr,
+                                    market: marketAction
+                                }, void 0, false, {
+                                    fileName: "[project]/app/lend/page.tsx",
+                                    lineNumber: 572,
+                                    columnNumber: 29
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/lend/page.tsx",
+                            lineNumber: 570,
+                            columnNumber: 25
+                        }, this),
+                        source === 'swap' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SwapAndLendTab, {
+                            contractAddr: activeMarketAddr,
+                            market: marketAction
+                        }, void 0, false, {
+                            fileName: "[project]/app/lend/page.tsx",
+                            lineNumber: 575,
+                            columnNumber: 43
+                        }, this),
+                        source === 'bridge' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(BridgeAndLendTab, {
+                            contractAddr: activeMarketAddr,
+                            market: marketAction
+                        }, void 0, false, {
+                            fileName: "[project]/app/lend/page.tsx",
+                            lineNumber: 576,
+                            columnNumber: 45
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/lend/page.tsx",
+                    lineNumber: 568,
+                    columnNumber: 17
+                }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/lend/page.tsx",
-            lineNumber: 534,
+            lineNumber: 545,
             columnNumber: 13
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/lend/page.tsx",
-        lineNumber: 533,
+        lineNumber: 544,
         columnNumber: 9
     }, this);
 }
-_s4(LendUsdcPage, "HIOKLh9c23f9DQKj50+qqCnQrRw=", false, function() {
+_s4(LendUsdcPage, "UUhFds7U+MzHhllPN7oSz0cIEBg=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$hooks$2f$useProtocolData$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useGlobalProtocolData"]
     ];

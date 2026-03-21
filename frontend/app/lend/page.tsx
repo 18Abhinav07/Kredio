@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react';
 import { useAccount, useBalance, useReadContract, usePublicClient, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseUnits, formatUnits } from 'viem';
@@ -19,6 +19,7 @@ import { useAccess } from '../../hooks/useAccess';
 
 const GAS_BUFFER = parseUnits('0.01', 18);
 type SourceTab = 'musdc' | 'swap' | 'bridge';
+type MarketType = 'lending' | 'pas';
 type SubstrateAccount = { address: string; type?: string; meta?: { name?: string } };
 
 function Spinner({ small }: { small?: boolean }) {
@@ -68,7 +69,7 @@ function LendDepositCard({
     const { address, isConnected } = useAccount();
     const { isWrongNetwork } = useAccess();
     const { logAction } = useActionLog();
-    const { lending } = useGlobalProtocolData();
+    const { lending, pasMarket } = useGlobalProtocolData();
     const portfolio = useUserPortfolio();
 
     const [amountInput, setAmountInput] = useState(prefillAmount ?? '');
@@ -83,7 +84,9 @@ function LendDepositCard({
         query: { enabled: !!address },
     });
     const musdcBalance = (balRaw as bigint | undefined) ?? 0n;
-    const utilBps = lending.utilizationBps;
+
+    const marketData = market === 'pas' ? pasMarket : lending;
+    const utilBps = marketData.utilizationBps;
     // Estimated lender APY: avg borrow rate (~10%) × utilization × 90% (after 10% protocol fee)
     const aprNum = (Number(utilBps) / 10000) * 9;
     const aprDisplay = utilBps === 0n ? '-' : `${aprNum.toFixed(2)}%`;
@@ -524,31 +527,54 @@ function BridgeAndLendTab({ contractAddr, market }: { contractAddr: `0x${string}
 /* ── Main page ──────────────────────────────────────────────────────────── */
 export default function LendUsdcPage() {
     const [source, setSource] = useState<SourceTab>('musdc');
-    const { lending } = useGlobalProtocolData();
+    const [marketAction, setMarketAction] = useState<MarketType>('lending');
+    const { lending, pasMarket } = useGlobalProtocolData();
     const tabCls = (active: boolean) => cn(
         'px-3 py-2 rounded-xl text-xs font-semibold border transition-colors',
         active ? 'bg-white text-black border-white' : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
     );
+    const mktCls = (active: boolean) => cn(
+        'px-4 py-2 rounded-xl text-sm font-semibold border transition-all',
+        active ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20' : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10'
+    );
+
+    const activeMarketAddr = marketAction === 'pas' ? config.pasMarket : config.lending;
+
     return (
-        <PageShell title="Lend" subtitle="Earn yield by lending mUSDC to the USDC lending pool. Source from mUSDC, Hub PAS, or People Chain PAS.">
-            <div className="max-w-lg mx-auto space-y-4">
+        <PageShell title="Lend" subtitle="Earn yield by lending mUSDC to the protocols. Source from mUSDC, Hub PAS, or People Chain PAS.">
+            <div className="max-w-lg mx-auto space-y-6">
+                {/* Market Selection */}
+                <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl border border-white/10 bg-black/40">
+                    <button className={mktCls(marketAction === 'lending')} onClick={() => setMarketAction('lending')}>
+                        <div className="flex flex-col items-center gap-0.5">
+                            <span>USDC Market</span>
+                            <span className="text-[10px] opacity-60 font-medium">Supply main pool</span>
+                        </div>
+                    </button>
+                    <button className={mktCls(marketAction === 'pas')} onClick={() => setMarketAction('pas')}>
+                        <div className="flex flex-col items-center gap-0.5">
+                            <span>PAS Market</span>
+                            <span className="text-[10px] opacity-60 font-medium">Supply PAS borrowers</span>
+                        </div>
+                    </button>
+                </div>
+
                 <div className="inline-flex gap-1 rounded-xl border border-white/10 bg-black/30 p-1">
                     <button className={tabCls(source === 'musdc')} onClick={() => setSource('musdc')}>mUSDC</button>
                     <button className={tabCls(source === 'swap')} onClick={() => setSource('swap')}>Swap &amp; Lend</button>
                     <button className={tabCls(source === 'bridge')} onClick={() => setSource('bridge')}>Bridge &amp; Lend</button>
                 </div>
-                <>
-                    <div>
-                        {source === 'musdc' && (
-                            <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5">
-                                <h2 className="text-base font-semibold text-white mb-4">Lend mUSDC directly</h2>
-                                <LendDepositCard contractAddr={config.lending} market="lending" />
-                            </div>
-                        )}
-                        {source === 'swap' && <SwapAndLendTab contractAddr={config.lending} market="lending" />}
-                        {source === 'bridge' && <BridgeAndLendTab contractAddr={config.lending} market="lending" />}
-                    </div>
-                </>
+
+                <div className="space-y-4">
+                    {source === 'musdc' && (
+                        <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-xl p-5">
+                            <h2 className="text-base font-semibold text-white mb-4">Lend mUSDC directly</h2>
+                            <LendDepositCard contractAddr={activeMarketAddr} market={marketAction} />
+                        </div>
+                    )}
+                    {source === 'swap' && <SwapAndLendTab contractAddr={activeMarketAddr} market={marketAction} />}
+                    {source === 'bridge' && <BridgeAndLendTab contractAddr={activeMarketAddr} market={marketAction} />}
+                </div>
             </div>
         </PageShell>
     );

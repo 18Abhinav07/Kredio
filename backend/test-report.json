@@ -1,6 +1,6 @@
 {
-  "runAt": "2026-03-19T21:44:49.345Z",
-  "elapsed_s": 782.8,
+  "runAt": "2026-03-20T08:31:41.207Z",
+  "elapsed_s": 1089.6,
   "chain": {
     "rpc": "https://eth-rpc-testnet.polkadot.io/",
     "chainId": 420420417
@@ -30,25 +30,25 @@
   },
   "phase0_state": {
     "lending": {
-      "totalDeposited": "910000000000",
+      "totalDeposited": "0",
       "totalBorrowed": "0",
-      "investedAmount": "455000000000",
-      "protocolFees": "6339419",
+      "investedAmount": "0",
+      "protocolFees": "43628709",
       "utilizationRate": "0",
       "globalTick": "86400",
-      "usdcBalance": "525063394214"
+      "usdcBalance": "43628709"
     },
     "pasMarket": {
-      "totalDeposited": "350000000000",
+      "totalDeposited": "44000000000",
       "totalBorrowed": "0",
       "protocolFees": "0",
       "utilizationRate": "0",
       "globalTick": "86400",
-      "usdcBalance": "350000000000"
+      "usdcBalance": "44000000000"
     },
     "yieldPool": {
-      "principal": "949995780822",
-      "pendingForLending": "10388127",
+      "principal": "494995780822",
+      "pendingForLending": "0",
       "yieldRateBps": "100000"
     }
   },
@@ -72,35 +72,35 @@
     },
     "yieldPool": {
       "principal": "494995780822",
-      "pendingForLending": "1198630",
+      "pendingForLending": "8656773",
       "yieldRateBps": "100000"
     }
   },
   "final_balances": {
     "ADMIN": {
       "address": "0xe37a8983570B39F305fe93D565A29F89366f3fFe",
-      "mUSDC": "2807872247296",
-      "PAS": "16018471214372554607237"
+      "mUSDC": "2808119854045",
+      "PAS": "16017381479079454607237"
     },
     "USER1": {
       "address": "0x5EF0a87f578778Fc78cbFe318D3444D71Ff638da",
-      "mUSDC": "1283052733547",
-      "PAS": "1999513674883800000000"
+      "mUSDC": "1283781518151",
+      "PAS": "2199316253094200000000"
     },
     "USER2": {
       "address": "0x8fb792EdBbA0A3b4e83Fffe790a8F080FD9C46CE",
-      "mUSDC": "526680380014",
-      "PAS": "1099535043266800000000"
+      "mUSDC": "526614219582",
+      "PAS": "1099316794531100000000"
     },
     "USER3": {
       "address": "0x7B8428750F29381Ef4190a0a9F8c294ac123014e",
-      "mUSDC": "6524558121197",
-      "PAS": "1097518061461000000000"
+      "mUSDC": "6524469122910",
+      "PAS": "1096031239236300000000"
     },
     "USER4": {
       "address": "0x6bA56a179ff0C0E08B60EBe2a3f03141CEacE50F",
-      "mUSDC": "398515381908",
-      "PAS": "1077699096116689092763"
+      "mUSDC": "400156246870",
+      "PAS": "777570488779389092763"
     },
     "USER5": {
       "address": "0x105952E94C36916757785C4F7f92DAf5f1cC99ad",
@@ -124,13 +124,13 @@
       "expected": "Lending tick reset",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x2226ecce6d33ed628dcc43f4e2851880333daf96e006f73a484be83c4ffd3881",
+      "txHash": "0x40c9f5c9ee468e3f2b9a005c30a31cc88873f4ec949073beb0d6e1b997d63407",
       "gasUsed": "0",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7915
+      "durationMs": 32566
     },
     {
       "step": 2,
@@ -142,13 +142,13 @@
       "expected": "PASMarket tick reset",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0xc38a8d905241bcac4e7e88374d6e21b10980714b6fffb2a5e2bfcced8ab12171",
+      "txHash": "0x56cf5d74230fe1d6d6b9fcd79eafec9dfb669317afab47ca5895bfb03b4fe0da",
       "gasUsed": "0",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7737
+      "durationMs": 44413
     },
     {
       "step": 3,
@@ -160,13 +160,13 @@
       "expected": "Lending clean state",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x22624efc0c3bea41c00af2f9897f6b354e350e0e94a61a12d6e431e457ac5847",
+      "txHash": "0x4bdc2f10013b71fd990ed3c017718e4c2983c3d16ac3e84d381825475d1fa8f7",
       "gasUsed": "0",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 8313
+      "durationMs": 15188
     },
     {
       "step": 4,
@@ -178,13 +178,13 @@
       "expected": "PAS clean state",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x0ae4f314686278c60d3ae31ebf8023cf3ff1795ce7395a0cd4f36df89024109a",
+      "txHash": "0xbeb9fa13f1cb885d3f30a5073b83af38e95b7ed788122964675a3b5653d0b1d6",
       "gasUsed": "0",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 8003
+      "durationMs": 9004
     },
     {
       "step": 5,
@@ -205,7 +205,7 @@
         "lendingTotalDeposited": "0",
         "pasTotalDeposited": "0"
       },
-      "durationMs": 523
+      "durationMs": 769
     },
     {
       "step": 6,
@@ -217,13 +217,13 @@
       "expected": "1 second -> 1 day interest simulation",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0xcccb676d810d385b18ff6fbd8f2e9587ef847257f8ff110a74533f829e2e3745",
+      "txHash": "0x1f3242cb5eca561f89c4d0b0e3aebe58b6cabd8d1050f077e90ad2a378a325fc",
       "gasUsed": "21820",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 11047
+      "durationMs": 8828
     },
     {
       "step": 7,
@@ -235,13 +235,13 @@
       "expected": "1 second -> 1 day interest simulation",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0xbe4aff3bf1a020b923f6d88f16c48bb18766eed6c91b063cca4e9eb8e30dc5aa",
+      "txHash": "0x794e4e56a8528da7d6377cc704504c4ddedd9ceb75b6d8db91f497f49e7da101",
       "gasUsed": "21820",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7998
+      "durationMs": 8572
     },
     {
       "step": 8,
@@ -253,13 +253,13 @@
       "expected": "Lending strategyStatus.pool points to deployed yield pool",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0xb9bb04f6cfdd23737ea8fd657c6d3cbe44d4fa097c7c3c8ed565d5f8efa4c98d",
+      "txHash": "0x08c7b96f8f3fd356c5ad473e572c0cb4e384d60d7483c7469dd5e20d94bc8e5b",
       "gasUsed": "1271",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 24990
+      "durationMs": 18271
     },
     {
       "step": 9,
@@ -271,13 +271,13 @@
       "expected": "Stable testing risk profile",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0xae9cb9fef9a8a477395db65a8aa6abc79adc04abe071daaed9b359f328ba3b2d",
+      "txHash": "0x27483c8b7e1c1a23bc7ed696ce6589f3ba46f0da46a385418fadf512dc31fa8d",
       "gasUsed": "1940",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 8575
+      "durationMs": 12995
     },
     {
       "step": 10,
@@ -289,31 +289,31 @@
       "expected": "Fast visible external yield accrual",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0xfcbbe934d16d5c4fc9cdc8d80e70f26b309cf65555f2b4b76ed2915ba1754928",
+      "txHash": "0x3093d985bcb0c04761cbd13d881aa0e1cce4da02175208e6d286d55afba90ee6",
       "gasUsed": "1180",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7807
+      "durationMs": 8672
     },
     {
       "step": 11,
       "phase": "PHASE 2",
       "actor": "ADMIN",
-      "action": "Refresh oracle with normal price 627840000",
+      "action": "Refresh oracle with normal price 572250000",
       "contract": "MockPASOracle",
       "params": "",
       "expected": "Fresh normal oracle baseline before borrow simulation",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x4bc947a3870555b5d3532e13968b6c3852f00a39990cb43194ec0c1ee96971a4",
+      "txHash": "0x7019a2021680e02c2140f7c546556b8327fc9299235ee310d9f9aa569e807d90",
       "gasUsed": "1543",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 8296
+      "durationMs": 9013
     },
     {
       "step": 12,
@@ -325,13 +325,13 @@
       "expected": "Admin can seed liquidity and support strategy ops",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x0548724c734989bdfe090ca26f272faf8c35fab064ed8d2f24b8ceb0f109ab06",
+      "txHash": "0xa376072fdd3d55f1b51e710d2b1b8388788f9f821602eab34f65062c9643a1dd",
       "gasUsed": "1256",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7688
+      "durationMs": 8846
     },
     {
       "step": 13,
@@ -343,13 +343,13 @@
       "expected": "Admin can seed PAS market + liquidations",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0xfa0ef1d8c38a5aa20b6dcb5371aa2e6c5d8d5c5b1ec51091016b355789aebd7e",
+      "txHash": "0x792b0ff4751c451008487519377c56042303833eebe20713fa4d73f310c9e6e9",
       "gasUsed": "1256",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7801
+      "durationMs": 8888
     },
     {
       "step": 14,
@@ -360,14 +360,14 @@
       "params": "",
       "expected": "Initial deep liquidity for simulation",
       "expectedFailure": false,
-      "status": "FAIL",
-      "txHash": "0x59efe4168d9ba9c49790895fe302fcc92d447a5fb1ebdb0dea119ff8d23399bc",
-      "gasUsed": null,
-      "error": "tx 0x59efe4168d9ba9c49790895fe302fcc92d447a5fb1ebdb0dea119ff8d23399bc not mined within 180s",
+      "status": "PASS",
+      "txHash": "0x5f958697ddf23c5b80db5060c9587733cdd3501d014e5e5d91ee5c33e153e7c0",
+      "gasUsed": "106701",
+      "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 185071
+      "durationMs": 8659
     },
     {
       "step": 15,
@@ -379,13 +379,13 @@
       "expected": "Initial PAS market liquidity",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0xb2ed118fa9c0255d4c5c2e92ffad23f8b3443d18a336df2d3ba7ee8450eaebfa",
+      "txHash": "0x67f82515fb876f64785b7128f6a76a074de00c6ceaef775978e4cad37a4a579c",
       "gasUsed": "106792",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7957
+      "durationMs": 8747
     },
     {
       "step": 16,
@@ -397,13 +397,13 @@
       "expected": "USER1 allowance set",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x2a05e4a871c5ce49b0f59be8e62bd94a0313b76c5e756d1a8b0dc6b61c743a7f",
+      "txHash": "0xf5bfd4e43d5160b2c8fa288321b58f7b6e56bfde6fbbaeb6840e829c0e6954c2",
       "gasUsed": "21885",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 8217
+      "durationMs": 8731
     },
     {
       "step": 17,
@@ -415,8 +415,8 @@
       "expected": "USER1 becomes depositor",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0xa0f3b0874734dfed4e55a64415b5c400a9926924e3fb069708723916132ca774",
-      "gasUsed": "65411",
+      "txHash": "0x9d50aa47466bfd37e1b8ebc078d5751a2b01c9cf1f630aba4bb9ef94c413a5e0",
+      "gasUsed": "44766",
       "error": null,
       "verification": null,
       "observedBefore": {
@@ -425,7 +425,7 @@
       "observedAfter": {
         "userDeposit": "120000000000"
       },
-      "durationMs": 8803
+      "durationMs": 10001
     },
     {
       "step": 18,
@@ -437,13 +437,13 @@
       "expected": "USER2 allowance set",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x8f490b6603b7ed17fd329db6b8ec152e6ef6dccb6808a46f2828a7c5497b07f0",
-      "gasUsed": "21885",
+      "txHash": "0xb64651173fd9d247b0af20bb4be300d1e2c83e148b72627e9f30a289606187d8",
+      "gasUsed": "1246",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7710
+      "durationMs": 32106
     },
     {
       "step": 19,
@@ -455,7 +455,7 @@
       "expected": "USER2 becomes depositor",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x7a201aa5e9ae11fddc34fe0b509153f94deff90217414f981a684844a3013f61",
+      "txHash": "0x1308b081ae33a95f138bc2124026f60458c247d6bd018fa95f583af620531c8e",
       "gasUsed": "44766",
       "error": null,
       "verification": null,
@@ -465,7 +465,7 @@
       "observedAfter": {
         "userDeposit": "90000000000"
       },
-      "durationMs": 8258
+      "durationMs": 9788
     },
     {
       "step": 20,
@@ -476,17 +476,20 @@
       "params": "",
       "expected": "investedAmount increases and strategy accrues yield",
       "expectedFailure": false,
-      "status": "FAIL",
-      "txHash": null,
-      "gasUsed": null,
-      "error": "execution reverted: \"not enough liquid capital\"",
+      "status": "PASS",
+      "txHash": "0x8e32afa78549f58e090816bd9cdef6ba91986ca47f0e8e9956337cc7416f592c",
+      "gasUsed": "24997",
+      "error": null,
       "verification": null,
       "observedBefore": {
-        "investedAmount": "60000000000",
-        "strategyPending": "0"
+        "investedAmount": "350000000000",
+        "strategyPending": "7990867"
       },
-      "observedAfter": null,
-      "durationMs": 4167
+      "observedAfter": {
+        "investedAmount": "700000000000",
+        "strategyPending": "7990867"
+      },
+      "durationMs": 10382
     },
     {
       "step": 21,
@@ -501,12 +504,12 @@
       "txHash": null,
       "gasUsed": null,
       "error": null,
-      "verification": "pendingStrategyYield=0.2283 mUSDC",
+      "verification": "pendingStrategyYield=10.6545 mUSDC",
       "observedBefore": null,
       "observedAfter": {
-        "pendingStrategyYield": "228310"
+        "pendingStrategyYield": "10654489"
       },
-      "durationMs": 398
+      "durationMs": 537
     },
     {
       "step": 22,
@@ -518,13 +521,13 @@
       "expected": "USER3 collateral allowance ready",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x30870fbe31a54bdbf4e53758649fb6a181f3cab9c7801bb5faeb374e62b72d87",
+      "txHash": "0x7bbd3658429ad095e1ad0f6668ee1754134a6cc5a9032c9a0a668696e4c23b14",
       "gasUsed": "1256",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 8130
+      "durationMs": 8642
     },
     {
       "step": 23,
@@ -536,13 +539,13 @@
       "expected": "USER3 collateral set for borrowing",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x7520266c3213eabf44c0926c4bd044fb961f94cf7531799b481a8b2c522e5b52",
+      "txHash": "0x582ffaa6fceb94d22b1282a56862abcd01812c41fa0fa3dbd5a3881a8585d36b",
       "gasUsed": "2318",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7780
+      "durationMs": 8780
     },
     {
       "step": 24,
@@ -553,20 +556,17 @@
       "params": "",
       "expected": "USER3 debt opens and pool utilization increases",
       "expectedFailure": false,
-      "status": "PASS",
-      "txHash": "0x140998c99d761c85cce3551197b8a660d95ceeebb6d3078fb72528c722149215",
-      "gasUsed": "87142",
-      "error": null,
+      "status": "FAIL",
+      "txHash": "0x92da5b836bb8e68b49471e8a89ec00672ca2cd2e1321ef74bf1c733111948b3d",
+      "gasUsed": null,
+      "error": "tx 0x92da5b836bb8e68b49471e8a89ec00672ca2cd2e1321ef74bf1c733111948b3d not mined within 180s",
       "verification": null,
       "observedBefore": {
         "totalBorrowed": "0",
-        "investedAmount": "60000000000"
+        "investedAmount": "455000000000"
       },
-      "observedAfter": {
-        "totalBorrowed": "35000000000",
-        "investedAmount": "60000000000"
-      },
-      "durationMs": 9099
+      "observedAfter": null,
+      "durationMs": 187897
     },
     {
       "step": 25,
@@ -577,50 +577,50 @@
       "params": "",
       "expected": "Borrow interest converted into lender yield",
       "expectedFailure": false,
-      "status": "PASS",
-      "txHash": "0xe65d539265f24efc21c02ac58d9a401eb5211731433fba42928db6e40d3d9a65",
-      "gasUsed": "23871",
-      "error": null,
+      "status": "FAIL",
+      "txHash": "0x244d86356900acb1098a04bd879c30f3fba424fe44c09ede5bd9e91f61be2f9b",
+      "gasUsed": null,
+      "error": "tx 0x244d86356900acb1098a04bd879c30f3fba424fe44c09ede5bd9e91f61be2f9b not mined within 180s",
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7951
+      "durationMs": 186489
     },
     {
       "step": 26,
       "phase": "PHASE 3",
       "actor": "USER3",
-      "action": "Approve 36,506.3014 mUSDC for Lending repay",
+      "action": "Approve 1,000.00 mUSDC for Lending repay",
       "contract": "MockUSDC",
       "params": "",
       "expected": "Repay allowance set",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x5b9d3636cd42e2a7a791d553f1bb90a9e7677ec8e028804c7d0ab99e10bf2ac8",
+      "txHash": "0x8a48b67e7492b2f0249ffffc92438bfd27a87acd9a56eca9b2542fa0c85e4c55",
       "gasUsed": "21895",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7745
+      "durationMs": 7728
     },
     {
       "step": 27,
       "phase": "PHASE 3",
       "actor": "USER3",
-      "action": "Repay Lending debt (owed 35,506.3014 mUSDC)",
+      "action": "Repay Lending debt (owed 0.00 mUSDC)",
       "contract": "KredioLending",
       "params": "",
       "expected": "USER3 lending debt closed and collateral returned",
       "expectedFailure": false,
-      "status": "PASS",
-      "txHash": "0x9ca4a90ebe9c949d6171163c6953da06caeef8917eedc144da66124135a1920b",
-      "gasUsed": "0",
-      "error": null,
-      "verification": "USER3 active=false",
+      "status": "FAIL",
+      "txHash": null,
+      "gasUsed": null,
+      "error": "execution reverted: \"no position\"",
+      "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7973
+      "durationMs": 3554
     },
     {
       "step": 28,
@@ -632,31 +632,31 @@
       "expected": "USER4 PAS collateral active",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0xb7da1b095b6f59a18ef4f3ee2dfc281c40884b6d69fb8f6b6a03812f8f4512ed",
+      "txHash": "0x28cdeddb538e8b372eda5bde8e914ad1c2132d4f38d909722856a99da8fd236b",
       "gasUsed": "22057",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7701
+      "durationMs": 7683
     },
     {
       "step": 29,
       "phase": "PHASE 3",
       "actor": "USER4",
-      "action": "Borrow 114.2669 mUSDC from PASMarket",
+      "action": "Borrow 104.1495 mUSDC from PASMarket",
       "contract": "KredioPASMarket",
       "params": "",
       "expected": "USER4 PAS debt opens",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0xcfc22f146d87c5fe3630b146d7d197f48021e6f01db0c5ce5d79f5587e4a4821",
+      "txHash": "0x97b6e70f791b23c3fb90410de06ec9cccb2c8604c3205a9e36ab7d11acc96e3d",
       "gasUsed": "108093",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7684
+      "durationMs": 7799
     },
     {
       "step": 30,
@@ -668,49 +668,49 @@
       "expected": "PAS debt interest capitalized",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x0a6efb2a1027f60cfbbb78a1ea79edae36fc940ea5fadd9d8309ce6829a8610b",
+      "txHash": "0x95814f903516e4bac1158918b3a053f16f0f0eb942e32406994ccc3307cda065",
       "gasUsed": "44692",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7799
+      "durationMs": 9078
     },
     {
       "step": 31,
       "phase": "PHASE 3",
       "actor": "USER4",
-      "action": "Approve 315.0934 mUSDC for PAS repay",
+      "action": "Approve 304.9028 mUSDC for PAS repay",
       "contract": "MockUSDC",
       "params": "",
       "expected": "Repay allowance set",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0xc06cf36291fac744bb479663eba5f55cff40a11e5b7dc8a2de23585967cab927",
+      "txHash": "0xb530d9864f4ce42313d102ce182d513a8789d5b43505923cd78ed004035c9082",
       "gasUsed": "1246",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7830
+      "durationMs": 9075
     },
     {
       "step": 32,
       "phase": "PHASE 3",
       "actor": "USER4",
-      "action": "Repay PAS debt (owed 115.0934 mUSDC)",
+      "action": "Repay PAS debt (owed 104.9028 mUSDC)",
       "contract": "KredioPASMarket",
       "params": "",
       "expected": "USER4 PAS position closed after repayment",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x0918dc65803187e002167cfb5f771510dc5e7f4a07c7ecb1731a59fccd0e2143",
+      "txHash": "0x4917bacb6b4f3f894cfb2f0f7cc7a675b846860b00c81292008e00954d67daa9",
       "gasUsed": "0",
       "error": null,
       "verification": "USER4 active=false",
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 8054
+      "durationMs": 9225
     },
     {
       "step": 33,
@@ -722,13 +722,13 @@
       "expected": "Collateral withdrawal succeeds after debt close",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x1e7a2df3a272b912f05ed3c6a94a03213653ccb8435d52ff091b81459e9f7a1f",
+      "txHash": "0xe6c29fbc1a0e57c86611621f6cbc9ac74ae403654aaa7eaa567595f01246434e",
       "gasUsed": "0",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7762
+      "durationMs": 11803
     },
     {
       "step": 34,
@@ -740,49 +740,49 @@
       "expected": "Risky collateral position opened",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0xee9f4f808d6a2b9a0bce8614d7cf772b18a4a6cd9225d2999937c5a29e52a865",
+      "txHash": "0xc4cad7e12cd1957522164d33ac4b495e875de650416fa82c0644fbdb2050b93d",
       "gasUsed": "22057",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7797
+      "durationMs": 8819
     },
     {
       "step": 35,
       "phase": "PHASE 3",
       "actor": "USER4",
-      "action": "Borrow 113.8588 mUSDC at high LTV",
+      "action": "Borrow 103.7775 mUSDC at high LTV",
       "contract": "KredioPASMarket",
       "params": "",
       "expected": "Position vulnerable to oracle downside move",
       "expectedFailure": false,
-      "status": "PASS",
-      "txHash": "0x14254747c182b5bfa84ffaabc92529933b9c5043015a26be392776715957d66e",
-      "gasUsed": "108093",
-      "error": null,
+      "status": "FAIL",
+      "txHash": null,
+      "gasUsed": null,
+      "error": "execution reverted: \"exceeds LTV\"",
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7815
+      "durationMs": 3926
     },
     {
       "step": 36,
       "phase": "PHASE 3",
       "actor": "ADMIN",
-      "action": "Crash oracle price to 52320000 for liquidation test",
+      "action": "Crash oracle price to 47687500 for liquidation test",
       "contract": "MockPASOracle",
       "params": "",
       "expected": "Collateral value drops sharply, risky position becomes liquidatable",
       "expectedFailure": false,
       "status": "FAIL",
-      "txHash": "0x67ddbb282b71defd32c4d4e81e2ed5d51c6b47f7cade4eecf48de3ff83eac0cb",
+      "txHash": "0xd15d3b86948009954212a905a0b6f42223b94f4f1db18e130ce324d44937e23a",
       "gasUsed": null,
-      "error": "tx 0x67ddbb282b71defd32c4d4e81e2ed5d51c6b47f7cade4eecf48de3ff83eac0cb not mined within 180s",
+      "error": "tx 0xd15d3b86948009954212a905a0b6f42223b94f4f1db18e130ce324d44937e23a not mined within 180s",
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 185162
+      "durationMs": 186106
     },
     {
       "step": 37,
@@ -793,14 +793,14 @@
       "params": "",
       "expected": "Liquidation succeeds and closes USER4 risky PAS debt",
       "expectedFailure": false,
-      "status": "PASS",
-      "txHash": "0x3ba2f54c4bda6b79e88a010661af38d593627cb9a1d642cdc820e005ebcb6113",
-      "gasUsed": "0",
-      "error": null,
-      "verification": "USER4 active=false",
+      "status": "FAIL",
+      "txHash": null,
+      "gasUsed": null,
+      "error": "execution reverted: \"no position\"",
+      "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 8004
+      "durationMs": 4074
     },
     {
       "step": 38,
@@ -811,32 +811,32 @@
       "params": "",
       "expected": "No collateral left to withdraw after liquidation",
       "expectedFailure": true,
-      "status": "EXPECTED_FAIL",
-      "txHash": null,
-      "gasUsed": null,
-      "error": "execution reverted: \"no collateral\"",
+      "status": "UNEXPECTED_SUCCESS",
+      "txHash": "0x646f0006f9200b321bfa75d5dc2a8774b378c9450288acaa0dd1fb66a46e67a7",
+      "gasUsed": "0",
+      "error": "Transaction succeeded but failure was expected",
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 3628
+      "durationMs": 5999
     },
     {
       "step": 39,
       "phase": "PHASE 3",
       "actor": "ADMIN",
-      "action": "Recover oracle to normal price 627840000",
+      "action": "Recover oracle to normal price 572250000",
       "contract": "MockPASOracle",
       "params": "",
       "expected": "Restore normal pricing after crash simulation",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0xbf91ff5189ca1e1021feec41c3ba691b279f98fe633c1514234339ace8377f18",
+      "txHash": "0xb1861f608fb9b997dd4d5cb0d00fa58b609c6743c6f6a699265213fc59ddf619",
       "gasUsed": "1543",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7982
+      "durationMs": 12859
     },
     {
       "step": 40,
@@ -848,49 +848,49 @@
       "expected": "External strategy yield distributed to lenders",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0xef103c2730edbcd8e90502e579d7a40c39c448c70e8ab2ade36b6e959227ba8a",
-      "gasUsed": "0",
+      "txHash": "0x372c8f5a66dced093f461d6b54866a12e2777f306163706b6324f6c874b35fb0",
+      "gasUsed": "3512",
       "error": null,
-      "verification": "U1 pending: 392.4587 -> 397.2728, U2 pending: 294.344 -> 297.9546",
+      "verification": "U1 pending: 12.2655 -> 13.4984, U2 pending: 9.1992 -> 10.1238",
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 8491
+      "durationMs": 9799
     },
     {
       "step": 41,
       "phase": "PHASE 3",
       "actor": "USER1",
-      "action": "Harvest Lending yield (397.2728 mUSDC pending)",
+      "action": "Harvest Lending yield (13.4984 mUSDC pending)",
       "contract": "KredioLending",
       "params": "",
       "expected": "USER1 pending yield becomes near zero",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x97652f94d792c81a175b8b5fea4085d37049fb1a104f52ecfb4c85dabd7ed045",
+      "txHash": "0x0eb828eeac591d022a35d6cc840b80103b8ec0659885a69c14e6ff623b8c21a5",
       "gasUsed": "23039",
       "error": null,
       "verification": "remaining pending=0.00 mUSDC",
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7927
+      "durationMs": 6687
     },
     {
       "step": 42,
       "phase": "PHASE 3",
       "actor": "USER2",
-      "action": "Harvest Lending yield (297.9546 mUSDC pending)",
+      "action": "Harvest Lending yield (10.1238 mUSDC pending)",
       "contract": "KredioLending",
       "params": "",
       "expected": "USER2 pending yield becomes near zero",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0xf92d279126bd6f47c37339c8fe87c276e30a44dbd498513f24726a801831fc73",
+      "txHash": "0x2d4c5d47ca3a70b679b17e0959e56ba3587aa163d1865b81827e1c476233cfbd",
       "gasUsed": "23039",
       "error": null,
       "verification": "remaining pending=0.00 mUSDC",
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 8215
+      "durationMs": 9529
     },
     {
       "step": 43,
@@ -902,13 +902,13 @@
       "expected": "USER1 principal withdrawn",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x7ce8cbe8c0b9ca1ac9071692502acf26ed37dcbbba7262ffb3b1d02b0f8fb2b9",
+      "txHash": "0x72ce0907f2ae46104984c4e79d029ee1608875ac00bd8345f7c1edfd4a3edfcd",
       "gasUsed": "0",
       "error": null,
       "verification": "remaining deposit=0.00 mUSDC",
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7994
+      "durationMs": 9488
     },
     {
       "step": 44,
@@ -920,13 +920,13 @@
       "expected": "USER2 principal withdrawn",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x8fd3e12af59dac7cb94c2cf9b6de1fd70a1d1f8ae91d85ffd88810eeaa9e9d15",
+      "txHash": "0x0839d85b8e54c7e23e1753b8c5b9911921dab8405dd6fd7e556bb8f709b65acb",
       "gasUsed": "0",
       "error": null,
       "verification": "remaining deposit=0.00 mUSDC",
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7967
+      "durationMs": 9355
     },
     {
       "step": 45,
@@ -938,13 +938,13 @@
       "expected": "Disable accelerated interest after simulation",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x0a2b30b8c5e30f2910a62aeee8da7a05879035ddca134b5a944b8dda78fcbf9c",
+      "txHash": "0xd44805a89e459e1685b7304f9037bcdef3203bcfcef02d2893c9b208d0061d7e",
       "gasUsed": "0",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7805
+      "durationMs": 9100
     },
     {
       "step": 46,
@@ -956,13 +956,13 @@
       "expected": "Disable accelerated interest after simulation",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x9c273eb992e19c744a4602801d01b53b932ba85a557c24acad5e643eb42776d0",
+      "txHash": "0xe6db27344c4d82536eabd143d50ecc9b8205c8060e3cbea1487b4f3b160d162d",
       "gasUsed": "0",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 11070
+      "durationMs": 8829
     },
     {
       "step": 47,
@@ -974,13 +974,13 @@
       "expected": "Fresh lending state for next run",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0xa8973fc53680b10fb2b179fa17ac18f5abcd70a2e3b1578f12de0c5c28e9773e",
+      "txHash": "0x5e51b18c7b4508c566ba701599a987d3f0d90de986e5c1d3688652bcc3152a16",
       "gasUsed": "0",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 7860
+      "durationMs": 9322
     },
     {
       "step": 48,
@@ -992,19 +992,19 @@
       "expected": "Fresh PAS market state for next run",
       "expectedFailure": false,
       "status": "PASS",
-      "txHash": "0x65ff01590f461810ab5210e2cfe0002aece29b7b0dffe6bf567b751711789d51",
+      "txHash": "0xe4988cba3e0996966c56586602cb0828e718e815d114d669f30365b56478abaa",
       "gasUsed": "0",
       "error": null,
       "verification": null,
       "observedBefore": null,
       "observedAfter": null,
-      "durationMs": 8190
+      "durationMs": 8935
     }
   ],
   "summary": {
     "total": 48,
-    "passed": 45,
-    "failed": 3,
-    "passRatePct": 93.75
+    "passed": 41,
+    "failed": 7,
+    "passRatePct": 85.42
   }
 }
