@@ -3,9 +3,10 @@ import type { ApiPromise as PolkadotApiPromise } from '@polkadot/api';
 
 // Primary: wss://sys.ibp.network/people-paseo is the only officially listed
 // People Paseo endpoint on paseo.site; others kept as fallbacks.
-export const PEOPLE_RPC = 'wss://sys.ibp.network/people-paseo';
+export const PEOPLE_RPC = 'wss://people-paseo.rpc.amforc.com';
 export const PEOPLE_RPCS = [
     PEOPLE_RPC,
+    'wss://sys.ibp.network/people-paseo',
     'wss://people-paseo.rpc.amforc.com',
     'wss://people-paseo.dotters.network',
     // NOTE: wss://rpc.people-paseo.luckyfriday.io was removed - endpoint is dead (2026-03-20)
@@ -118,6 +119,11 @@ function normalizeXcmError(error: unknown): Error {
     return new Error(message || 'XCM transfer failed');
 }
 
+async function getBuilder(api: any) {
+    const { Builder } = await import("@paraspell/sdk-pjs");
+    return Builder(api);
+}
+
 export async function sendXCMToHub(params: SendXcmParams): Promise<{ blockHash: string }> {
     const { senderAddress, destinationEVM, amountPAS, onStatus } = params;
     if (!isAddress(destinationEVM)) {
@@ -143,8 +149,8 @@ export async function sendXCMToHub(params: SendXcmParams): Promise<{ blockHash: 
             id32.fill(0xee, 20);
             const ss58Dest = encodeAddress(id32, 0);
 
-            const { Builder } = await import('@paraspell/sdk-pjs');
-            const tx = await Builder(api)
+            const builder = await getBuilder(api);
+            const tx = await builder
                 .from('PeoplePaseo')
                 .to('AssetHubPaseo')
                 .currency({ symbol: 'PAS', amount })
