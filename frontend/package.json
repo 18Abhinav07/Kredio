@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "next build --webpack",
-    "start": "next build --webpack",
+    "build": "next build --webpack && node scripts/fix-chunks.js",
+    "start": "next start",
     "lint": "eslint",
     "postinstall": "node scripts/fix-wasm.js"
   },
