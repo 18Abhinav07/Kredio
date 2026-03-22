@@ -3,10 +3,11 @@ const fs = require("fs");
 const path = require("path");
 
 const root = path.resolve(__dirname, "..");
-const TARGET      = "`proving${'\\0'}0`";
-const REPLACEMENT = "`proving${String.fromCharCode(0)}0`";
+const TARGET      = "`proving${String.fromCharCode(0)}0`"; // catch if agent reverts
+const TARGET2     = "`proving${'\\0'}0`";                  // original form
+const REPLACEMENT = '"proving\\x000"';
 
-console.log("[fix-wasm] Searching for the octal string in @scure/sr25519 and @polkadot/util-crypto...");
+console.log("[fix-wasm] Searching for the octal string in @scure/sr25519...");
 
 function findJsFiles(dir, fileList = []) {
   try {
@@ -32,27 +33,26 @@ const scurePath = path.join(root, "node_modules", "@scure", "sr25519");
 if (fs.existsSync(scurePath)) {
   files = files.concat(findJsFiles(scurePath));
 }
-const cryptoPath = path.join(root, "node_modules", "@polkadot", "util-crypto");
-if (fs.existsSync(cryptoPath)) {
-  files = files.concat(findJsFiles(cryptoPath));
-}
 
-console.log(`[fix-wasm] Found ${files.length} candidate file(s).`);
-
-let patchedCount = 0;
+let patched = 0;
 for (const fullPath of files) {
-  const content = fs.readFileSync(fullPath, "utf8");
-  if (content.includes(REPLACEMENT)) { 
-    console.log(`[fix-wasm] Already patched: ${fullPath.replace(root, '')}`); 
+  let c = fs.readFileSync(fullPath, "utf8");
+  if (c.includes(REPLACEMENT)) { 
+    console.log(`[fix-wasm] Already clean: ${fullPath.replace(root + '/', '')}`); 
     continue; 
   }
-  if (!content.includes(TARGET)) { 
-    continue; 
+  if (c.includes(TARGET)) {
+    fs.writeFileSync(fullPath, c.replace(TARGET, REPLACEMENT));
+    console.log(`[fix-wasm] ✅ Patched (fromCharCode): ${fullPath.replace(root + '/', '')}`); 
+    patched++; 
+    continue;
   }
-  fs.writeFileSync(fullPath, content.replace(TARGET, REPLACEMENT));
-  console.log(`[fix-wasm] ✅ Patched: ${fullPath.replace(root, '')}`);
-  patchedCount++;
+  if (c.includes(TARGET2)) {
+    fs.writeFileSync(fullPath, c.replace(TARGET2, REPLACEMENT));
+    console.log(`[fix-wasm] ✅ Patched (original): ${fullPath.replace(root + '/', '')}`); 
+    patched++;
+  }
 }
 
-console.log(`[fix-wasm] Done. ${patchedCount} file(s) patched.`);
+console.log(`[fix-wasm] Done. ${patched} file(s) patched.`);
 process.exit(0);
